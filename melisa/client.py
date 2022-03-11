@@ -1,6 +1,8 @@
 from .models.app import Shard
 from .utils.types import Coro
 
+from .core.http import HTTPClient
+
 import asyncio
 from typing import Dict
 
@@ -8,6 +10,7 @@ from typing import Dict
 class Client:
     def __init__(self, token, intents, **kwargs):
         self.shards: Dict[int, Shard] = {}
+        self.http = HTTPClient(token)
         self._events = {}
 
         self.guilds = []
