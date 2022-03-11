@@ -5,8 +5,10 @@
 </p>
 
 <hr>
-## WARNING
+
+<h1 align="center">
 **THIS LIBRARY IS CURRENTLY UNDER DEVELOPMENT!**
+</h1>
 
 ## About
 <strong>MelisaPy</strong> is a Python library for the [Discord API](https://discord.com/developers/docs/intro). 
