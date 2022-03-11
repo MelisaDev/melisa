@@ -1,0 +1,14 @@
+<p align="center">
+  <b>
+    The easiest way to create your own Discord Bot.
+  </b>
+</p>
+
+<hr>
+## WARNING
+**THIS LIBRARY IS CURRENTLY UNDER DEVELOPMENT!**
+
+## About
+<strong>MelisaPy</strong> is a Python library for the [Discord API](https://discord.com/developers/docs/intro). 
+
+We are trying to make our library optimized. We are going to create really big Cache configuration, so don't worry about the RAM :)
