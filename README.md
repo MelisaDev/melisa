@@ -6,8 +6,8 @@
 
 <hr>
 
-<h1 align="center">
-**THIS LIBRARY IS CURRENTLY UNDER DEVELOPMENT!**
+<h2 align="center">
+THIS LIBRARY IS CURRENTLY UNDER DEVELOPMENT!
 </h1>
 
 ## About
