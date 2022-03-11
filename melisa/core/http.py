@@ -39,7 +39,7 @@ class HTTPClient:
 
         if ttl != 0:
             async with self.__aiohttp_session.request(method, url, **kwargs) as response:
-                return await self.__handle_response(response, method, endpoint, __ttl=ttl, **kwargs)
+                return await self.__handle_response(response, method, endpoint, _ttl=ttl, **kwargs)
 
     async def __handle_response(
             self,
@@ -51,6 +51,7 @@ class HTTPClient:
             **kwargs
     ) -> Optional[Dict]:
         """Handle responses from the Discord API."""
+
         if res.ok:
             return await res.json()
 
@@ -71,7 +72,7 @@ class HTTPClient:
         params: Optional[Dict] = None
     ) -> Optional[Dict]:
         """|coro|
-        Sends a get request to a Discord REST endpoint.
+        Sends a GET request to a Discord REST endpoint.
 
         Parameters
         ----------
@@ -90,3 +91,30 @@ class HTTPClient:
             route,
             params=params
         )
+
+    async def post(
+            self,
+            route: str,
+            data: Optional[Dict] = None
+    ) -> Optional[Dict]:
+        """|coro|
+        Sends a POST request to a Discord REST endpoint.
+
+        Parameters
+        ----------
+        route : :class:`str`
+            The endpoint to send the request to.
+        data : Dict
+            Data to post
+
+        Returns
+        -------
+        Optional[:class:`Dict`]
+            JSON response from the discord API.
+        """
+        return await self.__send(
+            "POST",
+            route,
+            json=data,
+        )
+
