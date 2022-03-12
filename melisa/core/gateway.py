@@ -2,11 +2,21 @@ import json
 import asyncio
 import zlib
 import time
+from dataclasses import dataclass
 
 import websockets
 
 from ..listeners import listeners
 from ..models.user import BotActivity
+from ..utils import APIObjectBase
+
+
+@dataclass
+class GatewayBotInfo(APIObjectBase):
+    """Gateway info from the `gateway/bot` endpoint"""
+    url: str
+    shards: int
+    session_start_limit: dict
 
 
 class Gateway:
@@ -79,7 +89,7 @@ class Gateway:
                 return
             await asyncio.gather(self.heartbeat(), self.receive())
 
-    async def close(self, code: int = 4000):
+    async def close(self, code: int = 1000):
         await self.websocket.close(code=code)
 
     async def resume(self):
