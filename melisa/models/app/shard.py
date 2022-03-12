@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from asyncio import create_task
+from asyncio import create_task, Task, sleep
+from typing import Optional
 
 from ...core.gateway import Gateway
 from ..user import BotActivity
@@ -24,8 +25,11 @@ class Shard:
         """Id of Shard"""
         return self._gateway.shard_id
 
+    # @property
+    # def
+
     async def launch(self, **kwargs) -> Shard:
-        """Launch new shard"""
+        """Launches new shard"""
         self._gateway = Gateway(self._client,
                                 self._shard_id,
                                 self._num_shards,
@@ -39,6 +43,11 @@ class Shard:
         create_task(self._gateway.start_loop())
 
         return self
+
+    async def _try_close(self) -> None:
+        if self._gateway.connected:
+            self._gateway.connected = False
+            await self._gateway.close(code=1000)
 
     async def update_presence(self, activity: BotActivity = None, status: str = None) -> Shard:
         """
@@ -56,9 +65,18 @@ class Shard:
 
         return self
 
-    async def disconnect(self) -> Shard:
-        await self._gateway.close()
+    async def disconnect(self) -> None:
+        """Disconnect current shard"""
+        await self._try_close()
 
-        self.disconnected = True
+    async def reconnect(self, wait_time: int = 3) -> None:
+        """Reconnect current shard
 
-        return self
+        Parameters
+        ----------
+        wait_time: :class:`int`
+            Reconnect after
+        """
+        await self._try_close()
+        await sleep(wait_time)
+        await self.launch()

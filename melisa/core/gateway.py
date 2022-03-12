@@ -47,6 +47,7 @@ class Gateway:
         self.client = client
         self.shard_id = shard_id
         self.latency = float('inf')
+        self.connected = False
 
         self.listeners = listeners
 
@@ -87,6 +88,7 @@ class Gateway:
             await self.hello()
             if self.interval is None:
                 return
+            self.connected = True
             await asyncio.gather(self.heartbeat(), self.receive())
 
     async def close(self, code: int = 1000):
@@ -136,6 +138,7 @@ class Gateway:
     async def heartbeat(self):
         while self.interval is not None:
             await self.send(self.HEARTBEAT, self.sequence)
+            self.connected = True
             await asyncio.sleep(self.interval)
 
     async def hello(self):

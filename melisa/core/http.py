@@ -143,5 +143,3 @@ class HTTPClient:
             route,
             headers=headers
         )
-
-
