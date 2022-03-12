@@ -3,9 +3,10 @@ from enum import IntEnum, Enum, Flag
 from typing import Optional, Tuple, List, Literal
 
 from ...utils import Snowflake
+from ...utils import APIObjectBase
 
 
-class BasePresenceData:
+class BasePresence:
     """
         All the information about activities here is from the Discord API docs.
         Read more here: https://discord.com/developers/docs/topics/gateway#activity-object
@@ -44,7 +45,7 @@ class ActivityType(IntEnum):
 
 
 @dataclass(repr=False)
-class ActivityTimestamp(BasePresenceData):
+class ActivityTimestamp(BasePresence, APIObjectBase):
     """Represents the timestamp of an activity.
 
     Attributes
@@ -59,7 +60,7 @@ class ActivityTimestamp(BasePresenceData):
 
 
 @dataclass(repr=False)
-class ActivityEmoji(BasePresenceData):
+class ActivityEmoji(BasePresence, APIObjectBase):
     """Represents an emoji in an activity.
 
     Attributes
@@ -77,7 +78,7 @@ class ActivityEmoji(BasePresenceData):
 
 
 @dataclass(repr=False)
-class ActivityParty(BasePresenceData):
+class ActivityParty(BasePresence, APIObjectBase):
     """Represents a party in an activity.
 
     Attributes
@@ -92,7 +93,7 @@ class ActivityParty(BasePresenceData):
 
 
 @dataclass(repr=False)
-class ActivityAssets(BasePresenceData):
+class ActivityAssets(BasePresence, APIObjectBase):
     """Represents an asset of an activity.
 
     Attributes
@@ -113,7 +114,7 @@ class ActivityAssets(BasePresenceData):
 
 
 @dataclass(repr=False)
-class ActivitySecrets(BasePresenceData):
+class ActivitySecrets(BasePresence, APIObjectBase):
     """Represents a secret of an activity.
 
     Attributes
@@ -130,7 +131,7 @@ class ActivitySecrets(BasePresenceData):
     match_: Optional[str] = None
 
 
-class ActivityFlags(BasePresenceData):
+class ActivityFlags(BasePresence, APIObjectBase):
     """
         Just Activity Flags (From Discord API).
 
@@ -150,7 +151,7 @@ class ActivityFlags(BasePresenceData):
 
 
 @dataclass(repr=False)
-class ActivityButton(BasePresenceData):
+class ActivityButton(BasePresence, APIObjectBase):
     """When received over the gateway, the buttons field is an array of strings, which are the button labels. Bots
     cannot access a user's activity button URLs. When sending, the buttons field must be an array of the below
     object:
@@ -166,7 +167,7 @@ class ActivityButton(BasePresenceData):
 
 
 @dataclass(repr=False)
-class Activity(BasePresenceData):
+class Activity(BasePresence, APIObjectBase):
     """Bots are only able to send ``name``, ``type``, and optionally ``url``.
 
     Attributes
@@ -222,7 +223,7 @@ class Activity(BasePresenceData):
 
 
 @dataclass(repr=False)
-class BotActivity(BasePresenceData):
+class BotActivity(BasePresence, APIObjectBase):
     """
 
     Attributes
