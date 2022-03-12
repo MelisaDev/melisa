@@ -1,29 +1,38 @@
+# i not like PEP8, sorry
+
 class MelisaException(Exception):
     """Base exception"""
     pass
+
 
 class NoMoreItems(MelisaException):
     """Occurs when there are no more elements in an asynchronous iterative operation"""
     pass
 
+
 class NotFoundGateway(MelisaException):
     """Occurs when the gateway for the websocket was not found"""
     def __init__(self):
         message = "The gateway to connect to Discord was not found"
+        
         super().__init__(message)
+
 
 class ClientException(MelisaException):
     """Handling user errors"""
     pass
 
 
+
 class InvalidData(ClientException):
     """Unknown or invalid data from Discord"""
     pass
 
+
 class LoginFailure(ClientException):
     """Fails to log you in from improper credentials or some other misc."""
     pass
+
 
 class ConnectionClosed(ClientException):
     """Exception that's thrown when the gateway connection is closed for reasons that could not be handled internally."""
@@ -33,6 +42,7 @@ class ConnectionClosed(ClientException):
         self.shard_id = shard_id
 
         super().__init__(message.format(self.shard_id, self.code))
+
 
 class PrivilegedIntentsRequired(ClientException):
     """Occurs when the gateway requests privileged intents, but they are not yet marked on the developer page.
@@ -46,57 +56,27 @@ class PrivilegedIntentsRequired(ClientException):
 
         super().__init__(message.format(self.shard_id))
 
-def flatten_error_dict(d, key=''):
-        items = []
-        for k, v in d.items():
-            new_key = key + '.' + k if key else k
-
-            if isinstance(v, dict):
-                try:
-                    _errors = v['_errors']
-                except KeyError:
-                    items.extend(flatten_error_dict(v, new_key).items())
-                else:
-                    items.append((new_key, ' '.join(x.get('message', '') for x in _errors)))
-            else:
-                items.append((new_key, v))
-
-        return dict(items)
 
 class HttpException(MelisaException):
     """Occurs when an HTTP request operation fails."""
 
-    def __init__(self, response, message):
+    def __init__(self, response):
         self.responce = response
         self.status = response.status
+        message = "{} with responce status {}"
         
-        if isinstance(message, dict):
-            self.code = message.get('code', 0)
-            base = message.get('message', '')
-            errors = message.get('errors')
-            if errors:
-                errors = flatten_error_dict(errors)
-                helpful = '\n'.join('In %s: %s' % t for t in errors.items())
-                self.text = base + '\n' + helpful
-            else:
-                self.text = base
-        else:
-            self.text = message
-            self.code = 0
+        super().__init__(message.format(self.responce, self.status))
 
-        send = '{0.status} {0.reason} (Code error: {1})'
-        if len(self.text):
-            send += ': {2}'
-
-        super().__init__(send.format(self.responce, self.code, self.text))
 
 class DiscordErrorServer(HttpException):
     """Error that is issued when the status code 500"""
     pass
 
+
 class NotFound(HttpException):
     """Error that is issued when the status code 404"""
     pass
+
 
 class Forbidden(HttpException):
     """Error that is issued when the status code 403"""
