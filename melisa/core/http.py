@@ -72,7 +72,7 @@ class HTTPClient:
         params: Optional[Dict] = None
     ) -> Optional[Dict]:
         """|coro|
-        Sends a GET request to a Discord REST endpoint.
+        Sends a GET request to a Discord REST API endpoint.
 
         Parameters
         ----------
@@ -98,7 +98,7 @@ class HTTPClient:
             data: Optional[Dict] = None
     ) -> Optional[Dict]:
         """|coro|
-        Sends a POST request to a Discord REST endpoint.
+        Sends a POST request to a Discord REST API endpoint.
 
         Parameters
         ----------
@@ -110,11 +110,38 @@ class HTTPClient:
         Returns
         -------
         Optional[:class:`Dict`]
-            JSON response from the discord API.
+            JSON response from the Discord API.
         """
         return await self.__send(
             "POST",
             route,
             json=data,
         )
+
+    async def delete(
+            self,
+            route: str,
+            headers: dict = None
+    ) -> Optional[Dict]:
+        """|coro|
+        Sends a DELETE request to a Discord REST API endpoint.
+
+        Parameters
+        ----------
+        route : :class:`str`
+            The endpoint to send the request to.
+        headers : :class:`dict`
+            Custom request headers
+
+        Returns
+        -------
+        Optional[:class:`Dict`]
+            JSON response from the Discord API.
+        """
+        return await self.__send(
+            "DELETE",
+            route,
+            headers=headers
+        )
+
 
