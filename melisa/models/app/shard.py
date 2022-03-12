@@ -25,11 +25,16 @@ class Shard:
         """Id of Shard"""
         return self._gateway.shard_id
 
-    # @property
-    # def
+    @property
+    def latency(self) -> float:
+        """:class:`float`:
+        Measures latency between a HEARTBEAT command and a HEARTBEAT_ACK event in seconds for this shard"""
+        return self._gateway.latency
 
     async def launch(self, **kwargs) -> Shard:
-        """Launches new shard"""
+        """|coro|
+
+        Launches new shard"""
         self._gateway = Gateway(self._client,
                                 self._shard_id,
                                 self._num_shards,
@@ -51,6 +56,8 @@ class Shard:
 
     async def update_presence(self, activity: BotActivity = None, status: str = None) -> Shard:
         """
+        |coro|
+
         Update Presence for the shard
 
         Parameters
@@ -66,11 +73,16 @@ class Shard:
         return self
 
     async def disconnect(self) -> None:
-        """Disconnect current shard"""
+        """
+        |coro|
+
+        Disconnect current shard"""
         await self._try_close()
 
     async def reconnect(self, wait_time: int = 3) -> None:
-        """Reconnect current shard
+        """|coro|
+
+        Reconnect current shard
 
         Parameters
         ----------
