@@ -2,10 +2,13 @@ import json
 import asyncio
 import zlib
 import time
+from asyncio import ensure_future
 from dataclasses import dataclass
+from typing import Dict, Any
 
 import websockets
 
+from ..exceptions import InvalidPayload, GatewayError, PrivilegedIntentsRequired, LoginFailure
 from ..listeners import listeners
 from ..models.user import BotActivity
 from ..utils import APIObjectBase
@@ -48,6 +51,23 @@ class Gateway:
         self.shard_id = shard_id
         self.latency = float('inf')
         self.connected = False
+
+        self.__close_codes: Dict[int, Any] = {
+            4001: GatewayError("Invalid opcode was sent"),
+            4002: InvalidPayload("Invalid payload was sent."),
+            4003: GatewayError("Payload was sent prior to identifying"),
+            4004: LoginFailure("Token is not valid"),
+            4005: GatewayError(
+                "Authentication was sent after client already authenticated"
+            ),
+            4007: GatewayError("Invalid sequence sent when starting new session"),
+            4008: GatewayError("Client was rate limited"),
+            4010: GatewayError("Invalid shard"),
+            4011: GatewayError("Sharding required"),
+            4012: GatewayError("Invalid API version"),
+            4013: GatewayError("Invalid intents"),
+            4014: PrivilegedIntentsRequired("Disallowed intents")
+        }
 
         self.listeners = listeners
 

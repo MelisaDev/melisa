@@ -5,6 +5,14 @@ from typing import Dict, Optional, Union, Any
 
 from aiohttp import ClientSession, ClientResponse
 
+from melisa.exceptions import (NotModifiedError,
+                               BadRequestError,
+                               ForbiddenError,
+                               UnauthorizedError,
+                               HTTPException,
+                               NotFoundError,
+                               MethodNotAllowedError)
+
 
 class HTTPClient:
     def __init__(self, token: str, *, ttl: int = 5):
@@ -15,6 +23,15 @@ class HTTPClient:
             "Content-Type": "application/json",
             "Authorization": f"Bot {token}",
             "User-Agent": f"Melisa Python Library"
+        }
+
+        self.__http_exceptions: Dict[int, HTTPException] = {
+            304: NotModifiedError(),
+            400: BadRequestError(),
+            401: UnauthorizedError(),
+            403: ForbiddenError(),
+            404: NotFoundError(),
+            405: MethodNotAllowedError()
         }
 
         self.__aiohttp_session: ClientSession = ClientSession(headers=headers)
@@ -54,6 +71,12 @@ class HTTPClient:
 
         if res.ok:
             return await res.json()
+
+        exception = self.__http_exceptions.get(res.status)
+
+        if exception:
+            exception.__init__(res.reason)
+            raise exception
 
         retry_in = 1 + (self.max_ttl - _ttl) * 2
 
