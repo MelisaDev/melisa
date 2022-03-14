@@ -2,11 +2,10 @@ from __future__ import annotations
 
 from enum import IntEnum
 from dataclasses import dataclass
+from typing import Optional
 
 from ...utils.api_object import APIObjectBase
 from ...utils.snowflake import Snowflake
-from ...utils.types import MISSING
-from ...utils.types import APINullable
 
 
 class PremiumTypes(IntEnum):
@@ -25,6 +24,9 @@ class PremiumTypes(IntEnum):
     NONE = 0
     NITRO_CLASSIC = 1
     NITRO = 2
+
+    def __int__(self):
+        return self.value
 
 
 class UserFlags(IntEnum):
@@ -80,6 +82,8 @@ class UserFlags(IntEnum):
     CERTIFIED_MODERATOR = 1 << 18
     BOT_HTTP_INTERACTIONS = 1 << 19
 
+    def __int__(self):
+        return self.value
 
 class VisibilityTypes(IntEnum):
     """The type of connection visibility.
@@ -95,6 +99,8 @@ class VisibilityTypes(IntEnum):
     NONE = 0
     EVERYONE = 1
 
+    def __int__(self):
+        return self.value
 
 @dataclass(repr=False)
 class User(APIObjectBase):
@@ -134,36 +140,36 @@ class User(APIObjectBase):
         the public flags on a user's account
     """
 
-    id: APINullable[Snowflake] = MISSING
-    username: APINullable[str] = MISSING
-    discriminator: APINullable[str] = MISSING
-    avatar: APINullable[str] = MISSING
-    bot: APINullable[bool] = MISSING
-    system: APINullable[bool] = MISSING
-    mfa_enabled: APINullable[bool] = MISSING
-    banner: APINullable[str] = MISSING
-    accent_color = APINullable[int] = MISSING
-    local = APINullable[str] = MISSING
-    verified = APINullable[bool] = MISSING
-    email = APINullable[str] = MISSING
-    flags = APINullable[int] = MISSING
-    premium_type = APINullable[int] = MISSING
-    public_flags = APINullable[int] = MISSING
+    id: Optional[Snowflake] = None
+    username: Optional[str] = None
+    discriminator: Optional[str] = None
+    avatar: Optional[str] = None
+    bot: Optional[bool] = None
+    system: Optional[bool] = None
+    mfa_enabled: Optional[bool] = None
+    banner: Optional[str] = None
+    accent_color: Optional[int] = None
+    local: Optional[str] = None
+    verified: Optional[bool] = None
+    email: Optional[str] = None
+    flags: Optional[int] = None
+    premium_type: Optional[int] = None
+    public_flags: Optional[int] = None
 
 
     @property
-    def premium(self) -> APINullable[PremiumTypes]:
+    def premium(self) -> Optional[PremiumTypes]:
         return (
-            MISSING
-            if self.premium_type is MISSING
+            None
+            if self.premium_type is None
             else PremiumTypes(self.premium_type)
         )
 
     @property
-    def flags(self) -> APINullable[UserFlags]:
+    def flags(self) -> Optional[UserFlags]:
         return(
-            MISSING
-            if self.flags is MISSING
+            None
+            if self.flags is None
             else UserFlags(self.flags)
         )
 
