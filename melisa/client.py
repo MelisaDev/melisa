@@ -1,11 +1,14 @@
+from . import exceptions
+from .models import User
 from .models.app import Shard
+from .utils import Snowflake
 from .utils.types import Coro
 
 from .core.http import HTTPClient
 from .core.gateway import GatewayBotInfo
 
 import asyncio
-from typing import Dict, List
+from typing import Dict, List, Union
 
 
 class Client:
@@ -15,6 +18,7 @@ class Client:
         self._events = {}
 
         self.guilds = []
+        self.user = None
 
         self.loop = asyncio.get_event_loop()
 
@@ -89,4 +93,18 @@ class Client:
             asyncio.ensure_future(inited_shard.launch(activity=self._activity, status=self._status), loop=self.loop)
         self.loop.run_forever()
 
+    async def fetch_user(self, user_id: Union[Snowflake, str, int]):
+        """
+            Fetch User from the Discord API (by id).
 
+            Parameters
+            ----------
+            user_id : :class:`Union[Snowflake, str, int]`
+                Id of user to fetch
+        """
+
+        # ToDo: Update cache if USER_CACHING enabled.
+
+        data = await self.http.get(f"users/{user_id}")
+
+        return User.from_dict(data)

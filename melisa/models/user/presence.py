@@ -4,6 +4,7 @@ from typing import Optional, Tuple, List, Literal
 
 from ...utils import Snowflake
 from ...utils import APIObjectBase
+from ...utils.types import APINullable
 
 
 class BasePresence:
@@ -55,8 +56,8 @@ class ActivityTimestamp(BasePresence, APIObjectBase):
     end: Optional[:class:`int`]
         Unix time (in milliseconds) of when the activity ends
     """
-    start: Optional[int] = None
-    end: Optional[int] = None
+    start: APINullable[int] = None
+    end: APINullable[int] = None
 
 
 @dataclass(repr=False)
@@ -73,8 +74,8 @@ class ActivityEmoji(BasePresence, APIObjectBase):
         Whether this emoji is animated
     """
     name: str
-    id: Optional[Snowflake] = None
-    animated: Optional[bool] = None
+    id: APINullable[Snowflake] = None
+    animated: APINullable[bool] = None
 
 
 @dataclass(repr=False)
@@ -88,8 +89,8 @@ class ActivityParty(BasePresence, APIObjectBase):
     size: Optional[Tuple[:class:`int`, :class:`int`]]
         Array of two integers (current_size, max_size)
     """
-    id: Optional[str] = None
-    size: Optional[Tuple[int, int]] = None
+    id: APINullable[str] = None
+    size: APINullable[Tuple[int, int]] = None
 
 
 @dataclass(repr=False)
@@ -107,10 +108,10 @@ class ActivityAssets(BasePresence, APIObjectBase):
     small_text: Optional[:class:`str`]
         text displayed when hovering over the small image of the activity
     """
-    large_image: Optional[str] = None
-    large_text: Optional[str] = None
-    small_image: Optional[str] = None
-    small_text: Optional[str] = None
+    large_image: APINullable[str] = None
+    large_text: APINullable[str] = None
+    small_image: APINullable[str] = None
+    small_text: APINullable[str] = None
 
 
 @dataclass(repr=False)
@@ -126,9 +127,9 @@ class ActivitySecrets(BasePresence, APIObjectBase):
     match: Optional[:class:`str`]
         The secret for a specific instanced match
     """
-    join: Optional[str] = None
-    spectate: Optional[str] = None
-    match_: Optional[str] = None
+    join: APINullable[str] = None
+    spectate: APINullable[str] = None
+    match_: APINullable[str] = None
 
 
 class ActivityFlags(BasePresence, APIObjectBase):
@@ -208,18 +209,18 @@ class Activity(BasePresence, APIObjectBase):
     type: ActivityType
     created_at: int
 
-    url: Optional[str] = None
-    timestamps: Optional[ActivityTimestamp] = None
-    application_id: Optional[Snowflake] = None
-    details: Optional[str] = None
-    state: Optional[str] = None
-    emoji: Optional[ActivityEmoji] = None
-    party: Optional[ActivityParty] = None
-    assets: Optional[ActivityAssets] = None
-    secrets: Optional[ActivitySecrets] = None
-    instance: Optional[bool] = None
-    flags: Optional[ActivityFlags] = None
-    buttons: Optional[List[ActivityButton]] = None
+    url: APINullable[str] = None
+    timestamps: APINullable[ActivityTimestamp] = None
+    application_id: APINullable[Snowflake] = None
+    details: APINullable[str] = None
+    state: APINullable[str] = None
+    emoji: APINullable[ActivityEmoji] = None
+    party: APINullable[ActivityParty] = None
+    assets: APINullable[ActivityAssets] = None
+    secrets: APINullable[ActivitySecrets] = None
+    instance: APINullable[bool] = None
+    flags: APINullable[ActivityFlags] = None
+    buttons: APINullable[List[ActivityButton]] = None
 
 
 @dataclass(repr=False)
@@ -237,7 +238,7 @@ class BotActivity(BasePresence, APIObjectBase):
 
     name: str
     type: ActivityType
-    url: Optional[str] = None
+    url: APINullable[str] = None
 
 
 class StatusType(Enum):

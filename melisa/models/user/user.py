@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from ...utils.api_object import APIObjectBase
+from ...utils.types import APINullable
 from ...utils.snowflake import Snowflake
 
 
@@ -85,6 +86,7 @@ class UserFlags(IntEnum):
     def __int__(self):
         return self.value
 
+
 class VisibilityTypes(IntEnum):
     """The type of connection visibility.
     
@@ -101,6 +103,7 @@ class VisibilityTypes(IntEnum):
 
     def __int__(self):
         return self.value
+
 
 @dataclass(repr=False)
 class User(APIObjectBase):
@@ -140,25 +143,26 @@ class User(APIObjectBase):
         the public flags on a user's account
     """
 
-    id: Optional[Snowflake] = None
-    username: Optional[str] = None
-    discriminator: Optional[str] = None
-    avatar: Optional[str] = None
-    bot: Optional[bool] = None
-    system: Optional[bool] = None
-    mfa_enabled: Optional[bool] = None
-    banner: Optional[str] = None
-    accent_color: Optional[int] = None
-    local: Optional[str] = None
-    verified: Optional[bool] = None
-    email: Optional[str] = None
-    flags: Optional[int] = None
-    premium_type: Optional[int] = None
-    public_flags: Optional[int] = None
-
+    id: APINullable[Snowflake] = None
+    username: APINullable[str] = None
+    discriminator: APINullable[str] = None
+    avatar: APINullable[str] = None
+    bot: APINullable[bool] = None
+    system: APINullable[bool] = None
+    mfa_enabled: APINullable[bool] = None
+    banner: APINullable[str] = None
+    accent_color: APINullable[int] = None
+    local: APINullable[str] = None
+    verified: APINullable[bool] = None
+    email: APINullable[str] = None
+    premium_type: APINullable[int] = None
+    public_flags: APINullable[int] = None
 
     @property
     def premium(self) -> Optional[PremiumTypes]:
+        """APINullable[:class:`~melisa.models.user.user.PremiumTypes`]: The
+        user their premium type in a usable enum.
+        """
         return (
             None
             if self.premium_type is None
@@ -167,18 +171,25 @@ class User(APIObjectBase):
 
     @property
     def flags(self) -> Optional[UserFlags]:
+        """Flags of user"""
         return(
             None
             if self.flags is None
             else UserFlags(self.flags)
         )
 
-    @property
-    def mention(self):
-        return "<@!{}>".format(self.id)
+    def __str__(self):
+        """String representation of the User object"""
+        return self.username + "#" + self.discriminator
 
     @property
-    def get_avatar_url(self):
+    def mention(self):
+        """:class:`str`: The user's mention string. (<@id>)"""
+        return "<@{}>".format(self.id)
+
+    @property
+    def avatar_url(self):
+        """Avatar url (from  the discord cdn server)"""
         return (
             "https://cdn.discordapp.com/avatars/{}/{}.png".format(self.id, self.avatar),
             "?size=1024"
