@@ -8,9 +8,9 @@
 
 <h2 align="center">
 THIS LIBRARY IS CURRENTLY UNDER DEVELOPMENT!
-</h1>
+</h2>
 
 ## About
 <strong>MelisaPy</strong> is a Python library for the [Discord API](https://discord.com/developers/docs/intro). 
 
-We are trying to make our library optimized. We are going to create really big Cache configuration, so don't worry about the RAM :)
+We are trying to make our library optimized. We are going to create really cool Cache configuration, so don't worry about the RAM :)

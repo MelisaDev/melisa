@@ -1,4 +1,3 @@
-from . import exceptions
 from .models import User
 from .models.app import Shard
 from .utils import Snowflake
