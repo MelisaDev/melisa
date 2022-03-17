@@ -1,0 +1,46 @@
+.py-attribute-table {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    margin: 0 2em;
+    padding-top: 16px;
+}
+
+.py-attribute-table-column {
+    flex: 1 1 auto;
+}
+
+.py-attribute-table-column:not(:first-child) {
+    margin-top: 1em;
+}
+
+.py-attribute-table-column > span {
+    font-weight: bold;
+}
+
+main .py-attribute-table-column > ul {
+    list-style: none;
+    margin: 4px 0;
+    padding-left: 0;
+    font-size: 0.95em;
+}
+
+.py-attribute-table-entry {
+    margin: 0;
+    padding: 2px 0 2px 0.2em;
+    display: flex;
+    line-height: 1.2em;
+}
+
+.py-attribute-table-entry > a {
+    padding-left: 0.5em;
+    flex-grow: 1;
+}
+.py-attribute-table-badge {
+    flex-basis: 3em;
+    text-align: right;
+    font-size: 0.9em;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}

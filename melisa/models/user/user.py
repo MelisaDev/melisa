@@ -111,36 +111,40 @@ class User(APIObjectBase):
     
     Attributes
     ----------
-    id:
+    id: :class:`~melisa.utils.types.Snowflake`
         the user's id
-    username:
+    username: :class:`str`
         the user's username, not unique across the platform
-    discriminator:
+    discriminator: :class:`int`
         the user's 4-digit discord-tag
-    avatar:
+    avatar: :class:`str`
         the user's avatar hash
-    bot:
+    bot: :class:`bool`
         whether the user belongs to an OAuth2 application
-    system:
+    system: :class:`bool`
         whether the user is an Official Discord System user (part of the urgent message system)
-    mfa_enabled:
+    mfa_enabled: :class:`bool`
         whether the user has two factor enabled on their account
-    banner:
+    banner: :class:`str`
         the user's banner hash
-    accent_color:
+    accent_color: :class:`int`
         the user's banner color encoded as an integer representation of hexadecimal color code
-    locale:
+    locale: :class:`str`
         the user's chosen language option
-    verified:
+    verified: :class:`bool`
         whether the email on this account has been verified
-    email:
+    email: :class:`str`
         the user's email
-    flags:
+    flags: :class:`~models.user.user.UserFlags`
         the flags on a user's account
-    premium_type:
+    premium_type: :class:`int`
         the type of Nitro subscription on a user's account
-    public_flags:
+    public_flags: :class:`int`
         the public flags on a user's account
+    premium: :class:`PremiumTypes`
+        The user their premium type in a usable enum.
+    mention: :class:`str`
+        The user's mention string. (<@id>)
     """
 
     id: APINullable[Snowflake] = None
@@ -187,10 +191,6 @@ class User(APIObjectBase):
         """:class:`str`: The user's mention string. (<@id>)"""
         return "<@{}>".format(self.id)
 
-    @property
-    def avatar_url(self):
-        """Avatar url (from  the discord cdn server)"""
-        return (
-            "https://cdn.discordapp.com/avatars/{}/{}.png".format(self.id, self.avatar),
-            "?size=1024"
-        )
+    def avatar_url(self) -> str:
+        """Avatar url (from the Discord CDN server)"""
+        return "https://cdn.discordapp.com/avatars/{}/{}.png?size=1024".format(self.id, self.avatar)

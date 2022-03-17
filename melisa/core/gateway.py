@@ -95,13 +95,12 @@ class Gateway:
             await self.resume()
 
     async def check_heartbeating(self):
-        await asyncio.sleep(20)
+        while True:
+            await asyncio.sleep(20)
 
-        if self._last_send + 60.0 < time.perf_counter():
-            await self.ws.close(code=4000)
-            await self.handle_close(4000)
-
-        await self.check_heartbeating()
+            if self._last_send + 60.0 < time.perf_counter():
+                await self.ws.close(code=4000)
+                await self.handle_close(4000)
 
     async def send(self, payload: str) -> None:
         await self.ws.send_str(payload)
