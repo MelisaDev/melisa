@@ -8,11 +8,6 @@ class ClientException(MelisaException):
     pass
 
 
-class InvalidPayload(MelisaException):
-    """This exception means invalid payload"""
-    pass
-
-
 class LoginFailure(ClientException):
     """Fails to log you in from improper credentials or some other misc."""
     pass

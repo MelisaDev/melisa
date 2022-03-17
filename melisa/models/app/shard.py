@@ -45,14 +45,15 @@ class Shard:
 
         self.disconnected = False
 
-        create_task(self._gateway.start_loop())
+        create_task(self._gateway.connect())
 
         return self
 
-    async def _try_close(self) -> None:
-        if self._gateway.connected:
-            self._gateway.connected = False
-            await self._gateway.close(code=1000)
+    async def close(self):
+        """|coro|
+            Disconnect shard
+        """
+        create_task(self._gateway.close())
 
     async def update_presence(self, activity: BotActivity = None, status: str = None) -> Shard:
         """
@@ -89,6 +90,6 @@ class Shard:
         wait_time: :class:`int`
             Reconnect after
         """
-        await self._try_close()
+        await self.close()
         await sleep(wait_time)
         await self.launch()
