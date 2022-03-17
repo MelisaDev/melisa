@@ -107,16 +107,19 @@ class Gateway:
         await self.ws.send_str(payload)
 
     async def parse_websocket_message(self, msg):
-        if type(msg) is bytes:
-            self._buffer.extend(msg)
+        try:
+            if type(msg) is bytes:
+                self._buffer.extend(msg)
 
-            if len(msg) < 4 or msg[-4:] != b'\x00\x00\xff\xff':
-                return None
-            msg = self._zlib.decompress(self._buffer)
-            msg = msg.decode('utf-8')
-            self._buffer = bytearray()
+                if len(msg) < 4 or msg[-4:] != b'\x00\x00\xff\xff':
+                    return None
+                msg = self._zlib.decompress(self._buffer)
+                msg = msg.decode('utf-8')
+                self._buffer = bytearray()
 
-        return json.loads(msg)
+            return json.loads(msg)
+        except zlib.error:
+            return None
 
     async def handle_data(self, data):
         if data['op'] == self.DISPATCH:
