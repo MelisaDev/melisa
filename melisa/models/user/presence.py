@@ -1,3 +1,6 @@
+# Copyright MelisaDev 2022 - Present
+# Full MIT License can be found in `LICENSE.txt` at the project root.
+
 from dataclasses import dataclass
 from enum import IntEnum, Enum, Flag
 from typing import Optional, Tuple, List, Literal

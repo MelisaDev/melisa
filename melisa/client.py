@@ -1,3 +1,6 @@
+# Copyright MelisaDev 2022 - Present
+# Full MIT License can be found in `LICENSE.txt` at the project root.
+
 from .models import User
 from .models.app import Shard
 from .utils import Snowflake, APIModelBase
@@ -20,7 +23,7 @@ class Client:
     ----------
     token : :class:`str`
         The token to login (you can found it in the developer portal)
-    intents : :class:`~objects.app.intents.Intents`
+    intents : :class:`~melisa.Intents`
         The Discord Intents values.
     activity : :class:`~models.user.presence.BotActivity`
         The Activity to set (on connecting)
