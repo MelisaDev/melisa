@@ -54,9 +54,13 @@ class APIModelBase:
     @property
     def _http(self):
         if not self._client:
-            raise AttributeError("Object is not yet linked to a main client")
+            return None
 
         return self._client.http
+
+    @classmethod
+    def set_client(cls, client):
+        cls._client = client
 
     @classmethod
     def from_dict(

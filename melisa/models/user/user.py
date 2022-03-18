@@ -194,3 +194,10 @@ class User(APIModelBase):
     def avatar_url(self) -> str:
         """Avatar url (from the Discord CDN server)"""
         return "https://cdn.discordapp.com/avatars/{}/{}.png?size=1024".format(self.id, self.avatar)
+
+    async def create_dm_channel(self):
+        # ToDo: Add docstrings
+        # ToDo: Add checking this channel in cache
+        return await self._http.post(
+                "/users/@me/channels", data={"recipient_id": self.id}
+        )

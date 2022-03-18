@@ -1,6 +1,6 @@
 from .models import User
 from .models.app import Shard
-from .utils import Snowflake
+from .utils import Snowflake, APIModelBase
 from .utils.types import Coro
 
 from .core.http import HTTPClient
@@ -54,6 +54,8 @@ class Client:
 
         self._activity = activity
         self._status = status
+
+        APIModelBase.set_client(self)
 
     async def _get_gateway(self):
         """Get Gateway information"""
