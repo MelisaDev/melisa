@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import asyncio
-from typing import Dict, Optional, Union, Any
+from typing import Dict, Optional
 
 from aiohttp import ClientSession, ClientResponse
 
@@ -15,14 +15,16 @@ from melisa.exceptions import (NotModifiedError,
 
 
 class HTTPClient:
+    API_VERSION = 9
+
     def __init__(self, token: str, *, ttl: int = 5):
-        self.url: str = f"https://discord.com/api/v9"
+        self.url: str = f"https://discord.com/api/v{self.API_VERSION}"
         self.max_ttl: int = ttl
 
         headers: Dict[str, str] = {
             "Content-Type": "application/json",
             "Authorization": f"Bot {token}",
-            "User-Agent": f"Melisa Python Library"
+            "User-Agent": "Melisa Python Library"
         }
 
         self.__http_exceptions: Dict[int, HTTPException] = {

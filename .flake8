@@ -1,0 +1,5 @@
+[flake8]
+ignore = D203, H501, F403, F401, C901, W503
+exclude = .git, .idea, __pycache__, docs, build, dev, dist, venv, .history, .github, examples
+max-complexity = 10
+max-line-length = 100

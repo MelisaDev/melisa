@@ -14,7 +14,8 @@ class LoginFailure(ClientException):
 
 
 class ConnectionClosed(ClientException):
-    """Exception that's thrown when the gateway connection is closed for reasons that could not be handled
+    """Exception that's thrown when the gateway connection is closed
+    for reasons that could not be handled
     internally. """
 
     def __init__(self, socket, *, shard_id, code=None):
@@ -26,14 +27,16 @@ class ConnectionClosed(ClientException):
 
 
 class PrivilegedIntentsRequired(ClientException):
-    """Occurs when the gateway requests privileged intents, but they are not yet marked on the developer page.
+    """Occurs when the gateway requests privileged intents,
+     but they are not yet marked on the developer page.
 
     Visit to https://discord.com/developers/applications/
     """
 
     def __init__(self, shard_id):
         self.shard_id = shard_id
-        message = "Shard ID {} is requesting privileged intents that have not been explicitly enabled in the " \
+        message = "Shard ID {} is requesting privileged intents " \
+                  "that have not been explicitly enabled in the " \
                   "developer portal. Please visit to https://discord.com/developers/applications/ "
 
         super().__init__(message.format(self.shard_id))

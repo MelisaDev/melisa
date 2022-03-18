@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from asyncio import create_task, Task, sleep
-from typing import Optional
+from asyncio import create_task, sleep
 
 from ...core.gateway import Gateway
 from ..user import BotActivity
@@ -28,7 +27,8 @@ class Shard:
     @property
     def latency(self) -> float:
         """:class:`float`:
-        Measures latency between a HEARTBEAT command and a HEARTBEAT_ACK event in seconds for this shard"""
+        Measures latency between a HEARTBEAT command
+        and a HEARTBEAT_ACK event in seconds for this shard"""
         return self._gateway.latency
 
     async def launch(self, **kwargs) -> Shard:

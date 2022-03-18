@@ -69,24 +69,25 @@ class Gateway:
         self._last_send = 0
 
         self.auth = {
-                "token": self.client._token,
-                "intents": self.intents,
-                "properties": {
-                    "$os": sys.platform,
-                    "$browser": "melisa",
-                    "$device": "melisa"
-                },
-                "compress": True,
-                "shard": [shard_id, num_shards],
-                "presence": self.generate_presence(kwargs.get("start_activity"), kwargs.get("start_status"))
-            }
+            "token": self.client._token,
+            "intents": self.intents,
+            "properties": {
+                "$os": sys.platform,
+                "$browser": "Melisa Python Library",
+                "$device": "Melisa Python Library"
+            },
+            "compress": True,
+            "shard": [shard_id, num_shards],
+            "presence": self.generate_presence(kwargs.get("start_activity"),
+                                               kwargs.get("start_status"))}
 
         self._zlib: zlib._Decompress = zlib.decompressobj()
         self._buffer: bytearray = bytearray()
 
     async def connect(self) -> None:
         self.ws = await self.__session.ws_connect(
-            f'wss://gateway.discord.gg/?v={self.GATEWAY_VERSION}&encoding=json&compress=zlib-stream')
+            f'wss://gateway.discord.gg/?v={self.GATEWAY_VERSION}&encoding=json&compress=zlib-stream'
+        )
 
         if self.session_id is None:
             await self.send_identify()

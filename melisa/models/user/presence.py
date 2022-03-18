@@ -24,13 +24,15 @@ class ActivityType(IntEnum):
     GAME:
         Playing {name} (Playing Rocket League)
     STREAMING:
-        Streaming {details} (Streaming Rocket League) It supports only YouTube and Twitch
+        Streaming {details} (Streaming Rocket League)
+        It supports only YouTube and Twitch
     LISTENING:
         Listening to {name} (Listening to Spotify)
     WATCHING:
         Watching {name} (Watching YouTube Together)
     CUSTOM:
-        {emoji} {name} (":smiley: I am cool") (THIS ACTIVITY IS NOT SUPPORTED FOR BOTS)
+        {emoji} {name} (":smiley: I am cool")
+        (THIS ACTIVITY IS NOT SUPPORTED FOR BOTS)
     COMPETING:
         Competing in {name} (Competing in Arena World Champions)
     """
@@ -100,11 +102,13 @@ class ActivityAssets(BasePresence, APIModelBase):
     Attributes
     ----------
     large_image: Optional[:class:`str`]
-        (Large Image) Activity asset images are arbitrary strings which usually contain snowflake IDs
+        (Large Image) Activity asset images are arbitrary strings
+        which usually contain snowflake IDs
     large_text: Optional[:class:`str`]
         text displayed when hovering over the large image of the activity
     small_image: Optional[:class:`str`]
-        (Small Image) Activity asset images are arbitrary strings which usually contain snowflake IDs
+        (Small Image) Activity asset images are arbitrary strings
+         which usually contain snowflake IDs
     small_text: Optional[:class:`str`]
         text displayed when hovering over the small image of the activity
     """
@@ -153,8 +157,10 @@ class ActivityFlags(BasePresence, APIModelBase):
 
 @dataclass(repr=False)
 class ActivityButton(BasePresence, APIModelBase):
-    """When received over the gateway, the buttons field is an array of strings, which are the button labels. Bots
-    cannot access a user's activity button URLs. When sending, the buttons field must be an array of the below
+    """When received over the gateway, the buttons field is an array of strings,
+     which are the button labels. Bots
+    cannot access a user's activity button URLs.
+    When sending, the buttons field must be an array of the below
     object:
     Attributes
     ----------

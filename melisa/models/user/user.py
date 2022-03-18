@@ -11,7 +11,7 @@ from ...utils.snowflake import Snowflake
 
 class PremiumTypes(IntEnum):
     """Premium types denote the level of premium a user has.
-    
+
     Attributes
     ----------
     NITRO:
@@ -32,39 +32,39 @@ class PremiumTypes(IntEnum):
 
 class UserFlags(IntEnum):
     """Profile Icons
-    
+
     Attributes
     ----------
     NONE:
         None
     STAFF:
-    	Discord Employee
+        Discord Employee
     PARTNER:
         Partnered Server Owner
     HYPESQUAD:
-    	HypeSquad Events Coordinator
+        HypeSquad Events Coordinator
     BUG_HUNTER_LEVEL_1:
         Bug Hunter Level 1
     HYPESQUAD_ONLINE_HOUSE_1:
-    	House Bravery Member
+        House Bravery Member
     HYPESQUAD_ONLINE_HOUSE_2:
-    	House Brilliance Member
+        House Brilliance Member
     HYPESQUAD_ONLINE_HOUSE_3:
-    	House Balance Member
+        House Balance Member
     PREMIUM_EARLY_SUPPORTER:
-    	Early Nitro Supporter
+        Early Nitro Supporter
     TEAM_PSEUDO_USER:
-    	User is a team
+        User is a team
     BUG_HUNTER_LEVEL_2:
-    	Bug Hunter Level 2
+        Bug Hunter Level 2
     VERIFIED_BOT:
-    	Verified Bot
+        Verified Bot
     VERIFIED_DEVELOPER:
-    	Early Verified Bot Developer
+        Early Verified Bot Developer
     CERTIFIED_MODERATOR:
-    	Discord Certified Moderator
+        Discord Certified Moderator
     BOT_HTTP_INTERACTIONS:
-    	Bot uses only HTTP interactions and is shown in the online member list
+        Bot uses only HTTP interactions and is shown in the online member list
     """
 
     NONE = 0
@@ -89,13 +89,13 @@ class UserFlags(IntEnum):
 
 class VisibilityTypes(IntEnum):
     """The type of connection visibility.
-    
+
     Attributes
     ----------
     None:
-    	invisible to everyone except the user themselves
+        invisible to everyone except the user themselves
     Everyone:
-    	visible to everyone
+        visible to everyone
     """
 
     NONE = 0
@@ -108,7 +108,7 @@ class VisibilityTypes(IntEnum):
 @dataclass(repr=False)
 class User(APIModelBase):
     """User Structure
-    
+
     Attributes
     ----------
     id: :class:`~melisa.utils.types.Snowflake`
@@ -199,5 +199,4 @@ class User(APIModelBase):
         # ToDo: Add docstrings
         # ToDo: Add checking this channel in cache
         return await self._http.post(
-                "/users/@me/channels", data={"recipient_id": self.id}
-        )
+            "/users/@me/channels", data={"recipient_id": self.id})

@@ -19,6 +19,7 @@ tools/*
 
 # Dev testing
 dev
+.pytest_cache
 _testing.py
 
 # Packaging

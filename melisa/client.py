@@ -25,7 +25,8 @@ class Client:
     activity : :class:`~models.user.presence.BotActivity`
         The Activity to set (on connecting)
     status : :class:`str`
-        The Status to set (on connecting). Can be generated using :class:`~models.user.presence.StatusType`
+        The Status to set (on connecting).
+        Can be generated using :class:`~models.user.presence.StatusType`
 
     Attributes
     ----------
@@ -82,7 +83,8 @@ class Client:
         """
         inited_shard = Shard(self, 0, 1)
 
-        asyncio.ensure_future(inited_shard.launch(activity=self._activity, status=self._status), loop=self._loop)
+        asyncio.ensure_future(inited_shard.launch(activity=self._activity,
+                                                  status=self._status), loop=self._loop)
         self._loop.run_forever()
 
     def run_shards(self, num_shards: int, *, shard_ids: List[int] = None):
@@ -102,7 +104,8 @@ class Client:
         for shard_id in shard_ids:
             inited_shard = Shard(self, shard_id, num_shards)
 
-            asyncio.ensure_future(inited_shard.launch(activity=self._activity, status=self._status), loop=self._loop)
+            asyncio.ensure_future(inited_shard.launch(activity=self._activity,
+                                                      status=self._status), loop=self._loop)
         self._loop.run_forever()
 
     def run_autosharded(self):
@@ -115,7 +118,8 @@ class Client:
         for shard_id in shard_ids:
             inited_shard = Shard(self, shard_id, num_shards)
 
-            asyncio.ensure_future(inited_shard.launch(activity=self._activity, status=self._status), loop=self._loop)
+            asyncio.ensure_future(inited_shard.launch(activity=self._activity,
+                                                      status=self._status), loop=self._loop)
         self._loop.run_forever()
 
     async def fetch_user(self, user_id: Union[Snowflake, str, int]):
