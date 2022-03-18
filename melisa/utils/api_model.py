@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import copy
+from dataclasses import _is_dataclass_instance, fields
 from enum import Enum
 from inspect import getfullargspec
 from typing import (
@@ -13,7 +15,36 @@ from typing import (
 T = TypeVar("T")
 
 
-class APIObjectBase:
+def _to_dict_without_none(model):
+    if _is_dataclass_instance(model):
+        result = []
+
+        for field in fields(model):
+            value = _to_dict_without_none(getattr(model, field.name))
+
+            if isinstance(value, Enum):
+                result.append((field.name, value.value))
+            elif value is not None and not field.name.startswith("_"):
+                result.append((field.name, value))
+
+        return dict(result)
+
+    elif isinstance(model, tuple) and hasattr(model, "_fields"):
+        return type(model)(*[_to_dict_without_none(v) for v in model])
+
+    elif isinstance(model, (list, tuple)):
+        return type(model)(_to_dict_without_none(v) for v in model)
+
+    elif isinstance(model, dict):
+        return type(model)(
+            (_to_dict_without_none(k), _to_dict_without_none(v))
+            for k, v in model.items()
+        )
+    else:
+        return copy.deepcopy(model)
+
+
+class APIModelBase:
     """
     Represents an object which has been fetched from the Discord API.
     """
@@ -55,3 +86,6 @@ class APIObjectBase:
                 )
             )
         )
+
+    def to_dict(self) -> Dict:
+        return _to_dict_without_none(self)

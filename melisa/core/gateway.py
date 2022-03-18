@@ -12,11 +12,11 @@ import aiohttp
 from ..exceptions import GatewayError, PrivilegedIntentsRequired, LoginFailure
 from ..listeners import listeners
 from ..models.user import BotActivity
-from ..utils import APIObjectBase
+from ..utils import APIModelBase
 
 
 @dataclass
-class GatewayBotInfo(APIObjectBase):
+class GatewayBotInfo(APIModelBase):
     """Gateway info from the `gateway/bot` endpoint"""
     url: str
     shards: int
@@ -210,15 +210,7 @@ class Gateway:
         }
 
         if activity is not None:
-            activity_to_set = {
-                "name": activity.name,
-                "type": int(activity.type)
-            }
-
-            if int(activity.type) == 1 and activity.url:
-                activity_to_set["url"] = activity.url
-
-            data["activities"] = [activity_to_set]
+            data["activities"] = activity.to_dict()
 
         if status is not None:
             data["status"] = str(status)

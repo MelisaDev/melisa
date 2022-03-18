@@ -73,13 +73,6 @@ class Shard:
 
         return self
 
-    async def disconnect(self) -> None:
-        """
-        |coro|
-
-        Disconnect current shard"""
-        await self._try_close()
-
     async def reconnect(self, wait_time: int = 3) -> None:
         """|coro|
 

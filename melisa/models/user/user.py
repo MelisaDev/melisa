@@ -4,7 +4,7 @@ from enum import IntEnum
 from dataclasses import dataclass
 from typing import Optional
 
-from ...utils.api_object import APIObjectBase
+from ...utils.api_model import APIModelBase
 from ...utils.types import APINullable
 from ...utils.snowflake import Snowflake
 
@@ -106,7 +106,7 @@ class VisibilityTypes(IntEnum):
 
 
 @dataclass(repr=False)
-class User(APIObjectBase):
+class User(APIModelBase):
     """User Structure
     
     Attributes

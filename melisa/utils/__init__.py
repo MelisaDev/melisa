@@ -5,10 +5,10 @@ from .types import (
 from .snowflake import Snowflake
 
 
-from .api_object import APIObjectBase
+from .api_model import APIModelBase
 
 __all__ = (
     "Coro",
     "Snowflake",
-    "APIObjectBase"
+    "APIModelBase"
 )
