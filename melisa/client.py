@@ -37,11 +37,12 @@ class Client:
         Bot's shards.
     """
 
-    def __init__(self, token, intents, *, activity=None, status: str = None):
+    def __init__(self, token: str, intents, *, activity=None, status: str = None):
         self.shards: Dict[int, Shard] = {}
-        self.http = HTTPClient(token)
-        self._events = {}
+        self.http: HTTPClient = HTTPClient(token)
+        self._events: Dict[str, Coro] = {}
 
+        # ToDo: Transfer guilds in to the cache manager
         self.guilds = []
         self.user = None
 
