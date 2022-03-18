@@ -53,6 +53,7 @@ class Gateway:
         self.latency = float('inf')
         self.ws = None
         self.loop = asyncio.get_event_loop()
+        self.shard_id = shard_id
 
         self.__raise_close_codes: Dict[int, Any] = {
             4004: LoginFailure("Token is not valid"),
