@@ -4,8 +4,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import IntEnum, Enum, Flag
-from typing import Optional, Tuple, List, Literal
+from enum import IntEnum, Enum
+from typing import List, Any
 
 from ...utils import Snowflake
 from ...utils import APIModelBase
@@ -27,7 +27,7 @@ class ExplicitContentFilterLevel(IntEnum):
 
     DISABLED = 0
     MEMBERS_WITHOUT_ROLES = 1
-    ALL_MEMBERS	= 2
+    ALL_MEMBERS = 2
 
     def __int__(self):
         return self.value
@@ -46,10 +46,10 @@ class MFALevel(IntEnum):
 class VerificationLevel(IntEnum):
     """"""
 
-    NONE = 0	
-    LOW	= 1	
-    MEDIUM = 2	
-    HIGH = 3	
+    NONE = 0
+    LOW = 1
+    MEDIUM = 2
+    HIGH = 3
     VERY_HIGH = 4
 
     def __int__(self):
@@ -71,10 +71,10 @@ class GuildNSFWLevel(IntEnum):
 class PremiumTier(IntEnum):
     """"""
 
-    NONE = 0	
-    TIER_1 = 1	
-    TIER_2 = 2	
-    TIER_3 = 3	
+    NONE = 0
+    TIER_1 = 1
+    TIER_2 = 2
+    TIER_3 = 3
 
     def __int__(self):
         return self.value
@@ -84,9 +84,9 @@ class SystemChannelFlags(IntEnum):
     """"""
 
     SUPPRESS_JOIN_NOTIFICATIONS = 1 << 0
-    SUPPRESS_PREMIUM_SUBSCRIPTIONS = 1 << 1	
-    SUPPRESS_GUILD_REMINDER_NOTIFICATIONS = 1 << 2	
-    SUPPRESS_JOIN_NOTIFICATION_REPLIES = 1 << 3	
+    SUPPRESS_PREMIUM_SUBSCRIPTIONS = 1 << 1
+    SUPPRESS_GUILD_REMINDER_NOTIFICATIONS = 1 << 2
+    SUPPRESS_JOIN_NOTIFICATION_REPLIES = 1 << 3
 
     def __int__(self):
         return self.value
@@ -141,19 +141,27 @@ class Guild(APIModelBase):
     default_message_notifications: APINullable[int] = None
     explicit_content_filter: APINullable[int] = None
     features: APINullable[List[GuildFeatures]] = None
-    #TODO: Make a structure for emoji and role 
+    roles: APINullable[List[Any]] = None
+    emojis: APINullable[List[Any]] = None
+    # TODO: Make a structures of emoji and role
 
     mfa_level: APINullable[int] = None
     application_id: APINullable[Snowflake] = None
     system_channel_id: APINullable[Snowflake] = None
     system_channel_flags: APINullable[int] = None
     rules_channel_id: APINullable[Snowflake] = None
-    #TODO: Deal with joined_at
+    joined_at: APINullable[int] = None
+    # TODO: Deal with joined_at
 
     large: APINullable[bool] = None
     unavailable: APINullable[bool] = None
     member_count: APINullable[int] = None
-    #TODO: Make a structure for voice_states, members, channels, threads, presences(?)
+    voice_states: APINullable[List[Any]] = None
+    members: APINullable[List[Any]] = None
+    channels: APINullable[List[Any]] = None
+    threads: APINullable[List[Any]] = None
+    presences: APINullable[List[Any]] = None
+    # TODO: Make a structure for voice_states, members, channels, threads, presences(?)
 
     max_presences: APINullable[int] = None
     max_members: APINullable[int] = None
@@ -169,90 +177,16 @@ class Guild(APIModelBase):
     approximate_presence_count: APINullable[int] = None
     nsfw_level: APINullable[int] = None
     premium_progress_bar_enabled: APINullable[bool] = None
-    #TODO: Make a structure for welcome_screen, stage_instances, stickers and guild_scheduled_events
+    stage_instances: APINullable[List[Any]] = None
+    stickers: APINullable[List[Any]] = None
+    welcome_screen: APINullable[Any] = None
+    guild_scheduled_events: APINullable[List[Any]] = None
 
-
-    async def get_guild(self, _id: id, with_counts: bool = False ):
-        """"""
-
-        return await self._http.get(
-            f"/guild/{_id}", params = {"with_counts": "true" if with_counts else None})
-    
-    
-
-    @property
-    def default_message_notifications(self) -> Optional[DefaultMessageNotificationLevel]:
-        """"""
-
-        return(
-            None
-            if self.default_message_notifications is None
-            else DefaultMessageNotificationLevel(self.default_message_notifications)
-        )
-    
-    @property
-    def explicit_content_filter(self) -> Optional[ExplicitContentFilterLevel]:
-        """"""
-
-        return(
-            None
-            if self.explicit_content_filter is None
-            else ExplicitContentFilterLevel(self.explicit_content_filter)
-        )
-    
-    @property
-    def mfa_level(self) -> Optional[MFALevel]:
-        """"""
-
-        return(
-            None
-            if self.mfa_level is None
-            else MFALevel(self.mfa_level)
-        )
-
-    @property
-    def verification_level(self) -> Optional[VerificationLevel]:
-        """"""
-
-        return(
-            None
-            if self.verification_level is None
-            else VerificationLevel(self.verification_level)
-        )
-
-    @property
-    def nsfw_level(self) -> Optional[GuildNSFWLevel]:
-        """"""
-
-        return(
-            None
-            if self.nsfw_level is None
-            else GuildNSFWLevel(self.nsfw_level)
-        )
-
-    @property 
-    def premium_tier(self) -> Optional(PremiumTier):
-        """"""
-
-        return(
-            None
-            if self.premium_tier is None
-            else PremiumTier(self.premium_tier)
-        )
-    
-    @property
-    def system_channel_flags(self) -> Optional[SystemChannelFlags]:
-        """"""
-
-        return(
-            None
-            if self.system_channel_flags is None
-            else SystemChannelFlags(self.system_channel_flags)
-        )
+    # TODO: Make a structure for welcome_screen, stage_instances,
+    #  stickers and guild_scheduled_events
 
 
 @dataclass(repr=False)
 class UnavailableGuild(APIModelBase):
-
     id: APINullable[Snowflake] = None
-    unavailable: APINullable[bool] = True 
+    unavailable: APINullable[bool] = True
