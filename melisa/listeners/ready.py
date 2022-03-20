@@ -14,7 +14,10 @@ async def on_ready_listener(self, gateway, payload: dict):
 
     guilds = payload.get("guilds")
 
-    self.guilds = dict(map(lambda i: (i["id"], None), guilds))
+    if self._none_guilds_cached is False:
+        self.guilds = dict(map(lambda i: (i["id"], None), guilds))
+        self._none_guilds_cached = True
+
     self.user = User.from_dict(payload.get("user"))
 
     custom_listener = self._events.get("on_shard_ready")

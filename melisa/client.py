@@ -47,7 +47,7 @@ class Client:
         self._events: Dict[str, Coro] = {}
 
         # ToDo: Transfer guilds in to the cache manager
-        self.guilds = []
+        self.guilds = {}
         self.user = None
 
         self._loop = asyncio.get_event_loop()
@@ -59,6 +59,7 @@ class Client:
 
         self._activity = activity
         self._status = status
+        self._none_guilds_cached = False
 
         APIModelBase.set_client(self)
 
