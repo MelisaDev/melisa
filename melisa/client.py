@@ -1,7 +1,7 @@
 # Copyright MelisaDev 2022 - Present
 # Full MIT License can be found in `LICENSE.txt` at the project root.
 
-from .models import User
+from .models import User, Guild
 from .models.app import Shard
 from .utils import Snowflake, APIModelBase
 from .utils.types import Coro
@@ -141,3 +141,19 @@ class Client:
         data = await self.http.get(f"users/{user_id}")
 
         return User.from_dict(data)
+
+    async def fetch_guild(self, guild_id: Union[Snowflake, str, int]):
+        """
+            Fetch Guild from the Discord API (by id).
+
+            Parameters
+            ----------
+            guild_id : :class:`Union[Snowflake, str, int]`
+                Id of guild to fetch
+        """
+
+        # ToDo: Update cache if GUILD_CACHE enabled.
+
+        data = await self.http.get(f"guilds/{guild_id}")
+
+        return Guild.from_dict(data)
