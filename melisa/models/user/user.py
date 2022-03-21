@@ -110,6 +110,7 @@ class VisibilityTypes(IntEnum):
 
 @dataclass(repr=False)
 class User(APIModelBase):
+    # ToDo: Update Docstrings
     """User Structure
 
     Attributes

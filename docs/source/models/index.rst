@@ -5,3 +5,4 @@ Melisa Models
    :maxdepth: 1
 
    user
+   guild
