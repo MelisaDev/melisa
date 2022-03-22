@@ -1,7 +1,6 @@
 # Copyright MelisaDev 2022 - Present
 # Full MIT License can be found in `LICENSE.txt` at the project root.
 
-import json
 import asyncio
 import sys
 import zlib
@@ -15,7 +14,7 @@ import aiohttp
 from ..exceptions import GatewayError, PrivilegedIntentsRequired, LoginFailure
 from ..listeners import listeners
 from ..models.user import BotActivity
-from ..utils import APIModelBase
+from ..utils import APIModelBase, json
 
 
 @dataclass
