@@ -257,21 +257,21 @@ class Guild(APIModelBase):
         Guild name (2-100 characters, excluding trailing and leading whitespace)
     icon: :class:`str`
         Icon hash
-    icon_hash: Optional[:class:`str`]
+    icon_hash: APINullable[:class:`str`]
         Icon hash, returned when in the template object
     splash: Optional[:class:`str`]
         Splash hash
-    discovery_splash: Optional[:class:`str`]
+    discovery_splash: APINullable[:class:`str`]
         Discovery splash hash; only present for guilds with the "DISCOVERABLE" feature
     owner: :class:`bool`
         True if the user is the owner of the guild
-    owner_id: Optional[:class:`~melisa.utils.types.Snowflake`]
+    owner_id: APINullable[:class:`~melisa.utils.types.Snowflake`]
         Id of owner
-    permissions: Optional[:class:`str`]
+    permissions: APINullable[:class:`str`]
         Total permissions for the user in the guild (excludes overwrites)
-    region: Optional[:class:`str`]
+    region: APINullable[:class:`str`]
         Voice region id for the guild (deprecated)
-    afk_channel_id: Optional[:class:`~melisa.utils.types.Snowflake`]
+    afk_channel_id: APINullable[:class:`~melisa.utils.types.Snowflake`]
         Id of afk channel
     afk_timeout: :class:`int`
         Afk timeout in seconds
@@ -281,89 +281,89 @@ class Guild(APIModelBase):
         The channel id that the widget will generate an invite to, or `null` if set to no invite
     verification_level: :class:`int`
         Verification level required for the guild
-    default_message_notifications: Optional[:class:`int`]
+    default_message_notifications: APINullable[:class:`int`]
         Default message notifications level
     explicit_content_filter: :class:`int`
         Explicit content filter level
-    features: Optional[:class:`typing.Any`]
+    features: APINullable[:class:`typing.Any`]
         Enabled guild features
-    roles: Optional[:class:`typing.Any`]
+    roles: APINullable[:class:`typing.Any`]
         Roles in the guild
-    emojis: Optional[:class:`typing.Any`]
+    emojis: APINullable[:class:`typing.Any`]
         Custom guild emojis
     mfa_level: :class:`int`
         Required MFA level for the guild
-    application_id: Optional[:class:`~melisa.utils.types.Snowflake`]
+    application_id: APINullable[:class:`~melisa.utils.types.Snowflake`]
         Application id of the guild creator if it is bot-created
-    system_channel_id: Optional[:class:`~melisa.utils.types.Snowflake`]
+    system_channel_id: APINullable[:class:`~melisa.utils.types.Snowflake`]
         The id of the channel where guild notices
         such as welcome messages and boost events are posted
     system_channel_flags: :class:`int`
         System channel flags
-    rules_channel_id: Optional[:class:`~melisa.utils.types.Snowflake`]
+    rules_channel_id: APINullable[:class:`~melisa.utils.types.Snowflake`]
         The id of the channel where Community guilds can display rules and/or guidelines
-    joined_at: Optional[:class:`int`]
+    joined_at: APINullable[:class:`int`]
         When this guild was joined at
-    large: Optional[:class:`bool`]
+    large: APINullable[:class:`bool`]
         True if this is considered a large guild
     unavailable: :class:`bool`
         True if this guild is unavailable due to an outage
-    member_count: Optional[:class:`int`]
+    member_count: APINullable[:class:`int`]
         Total number of members in this guild
     voice_states:
         States of members currently in voice channels; lacks the `guild_id` key
-    members: Optional[:class:`typing.Any`]
+    members: APINullable[:class:`typing.Any`]
         Users in the guild
-    channels: Optional[:class:`typing.Any`]
+    channels: APINullable[:class:`typing.Any`]
         Channels in the guild
-    threads: Optional[:class:`typing.Any`]
+    threads: APINullable[:class:`typing.Any`]
         All active threads in the guild that current user has permission to view
-    presences: Optional[:class:`typing.Any`]
+    presences: APINullable[:class:`typing.Any`]
         Presences of the members in the guild, will only include non-offline members
         if the size is greater than `large threshold`
-    max_presences: Optional[:class:`int`]
+    max_presences: APINullable[:class:`int`]
         The maximum number of presences for the guild
         (`null` is always returned, apart from the largest of guilds)
-    max_members: Optional[:class:`int`]
+    max_members: APINullable[:class:`int`]
         The maximum number of members for the guild
-    vanity_url_code: Optional[:class:`str`]
+    vanity_url_code: APINullable[:class:`str`]
         The vanity url code for the guild
-    description: Optional[:class:`str`]
+    description: APINullable[:class:`str`]
         The description of a Community guild
     banner: Optional[:class:`str`]
         Banner hash
-    premium_tier: Optional[:class:`str`]
+    premium_tier: APINullable[:class:`str`]
         Premium tier (Server Boost level)
-    premium_subscription_count: Optional[:class:`int`]
+    premium_subscription_count: APINullable[:class:`int`]
         The number of boosts this guild currently has
-    preferred_locale: Optional[:class:`str`]
+    preferred_locale: APINullable[:class:`str`]
         The preferred locale of a Community guild;
         used in server discovery and notices from Discord,
         and sent in interactions; defaults to "en-US"
-    public_updates_channel_id: Optional[:class:`~melisa.utils.types.Snowflake`]
+    public_updates_channel_id: APINullable[:class:`~melisa.utils.types.Snowflake`]
         The id of the channel where admins and moderators of
         Community guilds receive notices from Discord
-    max_video_channel_users: Optional[:class:`int`]
+    max_video_channel_users: APINullable[:class:`int`]
         The maximum amount of users in a video channel
-    approximate_member_count: Optional[:class:`int`]
+    approximate_member_count: APINullable[:class:`int`]
         Approximate number of members in this guild,
         returned from the `GET /guilds/<id>` endpoint when `with_counts` is `true`
-    approximate_presence_count: Optional[:class:`int`]
+    approximate_presence_count: APINullable[:class:`int`]
         Approximate number of non-offline members in this guild,
         returned from the `GET /guilds/<id>`
         endpoint when `with_counts` is `true`
-    nsfw_level: Optional[:class:`int`]
+    nsfw_level: APINullable[:class:`int`]
         Guild NSFW level
-    premium_progress_bar_enabled: Optional[:class:`bool`]
+    premium_progress_bar_enabled: APINullable[:class:`bool`]
         Whether the guild has the boost progress bar enabled
-    stage_instances: Optional[:class:`typing.Any`]
+    stage_instances: APINullable[:class:`typing.Any`]
         Stage instances in the guild
-    stickers: Optional[:class:`typing.Any`]
+    stickers: APINullable[:class:`typing.Any`]
         Custom guild stickers
-    welcome_screen: Optional[:class:`typing.Any`]
+    welcome_screen: APINullable[:class:`typing.Any`]
         The welcome screen of a Community guild, shown to new members,
         returned in an Invite's guild object
-    guild_scheduled_events: Optional[:class:`typing.Any`]
+    guild_scheduled_events: APINullable[:class:`typing.Any`]
         The scheduled events in the guild
     """
 

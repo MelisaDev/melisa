@@ -121,34 +121,32 @@ class User(APIModelBase):
         the user's username, not unique across the platform
     discriminator: :class:`int`
         the user's 4-digit discord-tag
-    avatar: :class:`str`
+    avatar: Optional[:class:`str`]
         the user's avatar hash
-    bot: :class:`bool`
+    bot: APINullable[:class:`bool`]
         whether the user belongs to an OAuth2 application
-    system: :class:`bool`
+    system: APINullable[:class:`bool`]
         whether the user is an Official Discord System user (part of the urgent message system)
-    mfa_enabled: :class:`bool`
+    mfa_enabled: APINullable[:class:`bool`]
         whether the user has two factor enabled on their account
-    banner: :class:`str`
+    banner: APINullable[:class:`str`]
         the user's banner hash
-    accent_color: :class:`int`
+    accent_color: APINullable[:class:`int`]
         the user's banner color encoded as an integer representation of hexadecimal color code
-    locale: :class:`str`
+    locale: APINullable[:class:`str`]
         the user's chosen language option
-    verified: :class:`bool`
+    verified: APINullable[:class:`bool`]
         whether the email on this account has been verified
-    email: :class:`str`
+    email: APINullable[:class:`str`]
         the user's email
-    flags: :class:`~models.user.user.UserFlags`
+    flags: APINullable[:class:`~models.user.user.UserFlags`]
         the flags on a user's account
-    premium_type: :class:`int`
+    premium_type: APINullable[:class:`int`]
         the type of Nitro subscription on a user's account
-    public_flags: :class:`int`
+    public_flags: APINullable[:class:`int`]
         the public flags on a user's account
-    premium: :class:`PremiumTypes`
+    premium: APINullable[:class:`PremiumTypes`]
         The user their premium type in a usable enum.
-    mention: :class:`str`
-        The user's mention string. (<@id>)
     """
 
     id: APINullable[Snowflake] = None
