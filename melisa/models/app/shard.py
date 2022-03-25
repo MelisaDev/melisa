@@ -10,10 +10,7 @@ from ..user import BotActivity
 
 
 class Shard:
-    def __init__(self,
-                 client,
-                 shard_id: int,
-                 num_shards: int):
+    def __init__(self, client, shard_id: int, num_shards: int):
         self._client = client
 
         self._shard_id: int = shard_id
@@ -38,11 +35,13 @@ class Shard:
         """|coro|
 
         Launches new shard"""
-        self._gateway = Gateway(self._client,
-                                self._shard_id,
-                                self._num_shards,
-                                start_activity=kwargs.get("activity"),
-                                start_status=kwargs.get("status"))
+        self._gateway = Gateway(
+            self._client,
+            self._shard_id,
+            self._num_shards,
+            start_activity=kwargs.get("activity"),
+            start_status=kwargs.get("status"),
+        )
 
         self._client.shards[self._shard_id] = self
 
@@ -54,11 +53,13 @@ class Shard:
 
     async def close(self):
         """|coro|
-            Disconnect shard
+        Disconnect shard
         """
         create_task(self._gateway.close())
 
-    async def update_presence(self, activity: BotActivity = None, status: str = None) -> Shard:
+    async def update_presence(
+        self, activity: BotActivity = None, status: str = None
+    ) -> Shard:
         """
         |coro|
 

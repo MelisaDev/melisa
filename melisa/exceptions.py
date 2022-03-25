@@ -1,25 +1,29 @@
 # Copyright MelisaDev 2022 - Present
 # Full MIT License can be found in `LICENSE.txt` at the project root.
 
+
 class MelisaException(Exception):
     """Base exception"""
+
     pass
 
 
 class ClientException(MelisaException):
     """Handling user errors"""
+
     pass
 
 
 class LoginFailure(ClientException):
     """Fails to log you in from improper credentials or some other misc."""
+
     pass
 
 
 class ConnectionClosed(ClientException):
     """Exception that's thrown when the gateway connection is closed
     for reasons that could not be handled
-    internally. """
+    internally."""
 
     def __init__(self, socket, *, shard_id, code=None):
         message = "Websocket with shard ID {} closed with code {}"
@@ -38,9 +42,11 @@ class PrivilegedIntentsRequired(ClientException):
 
     def __init__(self, shard_id):
         self.shard_id = shard_id
-        message = "Shard ID {} is requesting privileged intents " \
-                  "that have not been explicitly enabled in the " \
-                  "developer portal. Please visit to https://discord.com/developers/applications/ "
+        message = (
+            "Shard ID {} is requesting privileged intents "
+            "that have not been explicitly enabled in the "
+            "developer portal. Please visit to https://discord.com/developers/applications/ "
+        )
 
         super().__init__(message.format(self.shard_id))
 

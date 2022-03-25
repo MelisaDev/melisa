@@ -15,12 +15,14 @@ else:
     HAS_ORJSON = True
 
 if HAS_ORJSON:
+
     def dumps(obj: Any) -> str:
-        return orjson.dumps(obj).decode('utf-8')
+        return orjson.dumps(obj).decode("utf-8")
 
     loads = orjson.loads
 else:
+
     def dumps(obj: Any) -> str:
-        return json.dumps(obj, separators=(',', ':'), ensure_ascii=True)
+        return json.dumps(obj, separators=(",", ":"), ensure_ascii=True)
 
     loads = json.loads

@@ -169,20 +169,12 @@ class User(APIModelBase):
         """APINullable[:class:`~melisa.models.user.user.PremiumTypes`]: The
         user their premium type in a usable enum.
         """
-        return (
-            None
-            if self.premium_type is None
-            else PremiumTypes(self.premium_type)
-        )
+        return None if self.premium_type is None else PremiumTypes(self.premium_type)
 
     @property
     def flags(self) -> Optional[UserFlags]:
         """Flags of user"""
-        return(
-            None
-            if self.flags is None
-            else UserFlags(self.flags)
-        )
+        return None if self.flags is None else UserFlags(self.flags)
 
     def __str__(self):
         """String representation of the User object"""
@@ -195,10 +187,13 @@ class User(APIModelBase):
 
     def avatar_url(self) -> str:
         """Avatar url (from the Discord CDN server)"""
-        return "https://cdn.discordapp.com/avatars/{}/{}.png?size=1024".format(self.id, self.avatar)
+        return "https://cdn.discordapp.com/avatars/{}/{}.png?size=1024".format(
+            self.id, self.avatar
+        )
 
     async def create_dm_channel(self):
         # ToDo: Add docstrings
         # ToDo: Add checking this channel in cache
         return await self._http.post(
-            "/users/@me/channels", data={"recipient_id": self.id})
+            "/users/@me/channels", data={"recipient_id": self.id}
+        )

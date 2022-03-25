@@ -12,6 +12,7 @@ from typing import Dict, Tuple, Any
 @dataclass
 class RateLimitBucket:
     """Represents a rate limit bucket"""
+
     limit: int
     remaining: int
     reset: float
@@ -23,15 +24,12 @@ class RateLimiter:
     """Prevents ``user`` rate limits"""
 
     def __init__(self) -> None:
-        self.bucket_map: Dict[Tuple[str, str], str] = {}  # Dict[Tuple[endpoint, method], bucket_id]
+        self.bucket_map: Dict[
+            Tuple[str, str], str
+        ] = {}  # Dict[Tuple[endpoint, method], bucket_id]
         self.buckets: Dict[str, RateLimitBucket] = {}
 
-    def save_response_bucket(
-        self,
-        endpoint: str,
-        method: str,
-        header: Any
-    ):
+    def save_response_bucket(self, endpoint: str, method: str, header: Any):
         ratelimit_bucket_id = header.get("X-RateLimit-Bucket")
 
         if not ratelimit_bucket_id:
@@ -44,14 +42,10 @@ class RateLimiter:
             remaining=int(header["X-RateLimit-Remaining"]),
             reset=float(header["X-RateLimit-Reset"]),
             reset_after_timestamp=float(header["X-RateLimit-Reset-After"]),
-            since_timestamp=time()
+            since_timestamp=time(),
         )
 
-    async def wait_until_not_ratelimited(
-        self,
-        endpoint: str,
-        method: str
-    ):
+    async def wait_until_not_ratelimited(self, endpoint: str, method: str):
         bucket_id = self.bucket_map.get((endpoint, method))
 
         if not bucket_id:

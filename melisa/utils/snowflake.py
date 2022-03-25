@@ -24,9 +24,7 @@ class Snowflake(int):
         super().__init__()
 
         if self < self._MIN_VALUE:
-            raise ValueError(
-                "snowflake value should be greater than or equal to 0."
-            )
+            raise ValueError("snowflake value should be greater than or equal to 0.")
 
         if self > self._MAX_VALUE:
             raise ValueError(
@@ -66,7 +64,7 @@ class Snowflake(int):
 
     @property
     def increment(self) -> int:
-        """	For every ID that is generated on that process, this number is incremented"""
+        """For every ID that is generated on that process, this number is incremented"""
         return self % 2048
 
     @property

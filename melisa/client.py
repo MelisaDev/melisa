@@ -83,24 +83,26 @@ class Client:
 
     def run(self) -> None:
         """
-            Run Bot without shards (only 0 shard)
+        Run Bot without shards (only 0 shard)
         """
         inited_shard = Shard(self, 0, 1)
 
-        asyncio.ensure_future(inited_shard.launch(activity=self._activity,
-                                                  status=self._status), loop=self._loop)
+        asyncio.ensure_future(
+            inited_shard.launch(activity=self._activity, status=self._status),
+            loop=self._loop,
+        )
         self._loop.run_forever()
 
     def run_shards(self, num_shards: int, *, shard_ids: List[int] = None):
         """
-            Run Bot with shards specified by the user.
+        Run Bot with shards specified by the user.
 
-            Parameters
-            ----------
-            num_shards : :class:`int`
-                The endpoint to send the request to.
-            shard_ids: Optional[:class:`List[int]`]
-                List of Ids of shards to start.
+        Parameters
+        ----------
+        num_shards : :class:`int`
+            The endpoint to send the request to.
+        shard_ids: Optional[:class:`List[int]`]
+            List of Ids of shards to start.
         """
         if not shard_ids:
             shard_ids = range(num_shards)
@@ -108,13 +110,15 @@ class Client:
         for shard_id in shard_ids:
             inited_shard = Shard(self, shard_id, num_shards)
 
-            asyncio.ensure_future(inited_shard.launch(activity=self._activity,
-                                                      status=self._status), loop=self._loop)
+            asyncio.ensure_future(
+                inited_shard.launch(activity=self._activity, status=self._status),
+                loop=self._loop,
+            )
         self._loop.run_forever()
 
     def run_autosharded(self):
         """
-            Runs the bot with the amount of shards specified by the Discord gateway.
+        Runs the bot with the amount of shards specified by the Discord gateway.
         """
         num_shards = self._gateway_info.shards
         shard_ids = range(num_shards)
@@ -122,18 +126,20 @@ class Client:
         for shard_id in shard_ids:
             inited_shard = Shard(self, shard_id, num_shards)
 
-            asyncio.ensure_future(inited_shard.launch(activity=self._activity,
-                                                      status=self._status), loop=self._loop)
+            asyncio.ensure_future(
+                inited_shard.launch(activity=self._activity, status=self._status),
+                loop=self._loop,
+            )
         self._loop.run_forever()
 
     async def fetch_user(self, user_id: Union[Snowflake, str, int]):
         """
-            Fetch User from the Discord API (by id).
+        Fetch User from the Discord API (by id).
 
-            Parameters
-            ----------
-            user_id : :class:`Union[Snowflake, str, int]`
-                Id of user to fetch
+        Parameters
+        ----------
+        user_id : :class:`Union[Snowflake, str, int]`
+            Id of user to fetch
         """
 
         # ToDo: Update cache if USER_CACHING enabled.
@@ -144,12 +150,12 @@ class Client:
 
     async def fetch_guild(self, guild_id: Union[Snowflake, str, int]):
         """
-            Fetch Guild from the Discord API (by id).
+        Fetch Guild from the Discord API (by id).
 
-            Parameters
-            ----------
-            guild_id : :class:`Union[Snowflake, str, int]`
-                Id of guild to fetch
+        Parameters
+        ----------
+        guild_id : :class:`Union[Snowflake, str, int]`
+            Id of guild to fetch
         """
 
         # ToDo: Update cache if GUILD_CACHE enabled.

@@ -12,10 +12,10 @@ from ...utils.types import APINullable
 
 class BasePresence:
     """
-        All the information about activities here is from the Discord API docs.
-        Read more here: https://discord.com/developers/docs/topics/gateway#activity-object
+    All the information about activities here is from the Discord API docs.
+    Read more here: https://discord.com/developers/docs/topics/gateway#activity-object
 
-        Unknown data will be returned as None.
+    Unknown data will be returned as None.
     """
 
 
@@ -39,6 +39,7 @@ class ActivityType(IntEnum):
     COMPETING:
         Competing in {name} (Competing in Arena World Champions)
     """
+
     GAME = 0
     STREAMING = 1
     LISTENING = 2
@@ -61,6 +62,7 @@ class ActivityTimestamp(BasePresence, APIModelBase):
     end: Optional[:class:`int`]
         Unix time (in milliseconds) of when the activity ends
     """
+
     start: APINullable[int] = None
     end: APINullable[int] = None
 
@@ -78,6 +80,7 @@ class ActivityEmoji(BasePresence, APIModelBase):
     animated: Optional[:class:`bool`]
         Whether this emoji is animated
     """
+
     name: str
     id: APINullable[Snowflake] = None
     animated: APINullable[bool] = None
@@ -94,6 +97,7 @@ class ActivityParty(BasePresence, APIModelBase):
     size: Optional[Tuple[:class:`int`, :class:`int`]]
         Array of two integers (current_size, max_size)
     """
+
     id: APINullable[str] = None
     size: APINullable[Tuple[int, int]] = None
 
@@ -115,6 +119,7 @@ class ActivityAssets(BasePresence, APIModelBase):
     small_text: Optional[:class:`str`]
         text displayed when hovering over the small image of the activity
     """
+
     large_image: APINullable[str] = None
     large_text: APINullable[str] = None
     small_image: APINullable[str] = None
@@ -134,6 +139,7 @@ class ActivitySecrets(BasePresence, APIModelBase):
     match: Optional[:class:`str`]
         The secret for a specific instanced match
     """
+
     join: APINullable[str] = None
     spectate: APINullable[str] = None
     match_: APINullable[str] = None
@@ -141,9 +147,9 @@ class ActivitySecrets(BasePresence, APIModelBase):
 
 class ActivityFlags(BasePresence, APIModelBase):
     """
-        Just Activity Flags (From Discord API).
+    Just Activity Flags (From Discord API).
 
-        Everything returns :class:`bool` value.
+    Everything returns :class:`bool` value.
     """
 
     def __init__(self, flags) -> None:
@@ -172,6 +178,7 @@ class ActivityButton(BasePresence, APIModelBase):
     url: :class:`str`
         The url opened when clicking the button (1-512 characters)
     """
+
     label: str
     url: str
 
@@ -251,11 +258,11 @@ class BotActivity(BasePresence, APIModelBase):
 
 
 class StatusType(Enum):
-    ONLINE = 'online'
-    OFFLINE = 'offline'
-    IDLE = 'idle'
-    DND = 'dnd'
-    INVISIBLE = 'invisible'
+    ONLINE = "online"
+    OFFLINE = "offline"
+    IDLE = "idle"
+    DND = "dnd"
+    INVISIBLE = "invisible"
 
     def __str__(self):
         return self.value

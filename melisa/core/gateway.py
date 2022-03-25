@@ -20,6 +20,7 @@ from ..utils import APIModelBase, json
 @dataclass
 class GatewayBotInfo(APIModelBase):
     """Gateway info from the `gateway/bot` endpoint"""
+
     url: str
     shards: int
     session_start_limit: dict
@@ -39,11 +40,7 @@ class Gateway:
     HELLO = 10
     HEARTBEAT_ACK = 11
 
-    def __init__(self,
-                 client,
-                 shard_id: int = 0,
-                 num_shards: int = 1,
-                 **kwargs):
+    def __init__(self, client, shard_id: int = 0, num_shards: int = 1, **kwargs):
 
         self.GATEWAY_VERSION = "9"
         self.interval = None
@@ -52,7 +49,7 @@ class Gateway:
         self.__session = aiohttp.ClientSession()
         self.session_id = None
         self.client = client
-        self.latency = float('inf')
+        self.latency = float("inf")
         self.ws = None
         self.loop = asyncio.get_event_loop()
         self.shard_id = shard_id
@@ -63,7 +60,7 @@ class Gateway:
             4011: GatewayError("Sharding required"),
             4012: GatewayError("Invalid API version"),
             4013: GatewayError("Invalid intents"),
-            4014: PrivilegedIntentsRequired("Disallowed intents")
+            4014: PrivilegedIntentsRequired("Disallowed intents"),
         }
 
         self.listeners = listeners
@@ -76,19 +73,21 @@ class Gateway:
             "properties": {
                 "$os": sys.platform,
                 "$browser": "Melisa Python Library",
-                "$device": "Melisa Python Library"
+                "$device": "Melisa Python Library",
             },
             "compress": True,
             "shard": [shard_id, num_shards],
-            "presence": self.generate_presence(kwargs.get("start_activity"),
-                                               kwargs.get("start_status"))}
+            "presence": self.generate_presence(
+                kwargs.get("start_activity"), kwargs.get("start_status")
+            ),
+        }
 
         self._zlib: zlib._Decompress = zlib.decompressobj()
         self._buffer: bytearray = bytearray()
 
     async def connect(self) -> None:
         self.ws = await self.__session.ws_connect(
-            f'wss://gateway.discord.gg/?v={self.GATEWAY_VERSION}&encoding=json&compress=zlib-stream'
+            f"wss://gateway.discord.gg/?v={self.GATEWAY_VERSION}&encoding=json&compress=zlib-stream"
         )
 
         if self.session_id is None:
@@ -114,10 +113,10 @@ class Gateway:
             if type(msg) is bytes:
                 self._buffer.extend(msg)
 
-                if len(msg) < 4 or msg[-4:] != b'\x00\x00\xff\xff':
+                if len(msg) < 4 or msg[-4:] != b"\x00\x00\xff\xff":
                     return None
                 msg = self._zlib.decompress(self._buffer)
-                msg = msg.decode('utf-8')
+                msg = msg.decode("utf-8")
                 self._buffer = bytearray()
 
             return json.loads(msg)
@@ -125,7 +124,7 @@ class Gateway:
             return None
 
     async def handle_data(self, data):
-        if data['op'] == self.DISPATCH:
+        if data["op"] == self.DISPATCH:
             self.sequence = int(data["s"])
             event_type = data["t"].lower()
 
@@ -134,12 +133,12 @@ class Gateway:
             if event_to_call is not None:
                 ensure_future(event_to_call(self.client, self, data["d"]))
 
-        elif data['op'] == self.INVALID_SESSION:
+        elif data["op"] == self.INVALID_SESSION:
             await self.ws.close(code=4000)
             await self.handle_close(4000)
-        elif data['op'] == self.HELLO:
+        elif data["op"] == self.HELLO:
             await self.send_hello(data)
-        elif data['op'] == self.HEARTBEAT_ACK:
+        elif data["op"] == self.HEARTBEAT_ACK:
             self.latency = time.perf_counter() - self._last_send
 
     async def receive(self) -> None:
@@ -184,34 +183,28 @@ class Gateway:
         self._buffer.clear()
 
     async def send_hello(self, data: Dict) -> None:
-        interval = data['d']['heartbeat_interval'] / 1000
+        interval = data["d"]["heartbeat_interval"] / 1000
         await asyncio.sleep((interval - 2000) / 1000)
         self.loop.create_task(self.send_heartbeat(interval))
 
     async def send_identify(self) -> None:
-        await self.send(self.opcode(
-            self.IDENTIFY,
-            self.auth
-        ))
+        await self.send(self.opcode(self.IDENTIFY, self.auth))
 
     async def resume(self) -> None:
         await self.send(
             self.opcode(
                 self.RESUME,
                 {
-                    'token': self.client._token,
-                    'session_id': self.session_id,
-                    'seq': self.sequence,
-                }
+                    "token": self.client._token,
+                    "session_id": self.session_id,
+                    "seq": self.sequence,
+                },
             )
         )
 
     @staticmethod
     def generate_presence(activity: BotActivity = None, status: str = None):
-        data = {
-            "since": time.time() * 1000,
-            "afk": False
-        }
+        data = {"since": time.time() * 1000, "afk": False}
 
         if activity is not None:
             data["activities"] = activity.to_dict()
@@ -226,8 +219,5 @@ class Gateway:
 
     @staticmethod
     def opcode(opcode: int, payload) -> str:
-        data = {
-            "op": opcode,
-            "d": payload
-        }
+        data = {"op": opcode, "d": payload}
         return json.dumps(data)

@@ -66,9 +66,7 @@ class APIModelBase:
         cls._client = client
 
     @classmethod
-    def from_dict(
-        cls: Generic[T], data: Dict[str, Union[str, bool, int, Any]]
-    ) -> T:
+    def from_dict(cls: Generic[T], data: Dict[str, Union[str, bool, int, Any]]) -> T:
         """
         Parse an API object from a dictionary.
         """
@@ -81,13 +79,10 @@ class APIModelBase:
                 map(
                     lambda key: (
                         key,
-                        data[key].value
-                        if isinstance(data[key], Enum)
-                        else data[key],
+                        data[key].value if isinstance(data[key], Enum) else data[key],
                     ),
                     filter(
-                        lambda object_argument: data.get(object_argument)
-                        is not None,
+                        lambda object_argument: data.get(object_argument) is not None,
                         getfullargspec(cls.__init__).args,
                     ),
                 )
