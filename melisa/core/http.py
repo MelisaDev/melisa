@@ -14,7 +14,10 @@ from melisa.exceptions import (NotModifiedError,
                                UnauthorizedError,
                                HTTPException,
                                NotFoundError,
-                               MethodNotAllowedError)
+                               MethodNotAllowedError,
+                               ServerError,
+                               RateLimitError)
+from .ratelimiter import RateLimiter
 
 
 class HTTPClient:
@@ -23,6 +26,7 @@ class HTTPClient:
     def __init__(self, token: str, *, ttl: int = 5):
         self.url: str = f"https://discord.com/api/v{self.API_VERSION}"
         self.max_ttl: int = ttl
+        self.__rate_limiter = RateLimiter()
 
         headers: Dict[str, str] = {
             "Content-Type": "application/json",
@@ -36,10 +40,17 @@ class HTTPClient:
             401: UnauthorizedError(),
             403: ForbiddenError(),
             404: NotFoundError(),
-            405: MethodNotAllowedError()
+            405: MethodNotAllowedError(),
+            429: RateLimitError()
         }
 
         self.__aiohttp_session: ClientSession = ClientSession(headers=headers)
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc, tb):
+        await self.close()
 
     async def close(self):
         """Close the aiohttp session"""
@@ -57,11 +68,18 @@ class HTTPClient:
 
         ttl = _ttl or self.max_ttl
 
+        if ttl == 0:
+            raise ServerError(f"Maximum amount of retries for `{endpoint}`.")
+
+        await self.__rate_limiter.wait_until_not_ratelimited(
+            endpoint,
+            method
+        )
+
         url = f"{self.url}/{endpoint}"
 
-        if ttl != 0:
-            async with self.__aiohttp_session.request(method, url, **kwargs) as response:
-                return await self.__handle_response(response, method, endpoint, _ttl=ttl, **kwargs)
+        async with self.__aiohttp_session.request(method, url, **kwargs) as response:
+            return await self.__handle_response(response, method, endpoint, _ttl=ttl, **kwargs)
 
     async def __handle_response(
             self,
@@ -74,12 +92,26 @@ class HTTPClient:
     ) -> Optional[Dict]:
         """Handle responses from the Discord API."""
 
+        self.__rate_limiter.save_response_bucket(
+            endpoint, method, res.headers
+        )
+
         if res.ok:
             return await res.json()
 
         exception = self.__http_exceptions.get(res.status)
 
         if exception:
+            if isinstance(exception, RateLimitError):
+                timeout = (await res.json()).get("retry_after", 40)
+
+                await asyncio.sleep(timeout)
+                return await self.__send(
+                    method,
+                    endpoint,
+                    **kwargs
+                )
+
             exception.__init__(res.reason)
             raise exception
 
