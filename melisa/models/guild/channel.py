@@ -19,7 +19,7 @@ class ChannelTypes(IntEnum):
     Attributes
     ----------
     GUILD_TEXT:
-        A text channel within a server 
+        A text channel within a server
     DM:
         A direct message between users
     GUILD_VOICE:
@@ -54,7 +54,6 @@ class ChannelTypes(IntEnum):
     GUILD_PRIVATE_THREAD = 12
     GUILD_STAGE_VOICE = 13
 
-
     def __int__(self):
         return self.value
 
@@ -81,7 +80,7 @@ class VideoQualityModes(IntEnum):
 class Channel(APIModelBase):
     """Represents a guild or DM channel within Discord"""
 
-    #TODO: Add a description for Channel
+    # TODO: Add a description for Channel
 
     id: APINullable[Snowflake] = None
     type: APINullable[int] = None
@@ -109,4 +108,3 @@ class Channel(APIModelBase):
     member: APINullable[List[Any]] = None
     default_auto_archive_duration: APINullable[int] = None
     permissions: APINullable[str] = None
-
