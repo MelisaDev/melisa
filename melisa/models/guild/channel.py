@@ -37,7 +37,8 @@ class ChannelTypes(IntEnum):
     GUILD_PUBLIC_THREAD:
         A temporary sub-channel within a GUILD_TEXT channel
     GUILD_PRIVATE_THREAD:
-        A temporary sub-channel within a GUILD_TEXT channel that is only viewable by those invited and those with the MANAGE_THREADS permission
+        A temporary sub-channel within a GUILD_TEXT channel that is only viewable by those invited
+        and those with the MANAGE_THREADS permission
     GUILD_STAGE_VOICE:
         A voice channel for hosting events with an audience
     """
