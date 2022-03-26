@@ -4,17 +4,17 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import IntEnum, Enum
-from typing import List, Any
+from enum import IntEnum
+from typing import List, Any, Optional, AsyncIterator, Union, Dict
 
 from ...utils import Snowflake
 from ...utils import APIModelBase
 from ...utils.types import APINullable
 
 
-class ChannelTypes(IntEnum):
-    """Channel Types
-    NOTE: Type 10, 11 and 12 are only available in API v9.
+class ChannelType(IntEnum):
+    """Channel Type
+    NOTE: Type 10, 11 and 12 are only available in API v9 and older.
 
     Attributes
     ----------
@@ -109,3 +109,77 @@ class Channel(APIModelBase):
     member: APINullable[List[Any]] = None
     default_auto_archive_duration: APINullable[int] = None
     permissions: APINullable[str] = None
+
+    @property
+    def mention(self):
+        return f"<#{self.id}>"
+
+
+class TextChannel(Channel):
+    """A subclass of ``Channel`` representing text channels with all the same attributes."""
+
+    async def history(
+        self,
+        limit: int = 50,
+        *,
+        before: Optional[Union[int, str, Snowflake]] = None,
+        after: Optional[Union[int, str, Snowflake]] = None,
+        around: Optional[Union[int, str, Snowflake]] = None,
+    ) -> AsyncIterator[Dict[str, Any]]:
+        """|coro|
+        Returns a list of messages in this channel.
+
+        Examples
+        ---------
+        Flattening messages into a list: ::
+            messages = [message async for message in channel.history(limit=111)]
+
+        All parameters are optional.
+
+        Parameters
+        ----------
+        around : Optional[Union[:class:`int`, :class:`str`, :class:`Snowflake`]]
+            Get messages around this message ID.
+        before : Optional[Union[:class:`int`, :class:`str`, :class:`Snowflake`]]
+            Get messages before this message ID.
+        after : Optional[Union[:class:`int`, :class:`str`, :class:`Snowflake`]]
+            Get messages after this message ID.
+        limit : Optional[Union[:class:`int`, :class:`str`, :class:`Snowflake`]]
+            Max number of messages to return (1-100).
+
+        Returns
+        -------
+        AsyncIterator[Dict[:class:`str`, Any]]
+            An iterator of messages.
+        """
+
+        if limit is None:
+            limit = 100
+
+        while limit > 0:
+            search_limit = min(limit, 100)
+
+            raw_messages = await self._http.get(
+                f"/channels/{self.id}/messages",
+                params={
+                    "limit": search_limit,
+                    "before": before,
+                    "after": after,
+                    "around": around,
+                },
+            )
+
+            if not raw_messages:
+                break
+
+            for message_data in raw_messages:
+                yield message_data
+
+            before = raw_messages[-1]["id"]
+            limit -= search_limit
+
+
+# noinspection PyTypeChecker
+channel_types_for_converting: Dict[ChannelType, Any] = {
+    ChannelType.GUILD_TEXT: TextChannel
+}

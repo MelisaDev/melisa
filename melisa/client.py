@@ -8,9 +8,10 @@ from .utils.types import Coro
 
 from .core.http import HTTPClient
 from .core.gateway import GatewayBotInfo
+from .models.guild.channel import Channel, ChannelType, channel_types_for_converting
 
 import asyncio
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Any
 
 
 class Client:
@@ -163,3 +164,26 @@ class Client:
         data = await self.http.get(f"guilds/{guild_id}")
 
         return Guild.from_dict(data)
+
+    async def fetch_channel(
+        self, channel_id: Union[Snowflake, str, int]
+    ) -> Union[Channel, Any]:
+        """
+        Fetch Channel from the Discord API (by id).
+        If type of channel is unknown:
+        it will return just :class:`melisa.models.guild.channel.Channel` object.
+
+        Parameters
+        ----------
+        channel_id : :class:`Union[Snowflake, str, int]`
+            Id of channel to fetch
+        """
+
+        # ToDo: Update cache if CHANNEL_CACHE enabled.
+
+        data = (await self.http.get(f"channels/{channel_id}")) or {}
+
+        data.update({"type": ChannelType(data.pop("type"))})
+
+        channel_cls = channel_types_for_converting.get(data["type"], Channel)
+        return channel_cls.from_dict(data)

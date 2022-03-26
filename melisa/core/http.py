@@ -20,6 +20,7 @@ from melisa.exceptions import (
     RateLimitError,
 )
 from .ratelimiter import RateLimiter
+from ..utils import remove_none
 
 
 class HTTPClient:
@@ -59,7 +60,13 @@ class HTTPClient:
         await self.__aiohttp_session.close()
 
     async def __send(
-        self, method: str, endpoint: str, *, _ttl: int = None, **kwargs
+        self,
+        method: str,
+        endpoint: str,
+        *,
+        _ttl: int = None,
+        params: Optional[Dict] = None,
+        **kwargs,
     ) -> Optional[Dict]:
         """Send an API request to the Discord API."""
 
@@ -72,7 +79,9 @@ class HTTPClient:
 
         url = f"{self.url}/{endpoint}"
 
-        async with self.__aiohttp_session.request(method, url, **kwargs) as response:
+        async with self.__aiohttp_session.request(
+            method, url, params=remove_none(params), **kwargs
+        ) as response:
             return await self.__handle_response(
                 response, method, endpoint, _ttl=ttl, **kwargs
             )
@@ -111,7 +120,7 @@ class HTTPClient:
 
         return await self.__send(method, endpoint, _ttl=_ttl - 1, **kwargs)
 
-    async def get(self, route: str, params: Optional[Dict] = None) -> Optional[Dict]:
+    async def get(self, route: str, *, params: Optional[Dict] = None) -> Optional[Dict]:
         """|coro|
         Sends a GET request to a Discord REST API endpoint.
 

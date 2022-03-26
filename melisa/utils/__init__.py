@@ -7,5 +7,6 @@ from .snowflake import Snowflake
 
 
 from .api_model import APIModelBase
+from .conversion import remove_none
 
-__all__ = ("Coro", "Snowflake", "APIModelBase")
+__all__ = ("Coro", "Snowflake", "APIModelBase", "remove_none")
