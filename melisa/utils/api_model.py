@@ -32,18 +32,18 @@ def to_dict_without_none(model):
 
         return dict(result)
 
-    elif isinstance(model, tuple) and hasattr(model, "_fields"):
+    if isinstance(model, tuple) and hasattr(model, "_fields"):
         return type(model)(*[to_dict_without_none(v) for v in model])
 
-    elif isinstance(model, (list, tuple)):
+    if isinstance(model, (list, tuple)):
         return type(model)(to_dict_without_none(v) for v in model)
 
-    elif isinstance(model, dict):
+    if isinstance(model, dict):
         return type(model)(
             (to_dict_without_none(k), to_dict_without_none(v)) for k, v in model.items()
         )
-    else:
-        return copy.deepcopy(model)
+
+    return copy.deepcopy(model)
 
 
 class APIModelBase:
