@@ -27,4 +27,5 @@ User
 .. attributetable:: User
 
 .. autoclass:: User()
+    :inherited-members:
 

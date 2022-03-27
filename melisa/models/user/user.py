@@ -166,14 +166,10 @@ class User(APIModelBase):
 
     @property
     def premium(self) -> Optional[PremiumTypes]:
-        """APINullable[:class:`~melisa.models.user.user.PremiumTypes`]: The
-        user their premium type in a usable enum.
-        """
         return None if self.premium_type is None else PremiumTypes(self.premium_type)
 
     @property
     def flags(self) -> Optional[UserFlags]:
-        """Flags of user"""
         return None if self.flags is None else UserFlags(self.flags)
 
     def __str__(self):

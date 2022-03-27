@@ -34,7 +34,7 @@ class ChannelType(IntEnum):
     GUILD_STORE:
         A channel in which game developers can sell their game on Discord
     GUILD_NEWS_THREAD:
-        A temporary sub-channel within a `GUILD_NEWS` channel
+        A temporary sub-channel within a **GUILD_NEWS** channel
     GUILD_PUBLIC_THREAD:
         A temporary sub-channel within a GUILD_TEXT channel
     GUILD_PRIVATE_THREAD:
@@ -115,6 +115,42 @@ class Channel(APIModelBase):
     def mention(self):
         return f"<#{self.id}>"
 
+    async def delete(
+        self,
+        *,
+        reason: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """|coro|
+
+        Delete a channel, or close a private message.
+        Deleting a category does not delete its child channels;
+        they will have their parent_id removed.
+
+        Parameters
+        ----------
+        reason: Optional[:class:`str`]
+            The reason of the delete channel operation.
+
+        Raises
+        -------
+        NotFoundError
+            If channel is not found.
+        ForbiddenError
+            You do not have proper permissions to do the actions required.
+
+        Returns
+        -------
+        Dict[:class:`str`, Any]
+            Channel object.
+        """
+
+        message = await self._http.delete(
+            f"/channels/{self.id}",
+            headers={"X-Audit-Log-Reason": reason}
+        )
+
+        return message
+
 
 class TextChannel(Channel):
     """A subclass of ``Channel`` representing text channels with all the same attributes."""
@@ -128,6 +164,7 @@ class TextChannel(Channel):
         around: Optional[Union[int, str, Snowflake]] = None,
     ) -> AsyncIterator[Dict[str, Any]]:
         """|coro|
+
         Returns a list of messages in this channel.
 
         Examples
@@ -193,6 +230,7 @@ class TextChannel(Channel):
         message_id: Optional[Snowflake, int, str],
     ) -> Dict[str, Any]:
         """|coro|
+
         Returns a specific message in the channel.
 
         Parameters
@@ -223,6 +261,7 @@ class TextChannel(Channel):
         self, messages: List[Snowflake], *, reason: Optional[str] = None
     ):
         """|coro|
+
         Delete multiple messages in a single request.
         This method will not delete messages older than 2 weeks.
 
@@ -239,7 +278,7 @@ class TextChannel(Channel):
             if any message provided is older than that or if any duplicate message IDs are provided.
         ForbiddenError
             You do not have proper permissions to do the actions required.
-            (You must have `MANAGE_MESSAGES` permission)
+            (You must have **MANAGE_MESSAGES** permission)
         """
         await self._http.post(
             f"channels/{self.id}/messages/bulk-delete",
@@ -251,6 +290,7 @@ class TextChannel(Channel):
         self, message_id: Optional[Snowflake, str, int], *, reason: Optional[str] = None
     ):
         """|coro|
+
         Deletes only one specified message.
 
         Parameters
@@ -268,7 +308,7 @@ class TextChannel(Channel):
             If message is not found.
         ForbiddenError
             You do not have proper permissions to do the actions required.
-            (You must have `MANAGE_MESSAGES` permission)
+            (You must have **MANAGE_MESSAGES** permission)
         """
         await self._http.delete(
             f"channels/{self.id}/messages/{message_id}",
@@ -285,6 +325,7 @@ class TextChannel(Channel):
         reason: Optional[str] = None,
     ):
         """|coro|
+
         Purges a list of messages that meet the criteria specified in parameters.
         This method will not delete messages older than 2 weeks.
 
@@ -307,7 +348,7 @@ class TextChannel(Channel):
             if any message provided is older than that or if any duplicate message IDs are provided.
         ForbiddenError
             You do not have proper permissions to do the actions required.
-            (You must have `MANAGE_MESSAGES` permission)
+            (You must have **MANAGE_MESSAGES** permission)
         """
 
         iterator = self.history(
