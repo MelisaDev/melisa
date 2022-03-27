@@ -403,7 +403,6 @@ class Guild(APIModelBase):
     member_count: APINullable[int] = None
     voice_states: APINullable[List[Any]] = None
     members: APINullable[List[Any]] = None
-    channels: APINullable[List[Any]] = None
     threads: APINullable[List[Any]] = None
     presences: APINullable[List[Any]] = None
     # TODO: Make a structure for voice_states, members, channels, threads, presences(?)
@@ -429,6 +428,10 @@ class Guild(APIModelBase):
 
     # TODO: Make a structure for welcome_screen, stage_instances,
     #  stickers and guild_scheduled_events
+
+    @property
+    def channels(self):
+        return []
 
     @overload
     async def create_channel(
@@ -457,9 +460,9 @@ class Guild(APIModelBase):
         ----------
         name: str
             channel name (1-100 characters)
-        type: Optional[:class:int`]
+        type: Optional[:class:`int`]
             the type of channel
-        topic: Optional[:class:str`]
+        topic: Optional[:class:`str`]
             channel topic (0-1024 characters)
         bitrate: Optional[:class:`int`]
             the bitrate (in bits) of the voice channel (voice only)
