@@ -29,7 +29,7 @@ copyright = '2022, MelisaDev'
 author = 'MelisaDev'
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.1'
+release = '0.0.1a'
 
 
 # -- General configuration ---------------------------------------------------
@@ -44,6 +44,12 @@ extensions = [
     "sphinxcontrib_trio",
     "attributable"
 ]
+
+
+autodoc_default_options = {
+    'members': True,
+    'show-inheritance': True
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
