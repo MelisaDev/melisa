@@ -5,8 +5,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import IntEnum, Enum
-from typing import List, Any
+from typing import List, Any, Optional, overload
 
+from .channel import Channel, ChannelType, channel_types_for_converting
 from ...utils import Snowflake
 from ...utils import APIModelBase
 from ...utils.types import APINullable
@@ -428,6 +429,80 @@ class Guild(APIModelBase):
 
     # TODO: Make a structure for welcome_screen, stage_instances,
     #  stickers and guild_scheduled_events
+
+    @overload
+    async def create_channel(
+        self,
+        *,
+        name: str,
+        type: Optional[ChannelType] = None,
+        topic: Optional[str] = None,
+        bitrate: Optional[int] = None,
+        user_limit: Optional[int] = None,
+        rate_limit_per_user: Optional[int] = None,
+        position: Optional[int] = None,
+        permission_overwrites: Optional[List[Any]] = None,
+        parent_id: Optional[Snowflake] = None,
+        nsfw: Optional[bool] = None,
+        reason: Optional[str] = None,
+    ) -> Channel:
+        """|coro|
+        Create a new channel object for the guild.
+
+        Parameters
+        ----------
+        name: str
+            channel name (1-100 characters)
+        type: Optional[:class:int`]
+            the type of channel
+        topic: Optional[:class:str`]
+            channel topic (0-1024 characters)
+        bitrate: Optional[:class:`int`]
+            the bitrate (in bits) of the voice channel (voice only)
+        user_limit: Optional[:class:`int`]
+            the user limit of the voice channel (voice only)
+        rate_limit_per_user: Optional[:class:`int`]
+            amount of seconds a user has to wait
+            before sending another message (0-21600)
+            bots, as well as users with the permission
+            manage_messages or manage_channel, are unaffected
+        position: Optional[:class:`int`]
+            sorting position of the channel
+        permission_overwrites: Optional[List[Any]]
+            the channel's permission overwrites
+        parent_id: Optional[:class:`~melisa.Snowflake`]
+            id of the parent category for a channel
+        nsfw: Optional[:class:`bool`]
+            whether the channel is nsfw
+        reason: Optional[:class:`str`]
+            audit log reason |default| :data:`None`
+
+        Raises
+        -------
+        BadRequestError
+            If some specified parameters are wrong.
+        ForbiddenError
+            You do not have proper permissions to do the actions required.
+            This method requires `MANAGE_CHANNELS` permission.
+            Setting `MANAGE_ROLES` permission in channels is only possible for guild administrators.
+
+        Returns
+        -------
+        :class:`~melisa.models.guild.channel.Channel`
+            New channel object.
+        """
+
+    async def create_channel(self, *, reason: Optional[str] = None, **kwargs):
+        data = await self._http.post(
+            f"guilds/{self.id}/channels",
+            data=kwargs,
+            headers={"X-Audit-Log-Reason": reason},
+        )
+
+        data.update({"type": ChannelType(data.pop("type"))})
+
+        channel_cls = channel_types_for_converting.get(data["type"], Channel)
+        return channel_cls.from_dict(data)
 
 
 @dataclass(repr=False)

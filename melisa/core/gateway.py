@@ -124,6 +124,7 @@ class Gateway:
             return None
 
     async def handle_data(self, data):
+        """Handles received data and process it"""
         if data["op"] == self.DISPATCH:
             self.sequence = int(data["s"])
             event_type = data["t"].lower()
@@ -142,6 +143,7 @@ class Gateway:
             self.latency = time.perf_counter() - self._last_send
 
     async def receive(self) -> None:
+        """Receives and parses received data"""
         async for msg in self.ws:
             if msg.type == aiohttp.WSMsgType.BINARY:
                 data = await self.parse_websocket_message(msg.data)
@@ -155,8 +157,7 @@ class Gateway:
         close_code = self.ws.close_code
         if close_code is None:
             return
-        else:
-            await self.handle_close(close_code)
+        await self.handle_close(close_code)
 
     async def handle_close(self, code: int) -> None:
         if code == 4009:

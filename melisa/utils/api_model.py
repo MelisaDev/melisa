@@ -19,6 +19,9 @@ T = TypeVar("T")
 
 
 def to_dict_without_none(model):
+    """
+    Converts discord model or other object to dict.
+    """
     if _is_dataclass_instance(model):
         result = []
 
