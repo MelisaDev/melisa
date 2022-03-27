@@ -57,9 +57,9 @@ class Shard:
         """
         create_task(self._gateway.close())
 
-    async def update_presence(self,
-                              activity: BotActivity = None,
-                              status: str = None) -> Shard:
+    async def update_presence(
+        self, activity: BotActivity = None, status: str = None
+    ) -> Shard:
         """
         |coro|
 

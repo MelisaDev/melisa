@@ -2,7 +2,7 @@
 # Full MIT License can be found in `LICENSE.txt` at the project root.
 
 from .client import *
-from .models import Intents
+from .models import Intents, Snowflake
 from .exceptions import *
 
 __package__ = "melisa"

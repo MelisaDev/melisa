@@ -18,12 +18,12 @@ from typing import (
 T = TypeVar("T")
 
 
-def _to_dict_without_none(model):
+def to_dict_without_none(model):
     if _is_dataclass_instance(model):
         result = []
 
         for field in fields(model):
-            value = _to_dict_without_none(getattr(model, field.name))
+            value = to_dict_without_none(getattr(model, field.name))
 
             if isinstance(value, Enum):
                 result.append((field.name, value.value))
@@ -32,19 +32,18 @@ def _to_dict_without_none(model):
 
         return dict(result)
 
-    elif isinstance(model, tuple) and hasattr(model, "_fields"):
-        return type(model)(*[_to_dict_without_none(v) for v in model])
+    if isinstance(model, tuple) and hasattr(model, "_fields"):
+        return type(model)(*[to_dict_without_none(v) for v in model])
 
-    elif isinstance(model, (list, tuple)):
-        return type(model)(_to_dict_without_none(v) for v in model)
+    if isinstance(model, (list, tuple)):
+        return type(model)(to_dict_without_none(v) for v in model)
 
-    elif isinstance(model, dict):
+    if isinstance(model, dict):
         return type(model)(
-            (_to_dict_without_none(k), _to_dict_without_none(v))
-            for k, v in model.items()
+            (to_dict_without_none(k), to_dict_without_none(v)) for k, v in model.items()
         )
-    else:
-        return copy.deepcopy(model)
+
+    return copy.deepcopy(model)
 
 
 class APIModelBase:
@@ -90,4 +89,4 @@ class APIModelBase:
         )
 
     def to_dict(self) -> Dict:
-        return _to_dict_without_none(self)
+        return to_dict_without_none(self)

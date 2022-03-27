@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 import asyncio
-from typing import Dict, Optional
+from typing import Dict, Optional, Any
 
 from aiohttp import ClientSession, ClientResponse
 
@@ -20,6 +20,7 @@ from melisa.exceptions import (
     RateLimitError,
 )
 from .ratelimiter import RateLimiter
+from ..utils import remove_none
 
 
 class HTTPClient:
@@ -59,7 +60,14 @@ class HTTPClient:
         await self.__aiohttp_session.close()
 
     async def __send(
-        self, method: str, endpoint: str, *, _ttl: int = None, **kwargs
+        self,
+        method: str,
+        endpoint: str,
+        *,
+        _ttl: int = None,
+        headers: Optional[Dict[str, Any]] = None,
+        params: Optional[Dict] = None,
+        **kwargs,
     ) -> Optional[Dict]:
         """Send an API request to the Discord API."""
 
@@ -72,7 +80,16 @@ class HTTPClient:
 
         url = f"{self.url}/{endpoint}"
 
-        async with self.__aiohttp_session.request(method, url, **kwargs) as response:
+        async with self.__aiohttp_session.request(
+            method,
+            url,
+            params=remove_none(params),
+            headers={
+                "Content-Type": "application/json",
+                **(remove_none(headers) or {}),
+            },
+            **kwargs,
+        ) as response:
             return await self.__handle_response(
                 response, method, endpoint, _ttl=ttl, **kwargs
             )
@@ -91,6 +108,9 @@ class HTTPClient:
         self.__rate_limiter.save_response_bucket(endpoint, method, res.headers)
 
         if res.ok:
+            if res.status == 204:
+                return
+
             return await res.json()
 
         exception = self.__http_exceptions.get(res.status)
@@ -111,7 +131,7 @@ class HTTPClient:
 
         return await self.__send(method, endpoint, _ttl=_ttl - 1, **kwargs)
 
-    async def get(self, route: str, params: Optional[Dict] = None) -> Optional[Dict]:
+    async def get(self, route: str, *, params: Optional[Dict] = None) -> Optional[Dict]:
         """|coro|
         Sends a GET request to a Discord REST API endpoint.
 
@@ -129,7 +149,9 @@ class HTTPClient:
         """
         return await self.__send("GET", route, params=params)
 
-    async def post(self, route: str, data: Optional[Dict] = None) -> Optional[Dict]:
+    async def post(
+        self, route: str, *, headers: dict = None, data: Optional[Dict] = None
+    ) -> Optional[Dict]:
         """|coro|
         Sends a POST request to a Discord REST API endpoint.
 
@@ -145,13 +167,9 @@ class HTTPClient:
         Optional[:class:`Dict`]
             JSON response from the Discord API.
         """
-        return await self.__send(
-            "POST",
-            route,
-            json=data,
-        )
+        return await self.__send("POST", route, json=data, headers=headers)
 
-    async def delete(self, route: str, headers: dict = None) -> Optional[Dict]:
+    async def delete(self, route: str, *, headers: dict = None) -> Optional[Dict]:
         """|coro|
         Sends a DELETE request to a Discord REST API endpoint.
 
