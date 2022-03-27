@@ -80,9 +80,62 @@ class VideoQualityModes(IntEnum):
 
 @dataclass(repr=False)
 class Channel(APIModelBase):
-    """Represents a guild or DM channel within Discord"""
+    """Represents a guild or DM channel within Discord
+    
+    Attributes
+    ----------
+    id: :class:`~melisa.utils.types.Snowflake`
+        The id of this channel
+    type: :class:`int`
+        The type of channel
+    guild_id: :class:`~melisa.utils.types.Snowflake`
+        The id of the guild (may be missing for some channel objects received over gateway guild dispatches)
+    position: :class:`int`
+        Sorting position of the channel
+    permission_overwrites: :class:`typing.Any`
+        Explicit permission overwrites for members and roles
+    name: :class:`str`
+        The name of the channel (1-100 characters)
+    topic: :class:`str`
+        The channel topic (0-1024 characters)
+    nsfw: :class:`bool`
+        Whether the channel is nsfw
+    last_message_id: :class:`~melisa.utils.types.Snowflake`
+        The id of the last message sent in this channel (may not point to an existing or valid message)
+    bitrate: :class:`int`
+        The bitrate (in bits) of the voice channel
+    user_limit: :class:`int`
+        The user limit of the voice channel
+    rate_limit_per_user: :class:`int`
+        Amount of seconds a user has to wait before sending another message (0-21600); bots, as well as users with the permission `manage_messages` or `manage_channel`, are unaffected
+    recipients: :class:`typing.Any`
+        The recipients of the DM
+    icon: :class:`str`
+        Icon hash of the group DM
+    owner_id: :class:`~melisa.utils.types.Snowflake`
+        Id of the creator of the group DM or thread
+    application_id: :class:`~melisa.utils.types.Snowflake`
+        Application id of the group DM creator if it is bot-created
+    parent_id: :class:`~melisa.utils.types.Snowflake`
+        For guild channels: id of the parent category for a channel (each parent category can contain up to 50 channels), for threads: id of the text channel this thread was created
+    last_pin_timestamp: :class:`int`
+        When the last pinned message was pinned. This may be `null` in events such as `GUILD_CREATE` when a message is not pinned.
+    rtc_region: :class:`str`
+        Voice region id for the voice channel, automatic when set to null
+    video_quality_mode: :class:`int`
+        The camera video quality mode of the voice channel, 1 when not present
+    message_count: :class:`int`
+        An approximate count of messages in a thread, stops counting at 50
+    thread_metadata: :class:`typing.Any`
+        Thread-specific fields not needed by other channels
+    member: :class:`typing.Any`
+        Thread member object for the current user, if they have joined the thread, only included on certain API endpoints
+    default_auto_archive_duration: :class:`int`
+        default duration that the clients (not the API) will use for newly created threads, in minutes, to automatically archive the thread after recent activity, can be set to: 60, 1440, 4320, 10080
+    permissions: :class:`str`
+        Computed permissions for the invoking user in the channel, including overwrites, only included when part of the `resolved` data received on a slash command interaction
+    """
 
-    # TODO: Add a description for Channel
 
     id: APINullable[Snowflake] = None
     type: APINullable[int] = None
