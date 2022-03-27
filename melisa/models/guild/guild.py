@@ -446,7 +446,11 @@ class Guild(APIModelBase):
         nsfw: Optional[bool] = None,
         reason: Optional[str] = None,
     ) -> Channel:
+        ...
+
+    async def create_channel(self, *, reason: Optional[str] = None, **kwargs):
         """|coro|
+
         Create a new channel object for the guild.
 
         Parameters
@@ -491,8 +495,6 @@ class Guild(APIModelBase):
         :class:`~melisa.models.guild.channel.Channel`
             New channel object.
         """
-
-    async def create_channel(self, *, reason: Optional[str] = None, **kwargs):
         data = await self._http.post(
             f"guilds/{self.id}/channels",
             data=kwargs,
