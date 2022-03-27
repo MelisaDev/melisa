@@ -12,9 +12,9 @@ from ...utils import APIModelBase
 from ...utils.types import APINullable
 
 
-class ChannelTypes(IntEnum):
-    """Channel Types
-    NOTE: Type 10, 11 and 12 are only available in API v9.
+class ChannelType(IntEnum):
+    """Channel Type
+    NOTE: Type 10, 11 and 12 are only available in Discord API v9.
 
     Attributes
     ----------
