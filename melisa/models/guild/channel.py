@@ -6,7 +6,7 @@ from __future__ import annotations
 import asyncio
 from dataclasses import dataclass
 from enum import IntEnum
-from typing import List, Any, Optional, AsyncIterator, Union, Dict
+from typing import List, Any, Optional, AsyncIterator, Union, Dict, overload
 
 from ...utils import Snowflake
 from ...utils import APIModelBase
@@ -81,7 +81,7 @@ class VideoQualityModes(IntEnum):
 @dataclass(repr=False)
 class Channel(APIModelBase):
     """Represents a guild or DM channel within Discord
-    
+
     Attributes
     ----------
     id: :class:`~melisa.utils.types.Snowflake`
@@ -89,7 +89,8 @@ class Channel(APIModelBase):
     type: :class:`int`
         The type of channel
     guild_id: :class:`~melisa.utils.types.Snowflake`
-        The id of the guild (may be missing for some channel objects received over gateway guild dispatches)
+        The id of the guild
+        (may be missing for some channel objects received over gateway guild dispatches)
     position: :class:`int`
         Sorting position of the channel
     permission_overwrites: :class:`typing.Any`
@@ -101,13 +102,16 @@ class Channel(APIModelBase):
     nsfw: :class:`bool`
         Whether the channel is nsfw
     last_message_id: :class:`~melisa.utils.types.Snowflake`
-        The id of the last message sent in this channel (may not point to an existing or valid message)
+        The id of the last message sent in this channel
+        (may not point to an existing or valid message)
     bitrate: :class:`int`
         The bitrate (in bits) of the voice channel
     user_limit: :class:`int`
         The user limit of the voice channel
     rate_limit_per_user: :class:`int`
-        Amount of seconds a user has to wait before sending another message (0-21600); bots, as well as users with the permission `manage_messages` or `manage_channel`, are unaffected
+        Amount of seconds a user has to wait before sending another message (0-21600);
+        bots, as well as users with the permission
+        `manage_messages` or `manage_channel`, are unaffected
     recipients: :class:`typing.Any`
         The recipients of the DM
     icon: :class:`str`
@@ -117,9 +121,12 @@ class Channel(APIModelBase):
     application_id: :class:`~melisa.utils.types.Snowflake`
         Application id of the group DM creator if it is bot-created
     parent_id: :class:`~melisa.utils.types.Snowflake`
-        For guild channels: id of the parent category for a channel (each parent category can contain up to 50 channels), for threads: id of the text channel this thread was created
+        For guild channels: id of the parent category for a channel
+        (each parent category can contain up to 50 channels),
+        for threads: id of the text channel this thread was created
     last_pin_timestamp: :class:`int`
-        When the last pinned message was pinned. This may be `null` in events such as `GUILD_CREATE` when a message is not pinned.
+        When the last pinned message was pinned.
+        This may be `null` in events such as `GUILD_CREATE` when a message is not pinned.
     rtc_region: :class:`str`
         Voice region id for the voice channel, automatic when set to null
     video_quality_mode: :class:`int`
@@ -129,13 +136,16 @@ class Channel(APIModelBase):
     thread_metadata: :class:`typing.Any`
         Thread-specific fields not needed by other channels
     member: :class:`typing.Any`
-        Thread member object for the current user, if they have joined the thread, only included on certain API endpoints
+        Thread member object for the current user,
+        if they have joined the thread, only included on certain API endpoints
     default_auto_archive_duration: :class:`int`
-        default duration that the clients (not the API) will use for newly created threads, in minutes, to automatically archive the thread after recent activity, can be set to: 60, 1440, 4320, 10080
+        default duration that the clients (not the API) will use for newly created threads,
+        in minutes, to automatically archive the thread after recent activity,
+        can be set to: 60, 1440, 4320, 10080
     permissions: :class:`str`
-        Computed permissions for the invoking user in the channel, including overwrites, only included when part of the `resolved` data received on a slash command interaction
+        Computed permissions for the invoking user in the channel, including overwrites,
+        only included when part of the `resolved` data received on a slash command interaction
     """
-
 
     id: APINullable[Snowflake] = None
     type: APINullable[int] = None
@@ -168,11 +178,32 @@ class Channel(APIModelBase):
     def mention(self):
         return f"<#{self.id}>"
 
-    async def delete(
-        self,
-        *,
-        reason: Optional[str] = None
-    ) -> Dict[str, Any]:
+    async def edit(self, *, reason: Optional[str] = None, **kwargs):
+        """|coro|
+        Edit a channel with the specified keyword arguments.
+
+        Parameters
+        ----------
+        \\*\\*kwargs :
+            The keyword arguments to edit the channel with.
+
+        Returns
+        -------
+        :class:`~melisa.models.guild.channel.Channel`
+            The updated channel object.
+        """
+        data = await self._http.patch(
+            f"channels/{self.id}",
+            data=kwargs,
+            headers={"X-Audit-Log-Reason": reason},
+        )
+
+        data.update({"type": ChannelType(data.pop("type"))})
+
+        channel_cls = channel_types_for_converting.get(data["type"], Channel)
+        return channel_cls.from_dict(data)
+
+    async def delete(self, *, reason: Optional[str] = None) -> Dict[str, Any]:
         """|coro|
 
         Delete a channel, or close a private message.
@@ -198,8 +229,7 @@ class Channel(APIModelBase):
         """
 
         message = await self._http.delete(
-            f"/channels/{self.id}",
-            headers={"X-Audit-Log-Reason": reason}
+            f"/channels/{self.id}", headers={"X-Audit-Log-Reason": reason}
         )
 
         return message
@@ -207,6 +237,42 @@ class Channel(APIModelBase):
 
 class TextChannel(Channel):
     """A subclass of ``Channel`` representing text channels with all the same attributes."""
+
+    @overload
+    async def edit(
+        self,
+        *,
+        name: Optional[str] = None,
+        type: Optional[ChannelType] = None,
+        position: Optional[int] = None,
+        topic: Optional[str] = None,
+        nsfw: Optional[bool] = None,
+        rate_limit_per_user: Optional[int] = None,
+        bitrate: Optional[int] = None,
+        user_limit: Optional[int] = None,
+        permission_overwrite: Optional[List[Dict[str, Any]]] = None,
+        parent_id: Optional[Union[str, int, Snowflake]] = None,
+        rtc_region: Optional[str] = None,
+        video_quality_mode: Optional[int] = None,
+        default_auto_archive_duration: Optional[int] = None,
+    ) -> TextChannel:
+        ...
+
+    async def edit(self, **kwargs):
+        """|coro|
+        Edit a text channel with the specified keyword arguments.
+
+        Parameters
+        ----------
+        \\*\\*kwargs :
+            The keyword arguments to edit the channel with.
+
+        Returns
+        -------
+        :class:`~melisa.models.guild.channel.TextChannel`
+            The updated channel object.
+        """
+        return await super().edit(**kwargs)
 
     async def history(
         self,
