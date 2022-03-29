@@ -4,8 +4,9 @@
 import logging
 import asyncio
 import signal
-from typing import Dict, List, Union, Any
+from typing import Dict, List, Union, Any, Iterable
 
+from .models.app.intents import Intents
 from .models import User, Guild, Activity
 from .models.app import Shard
 from .utils import Snowflake, APIModelBase
@@ -28,7 +29,7 @@ class Client:
     ----------
     token: :class:`str`
         The token to login (you can found it in the developer portal)
-    intents: :class:`~melisa.Intents`
+    intents: :class:`Union[~melisa.Intents, Iterable[~melisa.Intents]]`
         The Discord Intents values.
     activity: :class:`~models.user.presence.BotActivity`
         The Activity to set (on connecting)
@@ -55,14 +56,14 @@ class Client:
     """
 
     def __init__(
-            self,
-            token: str,
-            intents,
-            *,
-            activity: Activity = None,
-            status: str = None,
-            mobile: bool = False,
-            logs: Union[None, int, str, Dict[str, Any]] = "INFO",
+        self,
+        token: str,
+        *,
+        intents: Union[Intents, Iterable[Intents]] = None,
+        activity: Activity = None,
+        status: str = None,
+        mobile: bool = False,
+        logs: Union[None, int, str, Dict[str, Any]] = "INFO",
     ):
         self.shards: Dict[int, Shard] = {}
         self.http: HTTPClient = HTTPClient(token)
@@ -76,7 +77,12 @@ class Client:
 
         self._gateway_info = self._loop.run_until_complete(self._get_gateway())
 
-        self.intents = intents
+        if isinstance(intents, Iterable):
+            self.intents = sum(intents)
+
+        if intents is None:
+            self.intents = Intents.all() - Intents.GUILD_PRESENCES - Intents.GUILD_MEMBERS
+
         self._token = token
 
         self._activity = activity
@@ -87,6 +93,18 @@ class Client:
         APIModelBase.set_client(self)
 
         init_logging(logs)
+
+        def sigint_handler(_signal, _frame):
+            _logger.info("SIGINT received, shutting down...")
+
+            asyncio.create_task(self.http.close())
+
+            if self._loop.is_running():
+                self._loop.stop()
+
+            print("(SIGINT received some seconds ago) Successfully stopped client loop")
+
+        signal.signal(signal.SIGINT, sigint_handler)
 
     async def _get_gateway(self):
         """Get Gateway information"""
@@ -114,11 +132,12 @@ class Client:
         inited_shard = Shard(self, 0, 1)
 
         asyncio.ensure_future(
-            inited_shard.launch(activity=self._activity,
-                                status=self._status,
-                                mobile=self._mobile,
-                                loop=self._loop,
-                                )
+            inited_shard.launch(
+                activity=self._activity,
+                status=self._status,
+                mobile=self._mobile,
+                loop=self._loop,
+            )
         )
         self._loop.run_forever()
 
@@ -140,9 +159,9 @@ class Client:
             inited_shard = Shard(self, shard_id, num_shards)
 
             asyncio.ensure_future(
-                inited_shard.launch(activity=self._activity,
-                                    status=self._status,
-                                    mobile=self._mobile),
+                inited_shard.launch(
+                    activity=self._activity, status=self._status, mobile=self._mobile
+                ),
                 loop=self._loop,
             )
         self._loop.run_forever()
@@ -158,9 +177,9 @@ class Client:
             inited_shard = Shard(self, shard_id, num_shards)
 
             asyncio.ensure_future(
-                inited_shard.launch(activity=self._activity,
-                                    status=self._status,
-                                    mobile=self._mobile),
+                inited_shard.launch(
+                    activity=self._activity, status=self._status, mobile=self._mobile
+                ),
                 loop=self._loop,
             )
         self._loop.run_forever()
@@ -198,7 +217,7 @@ class Client:
         return Guild.from_dict(data)
 
     async def fetch_channel(
-            self, channel_id: Union[Snowflake, str, int]
+        self, channel_id: Union[Snowflake, str, int]
     ) -> Union[Channel, Any]:
         """
         Fetch Channel from the Discord API (by id).

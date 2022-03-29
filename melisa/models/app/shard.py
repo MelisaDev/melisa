@@ -41,7 +41,7 @@ class Shard:
             self._num_shards,
             start_activity=kwargs.get("activity"),
             start_status=kwargs.get("status"),
-            mobile=kwargs.get("mobile")
+            mobile=kwargs.get("mobile"),
         )
 
         self._client.shards[self._shard_id] = self

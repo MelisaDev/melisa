@@ -79,7 +79,7 @@ class HTTPClient:
         if ttl == 0:
             raise ServerError(f"Maximum amount of retries for `{endpoint}`.")
 
-        _logger.debug(f"Send {method} request to the {endpoint}")
+        _logger.debug(f"Sending {method} request to the {endpoint}")
 
         await self.__rate_limiter.wait_until_not_ratelimited(endpoint, method)
 

@@ -76,7 +76,9 @@ class Gateway:
             "intents": self.intents,
             "properties": {
                 "$os": sys.platform,
-                "$browser": "Discord iOS" if kwargs.get("mobile") is not None else "MelisaPy",
+                "$browser": "Discord iOS"
+                if kwargs.get("mobile") is not None
+                else "MelisaPy",
                 "$device": "Melisa Python Library",
             },
             "compress": True,
