@@ -56,6 +56,7 @@ class Gateway:
         self.ws = None
         self.loop = asyncio.get_event_loop()
         self.shard_id = shard_id
+        self.not_closed = True
 
         self.__raise_close_codes: Dict[int, Any] = {
             4004: LoginFailure("Token is not valid"),
@@ -92,18 +93,18 @@ class Gateway:
         self.ws = await self.__session.ws_connect(
             f"wss://gateway.discord.gg/?v={self.GATEWAY_VERSION}&encoding=json&compress=zlib-stream"
         )
-        if self.session_id is None:
-            _logger.debug("(Shard %s) Starting...", self.shard_id)
+        _logger.debug("(Shard %s) Starting...", self.shard_id)
 
-            await self.send_identify()
-            self.loop.create_task(self.receive())
-            await self.check_heartbeating()
-        else:
-            _logger.debug("(Shard %s) Resumed.", self.shard_id)
-            await self.resume()
+        self._zlib: zlib._Decompress = zlib.decompressobj()
+        self._buffer = bytearray()
+        self.not_closed = True
+
+        await self.send_identify()
+        self.loop.create_task(self.receive())
+        await self.check_heartbeating()
 
     async def check_heartbeating(self):
-        while True:
+        while self.not_closed:
             await asyncio.sleep(20)
 
             if self._last_send + 60.0 < time.perf_counter():
@@ -178,22 +179,21 @@ class Gateway:
 
     async def receive(self) -> None:
         """Receives and parses received data"""
-        async for msg in self.ws:
-            if msg.type == aiohttp.WSMsgType.BINARY:
-                data = await self.parse_websocket_message(msg.data)
-                if data:
-                    await self.handle_data(data)
-            elif msg.type == aiohttp.WSMsgType.TEXT:
-                await self.handle_data(msg.data)
-            else:
-                raise RuntimeError
+        while self.not_closed:
+            async for msg in self.ws:
+                if msg.type == aiohttp.WSMsgType.BINARY:
+                    data = await self.parse_websocket_message(msg.data)
+                    if data:
+                        await self.handle_data(data)
+                elif msg.type == aiohttp.WSMsgType.TEXT:
+                    await self.handle_data(msg.data)
+                else:
+                    raise RuntimeError
 
-        close_code = self.ws.close_code
+            close_code = self.ws.close_code
 
-        if close_code is None:
-            return
-
-        await self.handle_close(close_code)
+            if close_code is not None:
+                await self.handle_close(close_code)
 
     async def handle_close(self, code: int) -> None:
         if code == 4009:
@@ -210,12 +210,14 @@ class Gateway:
             self.shard_id,
         )
 
+        self.not_closed = False
+
         await self.connect()
 
     async def send_heartbeat(self, interval: float) -> None:
         if not self.ws.closed:
             _logger.debug(
-                "(Shard %s) sending heartbeat in %sms", self.shard_id, interval
+                "(Shard %s) Sending next heartbeat in %s", self.shard_id, interval
             )
             await self.send(self.opcode(self.HEARTBEAT, self.sequence))
             self._last_send = time.perf_counter()
@@ -224,6 +226,7 @@ class Gateway:
 
     async def close(self, code: int = 4000) -> None:
         if self.ws:
+            self.not_closed = False
             await self.ws.close(code=code)
 
         self._buffer.clear()
