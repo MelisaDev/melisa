@@ -2,6 +2,7 @@
 # Full MIT License can be found in `LICENSE.txt` at the project root.
 
 import asyncio
+import logging
 import sys
 import zlib
 import time
@@ -15,6 +16,8 @@ from ..exceptions import GatewayError, PrivilegedIntentsRequired, LoginFailure
 from ..listeners import listeners
 from ..models.user import BotActivity
 from ..utils import APIModelBase, json
+
+_logger = logging.getLogger("melisa.gateway")
 
 
 @dataclass
@@ -89,12 +92,14 @@ class Gateway:
         self.ws = await self.__session.ws_connect(
             f"wss://gateway.discord.gg/?v={self.GATEWAY_VERSION}&encoding=json&compress=zlib-stream"
         )
-
         if self.session_id is None:
+            _logger.debug("(Shard %s) Starting...", self.shard_id)
+
             await self.send_identify()
             self.loop.create_task(self.receive())
             await self.check_heartbeating()
         else:
+            _logger.debug("(Shard %s) Resumed.", self.shard_id)
             await self.resume()
 
     async def check_heartbeating(self):
@@ -102,10 +107,15 @@ class Gateway:
             await asyncio.sleep(20)
 
             if self._last_send + 60.0 < time.perf_counter():
+                _logger.warning(
+                    "(Shard %s) ack not received. Attempting to reconnect.",
+                    self.shard_id,
+                )
                 await self.ws.close(code=4000)
                 await self.handle_close(4000)
 
     async def send(self, payload: str) -> None:
+        _logger.debug("(Shard %s) Sending payload: %s", self.shard_id, payload)
         await self.ws.send_str(payload)
 
     async def parse_websocket_message(self, msg):
@@ -125,8 +135,18 @@ class Gateway:
 
     async def handle_data(self, data):
         """Handles received data and process it"""
+
+        _logger.debug(
+            "(Shard %s) Data with %s opcode received", self.shard_id, data["op"]
+        )
+
         if data["op"] == self.DISPATCH:
             self.sequence = int(data["s"])
+
+            _logger.debug(
+                "(Shard %s) Set sequence number to %s", self.shard_id, data["s"]
+            )
+
             event_type = data["t"].lower()
 
             event_to_call = self.listeners.get(event_type)
@@ -135,12 +155,26 @@ class Gateway:
                 ensure_future(event_to_call(self.client, self, data["d"]))
 
         elif data["op"] == self.INVALID_SESSION:
+            _logger.debug(
+                "(Shard %s) Invalid session, attempting to reconnect", self.shard_id
+            )
             await self.ws.close(code=4000)
             await self.handle_close(4000)
         elif data["op"] == self.HELLO:
             await self.send_hello(data)
         elif data["op"] == self.HEARTBEAT_ACK:
+            _logger.debug(
+                "(Shard %s) received heartbeat ack",
+                self.shard_id,
+            )
             self.latency = time.perf_counter() - self._last_send
+        elif data["op"] == self.RECONNECT:
+            _logger.debug(
+                "(Shard %s) Requested to reconnect to Discord. "
+                "Closing session and attempting to resume",
+                self.shard_id,
+            )
+            await self.close(1012)
 
     async def receive(self) -> None:
         """Receives and parses received data"""
@@ -155,8 +189,10 @@ class Gateway:
                 raise RuntimeError
 
         close_code = self.ws.close_code
+
         if close_code is None:
             return
+
         await self.handle_close(close_code)
 
     async def handle_close(self, code: int) -> None:
@@ -169,10 +205,18 @@ class Gateway:
             if err:
                 raise err
 
+        _logger.info(
+            "(Shard %s) disconnected from the Discord Gateway without any errors. Reconnecting...",
+            self.shard_id,
+        )
+
         await self.connect()
 
     async def send_heartbeat(self, interval: float) -> None:
         if not self.ws.closed:
+            _logger.debug(
+                "(Shard %s) sending heartbeat in %sms", self.shard_id, interval
+            )
             await self.send(self.opcode(self.HEARTBEAT, self.sequence))
             self._last_send = time.perf_counter()
             await asyncio.sleep(interval)
@@ -181,6 +225,7 @@ class Gateway:
     async def close(self, code: int = 4000) -> None:
         if self.ws:
             await self.ws.close(code=code)
+
         self._buffer.clear()
 
     async def send_hello(self, data: Dict) -> None:
@@ -188,7 +233,22 @@ class Gateway:
         await asyncio.sleep((interval - 2000) / 1000)
         self.loop.create_task(self.send_heartbeat(interval))
 
-    async def send_identify(self) -> None:
+    async def send_identify(self, resume: bool = False) -> None:
+        if resume:
+            _logger.debug("(Shard %s) Resuming connection with Discord", self.shard_id)
+
+            await self.send(
+                self.opcode(
+                    self.RESUME,
+                    {
+                        "token": self.client._token,
+                        "session_id": self.session_id,
+                        "seq": self.sequence,
+                    },
+                )
+            )
+            return
+
         await self.send(self.opcode(self.IDENTIFY, self.auth))
 
     async def resume(self) -> None:
@@ -216,6 +276,7 @@ class Gateway:
         return data
 
     async def update_presence(self, data: dict):
+        _logger.debug("[Shard %s] Updating presence...", self.shard_id)
         await self.send(self.opcode(self.PRESENCE_UPDATE, data))
 
     @staticmethod

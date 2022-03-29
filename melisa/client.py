@@ -1,17 +1,20 @@
 # Copyright MelisaDev 2022 - Present
 # Full MIT License can be found in `LICENSE.txt` at the project root.
 
+import logging
+import asyncio
+from typing import Dict, List, Union, Any
+
 from .models import User, Guild
 from .models.app import Shard
 from .utils import Snowflake, APIModelBase
 from .utils.types import Coro
-
 from .core.http import HTTPClient
 from .core.gateway import GatewayBotInfo
 from .models.guild.channel import Channel, ChannelType, channel_types_for_converting
+from .utils.logging import init_logging
 
-import asyncio
-from typing import Dict, List, Union, Any
+_logger = logging.getLogger("melisa")
 
 
 class Client:
@@ -22,15 +25,21 @@ class Client:
 
     Parameters
     ----------
-    token : :class:`str`
+    token: :class:`str`
         The token to login (you can found it in the developer portal)
-    intents : :class:`~melisa.Intents`
+    intents: :class:`~melisa.Intents`
         The Discord Intents values.
-    activity : :class:`~models.user.presence.BotActivity`
+    activity: :class:`~models.user.presence.BotActivity`
         The Activity to set (on connecting)
-    status : :class:`str`
+    status: :class:`str`
         The Status to set (on connecting).
         Can be generated using :class:`~models.user.presence.StatusType`
+    logs: :class:`Optional[None, str, Dict[str, Any]]`
+        The hint for configuring logging.
+        This can be `None` to disable logging automatically.
+        If you pass a :class:`str` or a :class:`int`, it is interpreted as
+        the global logging level to use, and should match one of **DEBUG**,
+        **INFO**, **WARNING**, **ERROR** or **CRITICAL**, if :class:`str`.
 
     Attributes
     ----------
@@ -42,7 +51,15 @@ class Client:
         Bot's shards.
     """
 
-    def __init__(self, token: str, intents, *, activity=None, status: str = None):
+    def __init__(
+        self,
+        token: str,
+        intents,
+        *,
+        activity=None,
+        status: str = None,
+        logs: Union[None, int, str, Dict[str, Any]] = "INFO",
+    ):
         self.shards: Dict[int, Shard] = {}
         self.http: HTTPClient = HTTPClient(token)
         self._events: Dict[str, Coro] = {}
@@ -64,6 +81,8 @@ class Client:
 
         APIModelBase.set_client(self)
 
+        init_logging(logs)
+
     async def _get_gateway(self):
         """Get Gateway information"""
         return GatewayBotInfo.from_dict(await self.http.get("gateway/bot"))
@@ -80,6 +99,7 @@ class Client:
             raise TypeError(f"<{callback.__qualname__}> must be a coroutine function")
 
         self._events[callback.__qualname__] = callback
+        _logger.debug(f"Listener {callback.__qualname__} added successfully!")
         return self
 
     def run(self) -> None:

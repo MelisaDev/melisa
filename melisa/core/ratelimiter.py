@@ -3,10 +3,13 @@
 
 from __future__ import annotations
 
+import logging
 from asyncio import sleep
 from dataclasses import dataclass
 from time import time
 from typing import Dict, Tuple, Any
+
+_logger = logging.getLogger("melisa.http")
 
 
 @dataclass
@@ -16,7 +19,7 @@ class RateLimitBucket:
     limit: int
     remaining: int
     reset: float
-    reset_after_timestamp: float
+    reset_after: float
     since_timestamp: float
 
 
@@ -41,8 +44,14 @@ class RateLimiter:
             limit=int(header["X-RateLimit-Limit"]),
             remaining=int(header["X-RateLimit-Remaining"]),
             reset=float(header["X-RateLimit-Reset"]),
-            reset_after_timestamp=float(header["X-RateLimit-Reset-After"]),
+            reset_after=float(header["X-RateLimit-Reset-After"]),
             since_timestamp=time(),
+        )
+
+        _logger.info(
+            "Rate limit bucket detected: %s - %r.",
+            ratelimit_bucket_id,
+            self.buckets[ratelimit_bucket_id],
         )
 
     async def wait_until_not_ratelimited(self, endpoint: str, method: str):
@@ -55,4 +64,11 @@ class RateLimiter:
 
         if bucket.remaining == 0:
             sleep_time = time() - bucket.since_timestamp + bucket.reset_after_timestamp
+
+            _logger.info(
+                "Waiting until rate limit for bucket %s is over.", sleep_time, bucket_id
+            )
+
             await sleep(sleep_time)
+
+            _logger.info("Message sent. Bucket %s rate limit ended.", bucket_id)

@@ -485,7 +485,6 @@ class TextChannel(Channel):
             count += 1
 
             if count == 100:
-                print("abobatelecom")
                 await self.bulk_delete_messages(message_ids, reason=reason)
                 message_ids = []
                 count = 0

@@ -45,7 +45,6 @@ extensions = [
     "attributable"
 ]
 
-
 autodoc_default_options = {
     'members': True,
     'show-inheritance': True

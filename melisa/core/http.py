@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 from typing import Dict, Optional, Any
 
 from aiohttp import ClientSession, ClientResponse
@@ -21,6 +22,8 @@ from melisa.exceptions import (
 )
 from .ratelimiter import RateLimiter
 from ..utils import remove_none
+
+_logger = logging.getLogger("melisa.http")
 
 
 class HTTPClient:
@@ -76,6 +79,8 @@ class HTTPClient:
         if ttl == 0:
             raise ServerError(f"Maximum amount of retries for `{endpoint}`.")
 
+        _logger.debug(f"Send {method} request to the {endpoint}")
+
         await self.__rate_limiter.wait_until_not_ratelimited(endpoint, method)
 
         url = f"{self.url}/{endpoint}"
@@ -105,11 +110,18 @@ class HTTPClient:
     ) -> Optional[Dict]:
         """Handle responses from the Discord API."""
 
+        _logger.debug(f"Received response for the {endpoint} ({await res.text()})")
+
         self.__rate_limiter.save_response_bucket(endpoint, method, res.headers)
 
         if res.ok:
             if res.status == 204:
+                _logger.debug("Request has been sent successfully.")
                 return
+
+            _logger.debug(
+                "Request has been sent successfully and returned json response."
+            )
 
             return await res.json()
 
@@ -119,13 +131,29 @@ class HTTPClient:
             if isinstance(exception, RateLimitError):
                 timeout = (await res.json()).get("retry_after", 40)
 
+                _logger.exception(
+                    f"You are being ratelimited: {res.reason}."
+                    f" The scope is {res.headers.get('X-RateLimit-Scope')}."
+                    f" I will retry in {timeout} seconds"
+                )
+
                 await asyncio.sleep(timeout)
                 return await self.__send(method, endpoint, **kwargs)
+
+            _logger.error(
+                f"  HTTP exception occurred while trying to send "
+                f"a request to {endpoint}. ({res.status}, {res.reason})"
+            )
 
             exception.__init__(res.reason)
             raise exception
 
         retry_in = 1 + (self.max_ttl - _ttl) * 2
+
+        _logger.debug(
+            "Discord side error occurred (hahahhaha, discord, fix yourself)."
+            f" Status-Code: {res.status}. I will retry sending in {retry_in}s."
+        )
 
         await asyncio.sleep(retry_in)
 
