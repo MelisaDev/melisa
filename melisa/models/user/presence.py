@@ -195,7 +195,7 @@ class Activity(BasePresence, APIModelBase):
         Activity type
     url: Optional[:class:`str`]
         Stream url, is validated when type is 1
-    created_at: :class:`int`
+    created_at:  Optional[:class:`int`]
         Unix timestamp (in milliseconds) of when the activity was added to the user's session
     timestamps: Optional[:class:`~melisa.models.user.activity.ActivityTimestamp`]
         Unix timestamps for start and/or end of the game
@@ -223,8 +223,7 @@ class Activity(BasePresence, APIModelBase):
 
     name: str
     type: ActivityType
-    created_at: int
-
+    created_at: APINullable[int] = None
     url: APINullable[str] = None
     timestamps: APINullable[ActivityTimestamp] = None
     application_id: APINullable[Snowflake] = None
@@ -237,24 +236,6 @@ class Activity(BasePresence, APIModelBase):
     instance: APINullable[bool] = None
     flags: APINullable[ActivityFlags] = None
     buttons: APINullable[List[ActivityButton]] = None
-
-
-@dataclass(repr=False)
-class BotActivity(BasePresence, APIModelBase):
-    """
-
-    Attributes
-    ----------
-    name: :class:`str`
-        The activity's name
-    type: :class:`~melisa.models.user.activity.ActivityType`
-        Activity type
-    url: Optional[:class:`str`]
-        Stream url, is validated when type is Streaming"""
-
-    name: str
-    type: ActivityType
-    url: APINullable[str] = None
 
 
 class StatusType(Enum):

@@ -14,7 +14,7 @@ import aiohttp
 
 from ..exceptions import GatewayError, PrivilegedIntentsRequired, LoginFailure
 from ..listeners import listeners
-from ..models.user import BotActivity
+from ..models.user import Activity
 from ..utils import APIModelBase, json
 
 _logger = logging.getLogger("melisa.gateway")
@@ -76,7 +76,7 @@ class Gateway:
             "intents": self.intents,
             "properties": {
                 "$os": sys.platform,
-                "$browser": "Melisa Python Library",
+                "$browser": "Discord iOS" if kwargs.get("mobile") is not None else "MelisaPy",
                 "$device": "Melisa Python Library",
             },
             "compress": True,
@@ -267,11 +267,11 @@ class Gateway:
         )
 
     @staticmethod
-    def generate_presence(activity: BotActivity = None, status: str = None):
+    def generate_presence(activity: Activity = None, status: str = None):
         data = {"since": time.time() * 1000, "afk": False}
 
         if activity is not None:
-            data["activities"] = activity.to_dict()
+            data["activities"] = [activity.to_dict()]
 
         if status is not None:
             data["status"] = str(status)

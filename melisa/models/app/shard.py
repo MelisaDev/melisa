@@ -6,7 +6,7 @@ from __future__ import annotations
 from asyncio import create_task, sleep
 
 from ...core.gateway import Gateway
-from ..user import BotActivity
+from ..user import Activity
 
 
 class Shard:
@@ -41,6 +41,7 @@ class Shard:
             self._num_shards,
             start_activity=kwargs.get("activity"),
             start_status=kwargs.get("status"),
+            mobile=kwargs.get("mobile")
         )
 
         self._client.shards[self._shard_id] = self
@@ -58,7 +59,7 @@ class Shard:
         create_task(self._gateway.close())
 
     async def update_presence(
-        self, activity: BotActivity = None, status: str = None
+        self, activity: Activity = None, status: str = None
     ) -> Shard:
         """
         |coro|

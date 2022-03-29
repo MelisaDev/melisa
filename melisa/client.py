@@ -3,9 +3,10 @@
 
 import logging
 import asyncio
+import signal
 from typing import Dict, List, Union, Any
 
-from .models import User, Guild
+from .models import User, Guild, Activity
 from .models.app import Shard
 from .utils import Snowflake, APIModelBase
 from .utils.types import Coro
@@ -34,6 +35,8 @@ class Client:
     status: :class:`str`
         The Status to set (on connecting).
         Can be generated using :class:`~models.user.presence.StatusType`
+    mobile: :class:`bool`
+        Set user device as mobile?
     logs: :class:`Optional[None, str, Dict[str, Any]]`
         The hint for configuring logging.
         This can be `None` to disable logging automatically.
@@ -52,13 +55,14 @@ class Client:
     """
 
     def __init__(
-        self,
-        token: str,
-        intents,
-        *,
-        activity=None,
-        status: str = None,
-        logs: Union[None, int, str, Dict[str, Any]] = "INFO",
+            self,
+            token: str,
+            intents,
+            *,
+            activity: Activity = None,
+            status: str = None,
+            mobile: bool = False,
+            logs: Union[None, int, str, Dict[str, Any]] = "INFO",
     ):
         self.shards: Dict[int, Shard] = {}
         self.http: HTTPClient = HTTPClient(token)
@@ -77,6 +81,7 @@ class Client:
 
         self._activity = activity
         self._status = status
+        self._mobile = mobile
         self._none_guilds_cached = False
 
         APIModelBase.set_client(self)
@@ -109,8 +114,11 @@ class Client:
         inited_shard = Shard(self, 0, 1)
 
         asyncio.ensure_future(
-            inited_shard.launch(activity=self._activity, status=self._status),
-            loop=self._loop,
+            inited_shard.launch(activity=self._activity,
+                                status=self._status,
+                                mobile=self._mobile,
+                                loop=self._loop,
+                                )
         )
         self._loop.run_forever()
 
@@ -132,7 +140,9 @@ class Client:
             inited_shard = Shard(self, shard_id, num_shards)
 
             asyncio.ensure_future(
-                inited_shard.launch(activity=self._activity, status=self._status),
+                inited_shard.launch(activity=self._activity,
+                                    status=self._status,
+                                    mobile=self._mobile),
                 loop=self._loop,
             )
         self._loop.run_forever()
@@ -148,7 +158,9 @@ class Client:
             inited_shard = Shard(self, shard_id, num_shards)
 
             asyncio.ensure_future(
-                inited_shard.launch(activity=self._activity, status=self._status),
+                inited_shard.launch(activity=self._activity,
+                                    status=self._status,
+                                    mobile=self._mobile),
                 loop=self._loop,
             )
         self._loop.run_forever()
@@ -186,7 +198,7 @@ class Client:
         return Guild.from_dict(data)
 
     async def fetch_channel(
-        self, channel_id: Union[Snowflake, str, int]
+            self, channel_id: Union[Snowflake, str, int]
     ) -> Union[Channel, Any]:
         """
         Fetch Channel from the Discord API (by id).
