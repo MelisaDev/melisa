@@ -235,44 +235,9 @@ class Channel(APIModelBase):
         return message
 
 
-class TextChannel(Channel):
-    """A subclass of ``Channel`` representing text channels with all the same attributes."""
-
-    @overload
-    async def edit(
-        self,
-        *,
-        name: Optional[str] = None,
-        type: Optional[ChannelType] = None,
-        position: Optional[int] = None,
-        topic: Optional[str] = None,
-        nsfw: Optional[bool] = None,
-        rate_limit_per_user: Optional[int] = None,
-        bitrate: Optional[int] = None,
-        user_limit: Optional[int] = None,
-        permission_overwrite: Optional[List[Dict[str, Any]]] = None,
-        parent_id: Optional[Union[str, int, Snowflake]] = None,
-        rtc_region: Optional[str] = None,
-        video_quality_mode: Optional[int] = None,
-        default_auto_archive_duration: Optional[int] = None,
-    ) -> TextChannel:
-        ...
-
-    async def edit(self, **kwargs):
-        """|coro|
-        Edit a text channel with the specified keyword arguments.
-
-        Parameters
-        ----------
-        \\*\\*kwargs :
-            The keyword arguments to edit the channel with.
-
-        Returns
-        -------
-        :class:`~melisa.models.guild.channel.TextChannel`
-            The updated channel object.
-        """
-        return await super().edit(**kwargs)
+class MessageableChannel(Channel):
+    """A subclass of ``Channel`` with methods that are only available for channels,
+    where user can send messages."""
 
     async def history(
         self,
@@ -498,6 +463,46 @@ class TextChannel(Channel):
         if count == 0:
             await self.delete_message(message_ids[0], reason=reason)
         return
+
+
+class TextChannel(MessageableChannel):
+    """A subclass of ``Channel`` representing text channels with all the same attributes."""
+
+    @overload
+    async def edit(
+        self,
+        *,
+        name: Optional[str] = None,
+        type: Optional[ChannelType] = None,
+        position: Optional[int] = None,
+        topic: Optional[str] = None,
+        nsfw: Optional[bool] = None,
+        rate_limit_per_user: Optional[int] = None,
+        bitrate: Optional[int] = None,
+        user_limit: Optional[int] = None,
+        permission_overwrite: Optional[List[Dict[str, Any]]] = None,
+        parent_id: Optional[Union[str, int, Snowflake]] = None,
+        rtc_region: Optional[str] = None,
+        video_quality_mode: Optional[int] = None,
+        default_auto_archive_duration: Optional[int] = None,
+    ) -> TextChannel:
+        ...
+
+    async def edit(self, **kwargs):
+        """|coro|
+        Edit a text channel with the specified keyword arguments.
+
+        Parameters
+        ----------
+        \\*\\*kwargs :
+            The keyword arguments to edit the channel with.
+
+        Returns
+        -------
+        :class:`~melisa.models.guild.channel.TextChannel`
+            The updated channel object.
+        """
+        return await super().edit(**kwargs)
 
 
 # noinspection PyTypeChecker
