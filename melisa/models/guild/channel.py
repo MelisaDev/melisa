@@ -239,6 +239,70 @@ class MessageableChannel(Channel):
     """A subclass of ``Channel`` with methods that are only available for channels,
     where user can send messages."""
 
+    async def start_thread_without_message(
+        self,
+        *,
+        name: Optional[str] = None,
+        auto_archive_duration: Optional[int] = None,
+        type: Optional[ChannelType] = None,
+        invitable: Optional[bool] = None,
+        rate_limit_per_user: Optional[int] = None,
+        reason: Optional[str] = None,
+    ) -> Union[Channel, Any]:
+        """|coro|
+
+        Creates a new thread that is not connected to an existing message.
+        The created thread defaults to a ``GUILD_PRIVATE_THREAD``*.
+        Returns a Channel on success.
+
+        Creating a private thread requires the server to be boosted.
+        The guild features will indicate if that is possible for the guild.
+        The 3 day and 7 day archive durations require the server to be boosted.
+        The guild features will indicate if that is possible for the guild.
+
+
+        Parameters
+        ----------
+        name: Optional[:class:`str`]
+            The name of the thread. 1-100 characters.
+        auto_archive_duration: Optional[:class:`int`]
+            The duration in minutes to automatically archive the thread after
+            recent activity, can be set to: ``60``, ``1440``, ``4320``, ``10080``.
+        type: Optional[:class:`~melisa.models.guild.channel.ChannelType`]
+            The type of thread to create.
+        invitable: Optional[:class:`bool`]
+            Whether non-moderators can add other non-moderators to a thread;
+            only available when creating a private thread.
+        rate_limit_per_user: Optional[:class:`int`]
+            Amount of seconds a user has to wait before sending another message.
+            (0-21600)
+        reason: Optional[:class:`str`]
+            The reason of the thread creation.
+
+        Returns
+        -------
+        Union[:class:`~melisa.models.guild.channel.PublicThread`,
+        :class:`~melisa.models.guild.channel.PrivateThread`]
+            The created thread.
+        """
+
+        data = await self._http.post(
+                f"channels/{self.id}/threads",
+                headers={"X-Audit-Log-Reason": reason},
+                data={
+                    "name": name,
+                    "auto_archive_duration": auto_archive_duration,
+                    "type": type,
+                    "invitable": invitable,
+                    "rate_limit_per_user": rate_limit_per_user,
+                },
+            )
+
+        data.update({"type": ChannelType(data.pop("type"))})
+
+        channel_cls = channel_types_for_converting.get(data["type"], Channel)
+        return channel_cls.from_dict(data)
+
     async def history(
         self,
         limit: int = 50,
@@ -503,6 +567,18 @@ class TextChannel(MessageableChannel):
             The updated channel object.
         """
         return await super().edit(**kwargs)
+
+
+class Thread(MessageableChannel):
+    """A subclass of ``Channel`` for threads with all the same attributes."""
+
+
+class PublicThread(Thread):
+    """A subclass of ``Thread`` for public threads with all the same attributes."""
+
+
+class PrivateThread(Thread):
+    """A subclass of ``Thread`` for private threads with all the same attributes."""
 
 
 # noinspection PyTypeChecker
