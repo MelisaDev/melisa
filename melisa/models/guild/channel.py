@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from enum import IntEnum
 from typing import List, Any, Optional, AsyncIterator, Union, Dict, overload
 
-from ...utils import Snowflake
+from ...utils import Snowflake, Timestamp
 from ...utils import APIModelBase
 from ...utils.types import APINullable
 
@@ -151,7 +151,7 @@ class Channel(APIModelBase):
     type: APINullable[int] = None
     guild_id: APINullable[Snowflake] = None
     position: APINullable[int] = None
-    permission_overwrites: APINullable[List[Any]] = None
+    permission_overwrites: APINullable[List] = None
     name: APINullable[str] = None
     topic: APINullable[str] = None
     nsfw: APINullable[bool] = None
@@ -159,7 +159,7 @@ class Channel(APIModelBase):
     bitrate: APINullable[int] = None
     user_limit: APINullable[int] = None
     rate_limit_per_user: APINullable[int] = None
-    recipients: APINullable[List[Any]] = None
+    recipients: APINullable[List] = None
     icon: APINullable[str] = None
     owner_id: APINullable[Snowflake] = None
     application_id: APINullable[Snowflake] = None
@@ -169,8 +169,8 @@ class Channel(APIModelBase):
     video_quality_mode: APINullable[int] = None
     message_count: APINullable[int] = None
     member_count: APINullable[int] = None
-    thread_metadata: APINullable[List[Any]] = None
-    member: APINullable[List[Any]] = None
+    thread_metadata: APINullable[List] = None
+    member: APINullable[List] = None
     default_auto_archive_duration: APINullable[int] = None
     permissions: APINullable[str] = None
 
@@ -242,9 +242,9 @@ class MessageableChannel(Channel):
     async def start_thread_without_message(
         self,
         *,
-        name: Optional[str] = None,
+        name: str,
+        type: ChannelType,
         auto_archive_duration: Optional[int] = None,
-        type: Optional[ChannelType] = None,
         invitable: Optional[bool] = None,
         rate_limit_per_user: Optional[int] = None,
         reason: Optional[str] = None,
@@ -279,6 +279,13 @@ class MessageableChannel(Channel):
         reason: Optional[:class:`str`]
             The reason of the thread creation.
 
+        Raises
+        -------
+        ForbiddenError
+            You do not have proper permissions to do the actions required.
+        HTTPException
+            The request to perform the action failed with other http exception.
+
         Returns
         -------
         Union[:class:`~melisa.models.guild.channel.PublicThread`,
@@ -298,10 +305,7 @@ class MessageableChannel(Channel):
                 },
             )
 
-        data.update({"type": ChannelType(data.pop("type"))})
-
-        channel_cls = channel_types_for_converting.get(data["type"], Channel)
-        return channel_cls.from_dict(data)
+        return Thread.from_dict(data)
 
     async def history(
         self,
@@ -335,8 +339,8 @@ class MessageableChannel(Channel):
 
         Raises
         -------
-        NotFoundError
-            If channel is not found.
+        HTTPException
+            The request to perform the action failed with other http exception.
         ForbiddenError
             You do not have proper permissions to do the actions required.
 
@@ -388,8 +392,8 @@ class MessageableChannel(Channel):
 
         Raises
         -------
-        NotFoundError
-            If message is not found.
+        HTTPException
+            The request to perform the action failed with other http exception.
         ForbiddenError
             You do not have proper permissions to do the actions required.
 
@@ -422,8 +426,8 @@ class MessageableChannel(Channel):
 
         Raises
         -------
-        BadRequestError
-            if any message provided is older than that or if any duplicate message IDs are provided.
+        HTTPException
+            The request to perform the action failed with other http exception.
         ForbiddenError
             You do not have proper permissions to do the actions required.
             (You must have **MANAGE_MESSAGES** permission)
@@ -450,10 +454,8 @@ class MessageableChannel(Channel):
 
         Raises
         -------
-        BadRequestError
-            Something is wrong with request, maybe specified parameters.
-        NotFoundError
-            If message is not found.
+        HTTPException
+            The request to perform the action failed with other http exception.
         ForbiddenError
             You do not have proper permissions to do the actions required.
             (You must have **MANAGE_MESSAGES** permission)
@@ -492,8 +494,8 @@ class MessageableChannel(Channel):
 
         Raises
         -------
-        BadRequestError
-            if any message provided is older than that or if any duplicate message IDs are provided.
+        HTTPException
+            The request to perform the action failed with other http exception.
         ForbiddenError
             You do not have proper permissions to do the actions required.
             (You must have **MANAGE_MESSAGES** permission)
@@ -527,6 +529,61 @@ class MessageableChannel(Channel):
         if count == 0:
             await self.delete_message(message_ids[0], reason=reason)
         return
+
+    async def archived_threads(
+        self,
+        *,
+        private: bool = False,
+        joined: bool = False,
+        before: Optional[Union[Snowflake, Timestamp]] = None,
+        limit: Optional[int] = 50
+    ) -> ThreadsList:
+        """|coro|
+
+        Returns archived threads in the channel.
+
+        Requires the ``READ_MESSAGE_HISTORY`` permission.
+        If iterating over private threads then ``MANAGE_THREADS`` permission is also required.
+
+        Parameters
+        ----------
+        before: Optional[Union[:class:`~melisa.utils.Snowflake`, :class:`~melisa.utils.Timestamp`]]
+            Retrieve archived channels before the given date or ID.
+        limit: Optional[:class:`int`]
+            The number of threads to retrieve. If None, retrieves every archived thread in the channel.
+            Note, however, that this would make it a slow operation
+        private: :class:`bool`
+            Whether to retrieve private archived threads.
+        joined: :class:`bool`
+            Whether to retrieve private archived threads that you’ve joined.
+            You cannot set ``joined`` to ``True`` and ``private`` to ``False``.
+
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have permissions to get archived threads.
+
+        Returns
+        -------
+        :class:`~melisa.models.channel.ThreadsList`
+            The threads list object.
+        """
+
+        if joined:
+            url = f"/channels/{self.id}/users/@me/threads/archived/private"
+        elif private:
+            url = f"/channels/{self.id}/threads/archived/private"
+        else:
+            url = f"/channels/{self.id}/threads/archived/public"
+
+        return ThreadsList.from_dict(
+            await self._http.get(
+                url,
+                params={"before": before, "limit": limit},
+            )
+        )
 
 
 class TextChannel(MessageableChannel):
@@ -573,12 +630,23 @@ class Thread(MessageableChannel):
     """A subclass of ``Channel`` for threads with all the same attributes."""
 
 
-class PublicThread(Thread):
-    """A subclass of ``Thread`` for public threads with all the same attributes."""
+@dataclass(repr=False)
+class ThreadsList(APIModelBase):
+    """A class representing a list of channel threads from the Discord API.
 
+    Attributes
+    ----------
+    threads: List[:class:`~melisa.models.guild.channel.Thread`]
+        Async iterator of threads. To get their type use them `.type` attribute.
+    members: List[:class:`Any`]
+        Async iterator of thread members.
+    has_more: Optional[:class:`bool`]
+        Whether there are potentially additional threads that could be returned on a subsequent cal
+    """
 
-class PrivateThread(Thread):
-    """A subclass of ``Thread`` for private threads with all the same attributes."""
+    threads: List[Thread]
+    members: List
+    has_more: Optional[bool]
 
 
 # noinspection PyTypeChecker

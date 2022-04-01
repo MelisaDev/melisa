@@ -27,7 +27,7 @@ _logger = logging.getLogger("melisa.http")
 
 
 class HTTPClient:
-    API_VERSION = 9
+    API_VERSION = 10
 
     def __init__(self, token: str, *, ttl: int = 5):
         self.url: str = f"https://discord.com/api/v{self.API_VERSION}"

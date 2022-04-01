@@ -19,7 +19,7 @@ async def guild_create_listener(self, gateway, payload: dict):
     if self.guilds.get(guild.id, "empty") != "empty":
         guild_was_cached_as_none = True
 
-    self.guilds[guild.id] = guild
+    self.guilds[str(guild.id)] = guild
 
     custom_listener = self._events.get("on_guild_create")
 

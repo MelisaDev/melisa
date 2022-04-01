@@ -8,7 +8,7 @@ from enum import IntEnum, Enum
 from typing import List, Any, Optional, overload
 
 from .channel import Channel, ChannelType, channel_types_for_converting
-from ...utils import Snowflake
+from ...utils import Snowflake, Timestamp
 from ...utils import APIModelBase
 from ...utils.types import APINullable
 
@@ -243,6 +243,7 @@ class GuildFeatures(Enum):
     VERIFIED = "VERIFIED"
     VIP_REGIONS = "VIP_REGIONS"
     WELCOME_SCREEN_ENABLED = "WELCOME_SCREEN_ENABLED"
+    EXPOSED_TO_ACTIVITIES_WTP_EXPERIMENT = "EXPOSED_TO_ACTIVITIES_WTP_EXPERIMENT"
 
 
 @dataclass(repr=False)
@@ -303,7 +304,7 @@ class Guild(APIModelBase):
         System channel flags
     rules_channel_id: APINullable[:class:`~melisa.utils.types.Snowflake`]
         The id of the channel where Community guilds can display rules and/or guidelines
-    joined_at: APINullable[:class:`int`]
+    joined_at: APINullable[:class:`~melisa.utils.Timestamp`]
         When this guild was joined at
     large: APINullable[:class:`bool`]
         True if this is considered a large guild
@@ -386,8 +387,8 @@ class Guild(APIModelBase):
     default_message_notifications: APINullable[int] = None
     explicit_content_filter: APINullable[int] = None
     features: APINullable[List[GuildFeatures]] = None
-    roles: APINullable[List[Any]] = None
-    emojis: APINullable[List[Any]] = None
+    roles: APINullable[List] = None
+    emojis: APINullable[List] = None
     # TODO: Make a structures of emoji and role
 
     mfa_level: APINullable[int] = None
@@ -395,16 +396,16 @@ class Guild(APIModelBase):
     system_channel_id: APINullable[Snowflake] = None
     system_channel_flags: APINullable[int] = None
     rules_channel_id: APINullable[Snowflake] = None
-    joined_at: APINullable[int] = None
+    joined_at: APINullable[Timestamp] = None
     # TODO: Deal with joined_at
 
     large: APINullable[bool] = None
     unavailable: APINullable[bool] = None
     member_count: APINullable[int] = None
-    voice_states: APINullable[List[Any]] = None
-    members: APINullable[List[Any]] = None
-    threads: APINullable[List[Any]] = None
-    presences: APINullable[List[Any]] = None
+    voice_states: APINullable[List] = None
+    members: APINullable[List] = None
+    threads: APINullable[List] = None
+    presences: APINullable[List] = None
     # TODO: Make a structure for voice_states, members, channels, threads, presences(?)
 
     max_presences: APINullable[int] = None
@@ -421,10 +422,10 @@ class Guild(APIModelBase):
     approximate_presence_count: APINullable[int] = None
     nsfw_level: APINullable[int] = None
     premium_progress_bar_enabled: APINullable[bool] = None
-    stage_instances: APINullable[List[Any]] = None
-    stickers: APINullable[List[Any]] = None
-    welcome_screen: APINullable[Any] = None
-    guild_scheduled_events: APINullable[List[Any]] = None
+    stage_instances: APINullable[List] = None
+    stickers: APINullable[List] = None
+    welcome_screen: APINullable = None
+    guild_scheduled_events: APINullable[List] = None
 
     # TODO: Make a structure for welcome_screen, stage_instances,
     #  stickers and guild_scheduled_events

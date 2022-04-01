@@ -44,8 +44,6 @@ class Gateway:
     HEARTBEAT_ACK = 11
 
     def __init__(self, client, shard_id: int = 0, num_shards: int = 1, **kwargs):
-
-        self.GATEWAY_VERSION = "9"
         self.interval = None
         self.intents = client.intents
         self.sequence = None
@@ -93,7 +91,7 @@ class Gateway:
 
     async def connect(self) -> None:
         self.ws = await self.__session.ws_connect(
-            f"wss://gateway.discord.gg/?v={self.GATEWAY_VERSION}&encoding=json&compress=zlib-stream"
+            f"wss://gateway.discord.gg/?v=10&encoding=json&compress=zlib-stream"
         )
         _logger.debug("(Shard %s) Starting...", self.shard_id)
 
