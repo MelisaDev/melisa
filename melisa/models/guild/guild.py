@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from enum import IntEnum, Enum
 from typing import List, Any, Optional, overload
 
-from .channel import Channel, ChannelType, channel_types_for_converting
+from .channel import Channel, ChannelType, channel_types_for_converting, ThreadsList
 from ...utils import Snowflake, Timestamp
 from ...utils import APIModelBase
 from ...utils.types import APINullable
@@ -219,6 +219,8 @@ class GuildFeatures(Enum):
         Guild has access to set 384kbps bitrate in voice (previously VIP voice servers)
     WELCOME_SCREEN_ENABLED:
         Guild has enabled the welcome screen
+    EXPOSED_TO_ACTIVITIES_WTP_EXPERIMENT:
+        Unkown. Found during testing. Not listed in Discord API docs.
     """
 
     ANIMATED_ICON = "ANIMATED_ICON"
@@ -509,6 +511,30 @@ class Guild(APIModelBase):
 
         channel_cls = channel_types_for_converting.get(data["type"], Channel)
         return channel_cls.from_dict(data)
+
+    async def active_threads(self) -> ThreadsList:
+        """|coro|
+
+        Returns a Threadslist of active ``Thread`` that the client can access.
+
+        This includes both private and public threads.
+
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+
+        Returns
+        -------
+        :class:`~melisa.models.channel.ThreadsList`
+            The active threads.
+        """
+
+        return ThreadsList.from_dict(
+            await self._http.get(
+                f"/guilds/{self.id}/threads/active"
+            )
+        )
 
 
 @dataclass(repr=False)

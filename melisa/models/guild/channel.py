@@ -646,7 +646,7 @@ class ThreadsList(APIModelBase):
 
     threads: List[Thread]
     members: List
-    has_more: Optional[bool]
+    has_more: APINullable[bool] = None
 
 
 # noinspection PyTypeChecker
