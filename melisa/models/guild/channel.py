@@ -11,6 +11,7 @@ from typing import List, Any, Optional, AsyncIterator, Union, Dict, overload
 from ...utils import Snowflake, Timestamp
 from ...utils import APIModelBase
 from ...utils.types import APINullable
+from .thread import ThreadMember, ThreadMetadata
 
 
 class ChannelType(IntEnum):
@@ -133,7 +134,7 @@ class Channel(APIModelBase):
         The camera video quality mode of the voice channel, 1 when not present
     message_count: :class:`int`
         An approximate count of messages in a thread, stops counting at 50
-    thread_metadata: :class:`typing.Any`
+    thread_metadata: :class:`~melisa.models.guild.thread.ThreadMetadata`
         Thread-specific fields not needed by other channels
     member: :class:`typing.Any`
         Thread member object for the current user,
@@ -169,7 +170,7 @@ class Channel(APIModelBase):
     video_quality_mode: APINullable[int] = None
     message_count: APINullable[int] = None
     member_count: APINullable[int] = None
-    thread_metadata: APINullable[List] = None
+    thread_metadata: APINullable[ThreadMetadata] = None
     member: APINullable[List] = None
     default_auto_archive_duration: APINullable[int] = None
     permissions: APINullable[str] = None
@@ -252,8 +253,7 @@ class MessageableChannel(Channel):
         """|coro|
 
         Creates a new thread that is not connected to an existing message.
-        The created thread defaults to a ``GUILD_PRIVATE_THREAD``*.
-        Returns a Channel on success.
+        The created thread defaults to a ``GUILD_PRIVATE_THREAD``.
 
         Creating a private thread requires the server to be boosted.
         The guild features will indicate if that is possible for the guild.
@@ -645,7 +645,7 @@ class ThreadsList(APIModelBase):
     """
 
     threads: List[Thread]
-    members: List
+    members: List[ThreadMember]
     has_more: APINullable[bool] = None
 
 

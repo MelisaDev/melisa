@@ -89,3 +89,37 @@ UnavailableGuild
 .. attributetable:: UnavailableGuild
 
 .. autoclass:: UnavailableGuild()
+
+
+Thread
+------
+
+Thread
+~~~~~~
+.. attributetable:: Thread
+
+
+.. autoclass:: Thread()
+    :exclude-members: start_thread_without_message
+    :inherited-members:
+
+ThreadMember
+~~~~~~~~~~~~~
+.. attributetable:: ThreadMember
+
+.. autoclass:: ThreadMember()
+    :inherited-members:
+
+ThreadMetadata
+~~~~~~~~~~~~~
+.. attributetable:: ThreadMetadata
+
+.. autoclass:: ThreadMetadata()
+    :inherited-members:
+
+ThreadsList
+~~~~~~~~~~~~~
+.. attributetable:: ThreadsList
+
+.. autoclass:: ThreadsList()
+    :inherited-members:
