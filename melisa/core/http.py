@@ -238,3 +238,26 @@ class HTTPClient:
             JSON response from the Discord API.
         """
         return await self.__send("PATCH", route, json=data, headers=headers)
+
+    async def put(
+        self, route: str, *, headers: dict = None, data: Optional[Dict] = None
+    ) -> Optional[Dict]:
+        """|coro|
+        Sends a PUT request to a Discord REST API endpoint.
+
+        Parameters
+        ----------
+        route : :class:`str`
+            The endpoint to send the request to.
+        data : Dict
+            Data to post
+        headers : :class:`dict`
+            Custom request headers
+
+        Returns
+        -------
+        Optional[:class:`Dict`]
+            JSON response from the Discord API.
+        """
+        return await self.__send("PUT", route, json=data, headers=headers)
+
