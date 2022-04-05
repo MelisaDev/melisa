@@ -96,7 +96,7 @@ class MessageFlags(IntEnum):
         return self.value
 
 
-@dataclass(repl=False)
+@dataclass(repr=False)
 class Message(APIModelBase):
     """Represents a message sent in a channel within Discord.
 
@@ -146,7 +146,7 @@ class Message(APIModelBase):
         Sent with Rich Presence-related chat embeds
     application: :class:`typing.Any`
         Sent with Rich Presence-related chat embeds
-    application_id: :class:`~melisa.utils.types.Snowflake`
+    application_id: :class:`~melisa.Snowflake`
         If the message is an Interaction or application-owned webhook, this is the id of the application
     message_reference: :class:`typing.Any`
         Data showing the source of a crosspost, channel follow add, pin, or reply message

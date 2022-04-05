@@ -311,9 +311,9 @@ class MessageableChannel(Channel):
         self,
         limit: int = 50,
         *,
-        before: Optional[Union[int, Snowflake]] = None,
-        after: Optional[Union[int, Snowflake]] = None,
-        around: Optional[Union[int, Snowflake]] = None,
+        before: Optional[Snowflake] = None,
+        after: Optional[Snowflake] = None,
+        around: Optional[Snowflake] = None,
     ) -> AsyncIterator[Dict[str, Any]]:
         """|coro|
 
@@ -328,13 +328,13 @@ class MessageableChannel(Channel):
 
         Parameters
         ----------
-        limit : Optional[Union[:class:`int`, :class:`str`, :class:`~.melisa.Snowflake`]]
+        limit : Optional[:class:`~.melisa.Snowflake`]
             Max number of messages to return (1-100).
-        around : Optional[Union[:class:`int`, :class:`str`, :class:`~.melisa.Snowflake`]]
+        around : Optional[:class:`~.melisa.Snowflake`]
             Get messages around this message ID.
-        before : Optional[Union[:class:`int`, :class:`str`, :class:`~.melisa.Snowflake`]]
+        before : Optional[:class:`~.melisa.Snowflake`]
             Get messages before this message ID.
-        after : Optional[Union[:class:`int`, :class:`str`, :class:`~.melisa.Snowflake`]]
+        after : Optional[:class:`~.melisa.Snowflake`]
             Get messages after this message ID.
 
         Raises
@@ -469,9 +469,9 @@ class MessageableChannel(Channel):
         self,
         limit: int = 50,
         *,
-        before: Optional[Union[int, str, Snowflake]] = None,
-        after: Optional[Union[int, str, Snowflake]] = None,
-        around: Optional[Union[int, str, Snowflake]] = None,
+        before: Optional[Snowflake] = None,
+        after: Optional[Snowflake] = None,
+        around: Optional[Snowflake] = None,
         reason: Optional[str] = None,
     ):
         """|coro|
@@ -481,13 +481,13 @@ class MessageableChannel(Channel):
 
         Parameters
         ----------
-        limit : Optional[Union[:class:`int`, :class:`str`, :class:`~.melisa.Snowflake`]]
+        limit : Optional[:class:`~.melisa.Snowflake`]
             Max number of messages to purge.
-        around : Optional[Union[:class:`int`, :class:`str`, :class:`~.melisa.Snowflake`]]
+        around : Optional[:class:`~.melisa.Snowflake`]
             Get messages around this message ID.
-        before : Optional[Union[:class:`int`, :class:`str`, :class:`~.melisa.Snowflake`]]
+        before : Optional[:class:`~.melisa.Snowflake`]
             Get messages before this message ID.
-        after : Optional[Union[:class:`int`, :class:`str`, :class:`~.melisa.Snowflake`]]
+        after : Optional:class:`~.melisa.Snowflake`]
             Get messages after this message ID.
         reason: Optional[:class:`str`]
             The reason of the channel purge operation.
@@ -498,7 +498,7 @@ class MessageableChannel(Channel):
             The request to perform the action failed with other http exception.
         ForbiddenError
             You do not have proper permissions to do the actions required.
-            (You must have **MANAGE_MESSAGES** permission)
+            (You must have ``MANAGE_MESSAGES`` permission)
         """
 
         iterator = self.history(
@@ -631,7 +631,7 @@ class Thread(MessageableChannel):
 
     async def add_user(
         self,
-        user_id: Union[int, Snowflake]
+        user_id: Snowflake
     ) -> None:
         """|coro|
 
@@ -643,7 +643,7 @@ class Thread(MessageableChannel):
 
         Parameters
         ----------
-        user_id: Union[int, :class:`~melisa.utils.Snowflake`]
+        user_id: :class:`~melisa.utils.Snowflake`
             Id of user to add to the thread.
 
         Raises
@@ -658,7 +658,7 @@ class Thread(MessageableChannel):
 
     async def remove_user(
         self,
-        user_id: Union[int, Snowflake]
+        user_id: Snowflake
     ) -> None:
         """|coro|
 
@@ -668,7 +668,7 @@ class Thread(MessageableChannel):
 
         Parameters
         ----------
-        user_id: Union[int, :class:`~melisa.utils.Snowflake`]
+        user_id: :class:`~melisa.utils.Snowflake`
             Id of user to add to the thread.
 
         Raises
