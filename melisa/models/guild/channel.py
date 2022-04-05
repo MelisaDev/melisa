@@ -311,9 +311,9 @@ class MessageableChannel(Channel):
         self,
         limit: int = 50,
         *,
-        before: Optional[Union[int, str, Snowflake]] = None,
-        after: Optional[Union[int, str, Snowflake]] = None,
-        around: Optional[Union[int, str, Snowflake]] = None,
+        before: Optional[Union[int, Snowflake]] = None,
+        after: Optional[Union[int, Snowflake]] = None,
+        around: Optional[Union[int, Snowflake]] = None,
     ) -> AsyncIterator[Dict[str, Any]]:
         """|coro|
 
@@ -628,6 +628,58 @@ class TextChannel(MessageableChannel):
 
 class Thread(MessageableChannel):
     """A subclass of ``Channel`` for threads with all the same attributes."""
+
+    async def add_user(
+        self,
+        user_id: Union[int, Snowflake]
+    ) -> None:
+        """|coro|
+
+        Adds a user to this thread.
+
+        You must have ``SEND_MESSAGES`` permission to add a user to a public thread.
+        If the thread is private then ``SEND_MESSAGES`` and either ``CREATE_PRIVATE_THREADS``
+        or manage_messages permissions is required to add a user to the thread.
+
+        Parameters
+        ----------
+        user_id: Union[int, :class:`~melisa.utils.Snowflake`]
+            Id of user to add to the thread.
+
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have permissions to add the user to the thread.
+        """
+
+        await self._http.put(f"channels/{self.id}/thread-members/{user_id}")
+
+    async def remove_user(
+        self,
+        user_id: Union[int, Snowflake]
+    ) -> None:
+        """|coro|
+
+        Removes a user from this thread.
+
+        You must have ``MANAGE_THREADS`` or be the creator of the thread to remove a user.
+
+        Parameters
+        ----------
+        user_id: Union[int, :class:`~melisa.utils.Snowflake`]
+            Id of user to add to the thread.
+
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have permissions to add the user to the thread.
+        """
+
+        await self._http.delete(f"channels/{self.id}/thread-members/{user_id}")
 
 
 @dataclass(repr=False)
