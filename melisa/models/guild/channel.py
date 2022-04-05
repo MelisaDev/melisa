@@ -676,10 +676,41 @@ class Thread(MessageableChannel):
         HTTPException
             The request to perform the action failed with other http exception.
         ForbiddenError
-            You do not have permissions to add the user to the thread.
+            You do not have permissions to remove the user to the thread.
         """
 
         await self._http.delete(f"channels/{self.id}/thread-members/{user_id}")
+
+    async def join(self) -> None:
+        """|coro|
+
+        Joins this thread.
+
+        You must have ``SEND_MESSAGES_IN_THREADS`` to join a thread.
+        If the thread is private, ``MANAGE_THREADS`` is also needed.
+
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have permissions to join the thread.
+        """
+
+        await self._http.put(f"/channels/{self.id}/thread-members/@me")
+
+    async def leave(self) -> None:
+        """|coro|
+
+        Leaves this thread.
+
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        """
+
+        await self._http.delete(f"/channels/{self.id}/thread-members/@me")
 
 
 @dataclass(repr=False)
