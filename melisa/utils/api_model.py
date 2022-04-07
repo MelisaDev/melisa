@@ -16,7 +16,10 @@ from typing import (
     Union,
     Generic,
     TypeVar,
-    Any, get_origin, Tuple, get_args,
+    Any,
+    get_origin,
+    Tuple,
+    get_args,
 )
 
 from typing_extensions import get_type_hints
@@ -87,7 +90,7 @@ class APIModelBase:
 
             raise TypeError
 
-        return (arg_type, )
+        return (arg_type,)
 
     def __attr_convert(self, attr_value: Dict, attr_type: T) -> T:
         factory = attr_type
@@ -126,9 +129,7 @@ class APIModelBase:
             types = self.__get_types(attr_type)
 
             types = tuple(
-                filter(
-                    lambda tpe: tpe is not None and tpe is not None, types
-                )
+                filter(lambda tpe: tpe is not None and tpe is not None, types)
             )
 
             if not types:
@@ -191,9 +192,7 @@ class APIModelBase:
                 map(
                     lambda key: (
                         key,
-                        data[key].value
-                        if isinstance(data[key], Enum)
-                        else data[key],
+                        data[key].value if isinstance(data[key], Enum) else data[key],
                     ),
                     filter(
                         lambda object_argument: data.get(object_argument) is not None,

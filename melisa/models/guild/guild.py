@@ -531,9 +531,7 @@ class Guild(APIModelBase):
         """
 
         return ThreadsList.from_dict(
-            await self._http.get(
-                f"/guilds/{self.id}/threads/active"
-            )
+            await self._http.get(f"/guilds/{self.id}/threads/active")
         )
 
 

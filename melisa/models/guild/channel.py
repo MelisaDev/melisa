@@ -6,7 +6,16 @@ from __future__ import annotations
 import asyncio
 from dataclasses import dataclass
 from enum import IntEnum
-from typing import List, Any, Optional, AsyncIterator, Union, Dict, overload, TYPE_CHECKING
+from typing import (
+    List,
+    Any,
+    Optional,
+    AsyncIterator,
+    Union,
+    Dict,
+    overload,
+    TYPE_CHECKING,
+)
 
 from ..message.message import Message
 from ...utils import Snowflake, Timestamp
@@ -297,16 +306,16 @@ class MessageableChannel(Channel):
         """
 
         data = await self._http.post(
-                f"channels/{self.id}/threads",
-                headers={"X-Audit-Log-Reason": reason},
-                data={
-                    "name": name,
-                    "auto_archive_duration": auto_archive_duration,
-                    "type": type,
-                    "invitable": invitable,
-                    "rate_limit_per_user": rate_limit_per_user,
-                },
-            )
+            f"channels/{self.id}/threads",
+            headers={"X-Audit-Log-Reason": reason},
+            data={
+                "name": name,
+                "auto_archive_duration": auto_archive_duration,
+                "type": type,
+                "invitable": invitable,
+                "rate_limit_per_user": rate_limit_per_user,
+            },
+        )
 
         return Thread.from_dict(data)
 
@@ -563,7 +572,7 @@ class MessageableChannel(Channel):
         private: bool = False,
         joined: bool = False,
         before: Optional[Union[Snowflake, Timestamp]] = None,
-        limit: Optional[int] = 50
+        limit: Optional[int] = 50,
     ) -> ThreadsList:
         """|coro|
 
@@ -577,7 +586,8 @@ class MessageableChannel(Channel):
         before: Optional[Union[:class:`~melisa.utils.Snowflake`, :class:`~melisa.utils.Timestamp`]]
             Retrieve archived channels before the given date or ID.
         limit: Optional[:class:`int`]
-            The number of threads to retrieve. If None, retrieves every archived thread in the channel.
+            The number of threads to retrieve.
+            If None, retrieves every archived thread in the channel.
             Note, however, that this would make it a slow operation
         private: :class:`bool`
             Whether to retrieve private archived threads.
@@ -656,10 +666,7 @@ class TextChannel(MessageableChannel):
 class Thread(MessageableChannel):
     """A subclass of ``Channel`` for threads with all the same attributes."""
 
-    async def add_user(
-        self,
-        user_id: Snowflake
-    ) -> None:
+    async def add_user(self, user_id: Snowflake) -> None:
         """|coro|
 
         Adds a user to this thread.
@@ -683,10 +690,7 @@ class Thread(MessageableChannel):
 
         await self._http.put(f"channels/{self.id}/thread-members/{user_id}")
 
-    async def remove_user(
-        self,
-        user_id: Snowflake
-    ) -> None:
+    async def remove_user(self, user_id: Snowflake) -> None:
         """|coro|
 
         Removes a user from this thread.

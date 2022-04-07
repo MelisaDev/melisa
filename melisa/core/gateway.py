@@ -91,7 +91,7 @@ class Gateway:
 
     async def connect(self) -> None:
         self.ws = await self.__session.ws_connect(
-            f"wss://gateway.discord.gg/?v=10&encoding=json&compress=zlib-stream"
+            "wss://gateway.discord.gg/?v=10&encoding=json&compress=zlib-stream"
         )
         _logger.debug("(Shard %s) Starting...", self.shard_id)
 

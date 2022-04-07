@@ -260,4 +260,3 @@ class HTTPClient:
             JSON response from the Discord API.
         """
         return await self.__send("PUT", route, json=data, headers=headers)
-

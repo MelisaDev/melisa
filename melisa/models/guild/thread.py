@@ -35,6 +35,7 @@ class ThreadMetadata(APIModelBase):
     create_timestamp: Optional[:class:`~melisa.utils.timestamp.Timestamp`]
         Timestamp when the thread was created; only populated for threads created after 2022-01-09
     """
+
     archived: bool
     auto_archive_duration: int
     archive_timestamp: Timestamp
@@ -58,8 +59,8 @@ class ThreadMember(APIModelBase):
     flags: :class:`int`
         Any user-thread settings, currently only used for notifications
     """
+
     join_timestamp: Timestamp
     flags: int
     id: APINullable[Snowflake] = None
     user_id: APINullable[Snowflake] = None
-

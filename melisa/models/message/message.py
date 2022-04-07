@@ -17,7 +17,8 @@ if TYPE_CHECKING:
 
 class MessageType(IntEnum):
     """Message Type
-    NOTE: Type `19` and `20` are only in API v8. In v6, they are still type `0`. Type `21` is only in API v9.
+    NOTE: Type `19` and `20` are only in API v8.
+    In v6, they are still type `0`. Type `21` is only in API v9.
     """
 
     DEFAULT = 0
@@ -150,7 +151,8 @@ class Message(APIModelBase):
     application: :class:`typing.Any`
         Sent with Rich Presence-related chat embeds
     application_id: :class:`~melisa.Snowflake`
-        If the message is an Interaction or application-owned webhook, this is the id of the application
+        If the message is an Interaction or application-owned webhook,
+        this is the id of the application
     message_reference: :class:`typing.Any`
         Data showing the source of a crosspost, channel follow add, pin, or reply message
     flags: :class:`int`
@@ -160,7 +162,8 @@ class Message(APIModelBase):
     thread: :class:`typing.Any`
         The thread that was started from this message, includes thread member object
     components: :class:`typing.Any`
-        Sent if the message contains components like buttons, action rows, or other interactive components
+        Sent if the message contains components like buttons,
+        action rows, or other interactive components
     sticker_items: :class:`typing.Any`
         Sent if the message contains stickers
     stickers: :class:`typing.Any`
@@ -197,4 +200,3 @@ class Message(APIModelBase):
     components: APINullable[List] = None
     sticker_items: APINullable[List] = None
     stickers: APINullable[List] = None
-
