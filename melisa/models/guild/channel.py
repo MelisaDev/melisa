@@ -300,8 +300,8 @@ class MessageableChannel(Channel):
 
         Returns
         -------
-        Union[:class:`~melisa.models.guild.channel.PublicThread`,
-        :class:`~melisa.models.guild.channel.PrivateThread`]
+        Union[:class:`~melisa.models.guild.channel.Channel`,
+        :class:`Any`]
             The created thread.
         """
 
@@ -335,6 +335,8 @@ class MessageableChannel(Channel):
         ---------
         Flattening messages into a list:
         .. code-block:: python
+            :linenos:
+
             messages = [message async for message in channel.history(limit=111)]
 
         All parameters are optional.
@@ -359,7 +361,7 @@ class MessageableChannel(Channel):
 
         Returns
         -------
-        AsyncIterator[:class:`~melisa.Message`]
+        AsyncIterator[:class:`~melisa.models.message.message.Message`]
             An iterator of messages.
         """
 
@@ -412,7 +414,7 @@ class MessageableChannel(Channel):
 
         Returns
         -------
-        :class:`~melisa.Message`
+        :class:`~melisa.models.message.message.Message`
             Message object.
         """
 
@@ -434,7 +436,7 @@ class MessageableChannel(Channel):
 
         Returns
         -------
-        AsyncIterator[:class:`~melisa.Message`]
+        AsyncIterator[:class:`~melisa.models.message.message.Message`]
             AsyncIterator of Message objects.
         """
 
