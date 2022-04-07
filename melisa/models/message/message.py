@@ -5,16 +5,18 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import IntEnum
-from typing import List, Any, Optional
+from typing import List, TYPE_CHECKING
 
-from ... import Thread
 from ...utils import Snowflake, Timestamp
 from ...utils import APIModelBase
 from ...utils.types import APINullable
 
+if TYPE_CHECKING:
+    from ..guild.channel import Thread
 
-class MessageTypes(IntEnum):
-    """Message Types
+
+class MessageType(IntEnum):
+    """Message Type
     NOTE: Type `19` and `20` are only in API v8. In v6, they are still type `0`. Type `21` is only in API v9.
     """
 
@@ -46,8 +48,8 @@ class MessageTypes(IntEnum):
         return self.value
 
 
-class MessageActivityTypes(IntEnum):
-    """Message Activity Types"""
+class MessageActivityType(IntEnum):
+    """Message Activity Type"""
 
     JOIN = 1
     SPECTATE = 2
@@ -191,7 +193,7 @@ class Message(APIModelBase):
     message_reference: APINullable[List] = None
     flags: APINullable[int] = None
     interaction: APINullable[List] = None
-    thread: APINullable[List[Thread]] = None
+    thread: APINullable[Thread] = None
     components: APINullable[List] = None
     sticker_items: APINullable[List] = None
     stickers: APINullable[List] = None

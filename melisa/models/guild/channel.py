@@ -6,12 +6,15 @@ from __future__ import annotations
 import asyncio
 from dataclasses import dataclass
 from enum import IntEnum
-from typing import List, Any, Optional, AsyncIterator, Union, Dict, overload
+from typing import List, Any, Optional, AsyncIterator, Union, Dict, overload, TYPE_CHECKING
 
+from ..message.message import Message
 from ...utils import Snowflake, Timestamp
 from ...utils import APIModelBase
 from ...utils.types import APINullable
-from .thread import ThreadMember, ThreadMetadata
+
+if TYPE_CHECKING:
+    from .thread import ThreadMember, ThreadMetadata
 
 
 class ChannelType(IntEnum):
@@ -165,7 +168,7 @@ class Channel(APIModelBase):
     owner_id: APINullable[Snowflake] = None
     application_id: APINullable[Snowflake] = None
     parent_id: APINullable[Snowflake] = None
-    last_pin_timestamp: APINullable[int] = None
+    last_pin_timestamp: APINullable[Timestamp] = None
     rtc_region: APINullable[str] = None
     video_quality_mode: APINullable[int] = None
     message_count: APINullable[int] = None
@@ -314,14 +317,15 @@ class MessageableChannel(Channel):
         before: Optional[Snowflake] = None,
         after: Optional[Snowflake] = None,
         around: Optional[Snowflake] = None,
-    ) -> AsyncIterator[Dict[str, Any]]:
+    ) -> AsyncIterator[Message]:
         """|coro|
 
         Returns a list of messages in this channel.
 
         Examples
         ---------
-        Flattening messages into a list: ::
+        Flattening messages into a list:
+        .. code-block:: python
             messages = [message async for message in channel.history(limit=111)]
 
         All parameters are optional.
@@ -346,7 +350,7 @@ class MessageableChannel(Channel):
 
         Returns
         -------
-        AsyncIterator[Dict[:class:`str`, Any]]
+        AsyncIterator[:class:`~melisa.Message`]
             An iterator of messages.
         """
 
@@ -372,7 +376,7 @@ class MessageableChannel(Channel):
                 break
 
             for message_data in raw_messages:
-                yield message_data
+                yield Message.from_dict(message_data)
 
             before = raw_messages[-1]["id"]
             limit -= search_limit
@@ -380,7 +384,7 @@ class MessageableChannel(Channel):
     async def fetch_message(
         self,
         message_id: Optional[Snowflake, int, str],
-    ) -> Dict[str, Any]:
+    ) -> Message:
         """|coro|
 
         Returns a specific message in the channel.
@@ -399,7 +403,7 @@ class MessageableChannel(Channel):
 
         Returns
         -------
-        Dict[:class:`str`, Any]
+        :class:`~melisa.Message`
             Message object.
         """
 
@@ -407,7 +411,30 @@ class MessageableChannel(Channel):
             f"/channels/{self.id}/messages/{message_id}",
         )
 
-        return message
+        return Message.from_dict(message)
+
+    async def pins(self) -> AsyncIterator[Message]:
+        """|coro|
+
+        Retrieves all messages that are currently pinned in the channel.
+
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+
+        Returns
+        -------
+        AsyncIterator[:class:`~melisa.Message`]
+            AsyncIterator of Message objects.
+        """
+
+        messages = await self._http.get(
+            f"/channels/{self.id}/pins",
+        )
+
+        for message in messages:
+            yield Message.from_dict(message)
 
     async def bulk_delete_messages(
         self, messages: List[Snowflake], *, reason: Optional[str] = None
@@ -719,9 +746,9 @@ class ThreadsList(APIModelBase):
 
     Attributes
     ----------
-    threads: List[:class:`~melisa.models.guild.channel.Thread`]
+    threads: List[:class:`~melisa.Thread`]
         Async iterator of threads. To get their type use them `.type` attribute.
-    members: List[:class:`Any`]
+    members: List[:class:`~melisa.ThreadMember`]
         Async iterator of thread members.
     has_more: Optional[:class:`bool`]
         Whether there are potentially additional threads that could be returned on a subsequent cal
