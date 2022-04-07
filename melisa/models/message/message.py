@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from enum import IntEnum
 from typing import List, Any, Optional
 
+from ... import Thread
 from ...utils import Snowflake, Timestamp
 from ...utils import APIModelBase
 from ...utils.types import APINullable
@@ -190,7 +191,7 @@ class Message(APIModelBase):
     message_reference: APINullable[List] = None
     flags: APINullable[int] = None
     interaction: APINullable[List] = None
-    thread: APINullable[List[Any]] = None
+    thread: APINullable[List[Thread]] = None
     components: APINullable[List] = None
     sticker_items: APINullable[List] = None
     stickers: APINullable[List] = None
