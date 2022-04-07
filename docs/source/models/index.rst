@@ -6,3 +6,4 @@ Melisa Models
 
    user
    guild
+   message
