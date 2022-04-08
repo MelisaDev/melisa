@@ -229,3 +229,33 @@ class Message(APIModelBase):
             f"channels/{self.channel_id}/pins/{self.id}",
             headers={"X-Audit-Log-Reason": reason},
         )
+
+    async def unpin(
+        self, *, reason: Optional[str] = None
+    ) -> None:
+        """|coro|
+
+        Unpins the message.
+
+        You must have the ``MANAGE_MESSAGES` permission to do this in a non-private channel context.
+
+        Parameters
+        ----------
+        reason: Optional[:class:`str`]
+            The reason for unpinning the message. Shows up on the audit log.
+
+        Raises
+        -------
+        HTTPException
+            Pinning the message failed, probably due to the channel having more than 50 pinned messages.
+        ForbiddenError
+            You do not have permissions to unpin the message.
+        NotFound
+            The message or channel was not found or deleted.
+        """
+
+        await self._http.delete(
+            f"channels/{self.channel_id}/pins/{self.id}",
+            headers={"X-Audit-Log-Reason": reason},
+        )
+
