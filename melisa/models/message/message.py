@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import IntEnum
-from typing import List, TYPE_CHECKING
+from typing import List, TYPE_CHECKING, Optional
 
 from ...utils import Snowflake, Timestamp
 from ...utils import APIModelBase
@@ -200,3 +200,32 @@ class Message(APIModelBase):
     components: APINullable[List] = None
     sticker_items: APINullable[List] = None
     stickers: APINullable[List] = None
+
+    async def pin(
+        self, *, reason: Optional[str] = None
+    ) -> None:
+        """|coro|
+
+        Pins the message.
+
+        You must have the ``MANAGE_MESSAGES` permission to do this in a non-private channel context.
+
+        Parameters
+        ----------
+        reason: Optional[:class:`str`]
+            The reason for pinning the message. Shows up on the audit log.
+
+        Raises
+        -------
+        HTTPException
+            Pinning the message failed, probably due to the channel having more than 50 pinned messages.
+        ForbiddenError
+            You do not have permissions to pin the message.
+        NotFound
+            The message or channel was not found or deleted.
+        """
+
+        await self._http.put(
+            f"channels/{self.channel_id}/pins/{self.id}",
+            headers={"X-Audit-Log-Reason": reason},
+        )
