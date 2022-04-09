@@ -83,3 +83,38 @@ class Webhook(APIModelBase):
     source_guild: APINullable[Guild] = None
     source_channel: APINullable[Channel] = None
     url: APINullable[str] = None
+
+    async def create(
+            self,
+            *,
+            channel_id: Optional[Snowflake] = None,
+            name: Optional[str] = None,
+            reason: Optional[str] = None
+    ):
+        """|coro|
+        Creates a new webhook and returns a webhook object on success. Requires the ``MANAGE_WEBHOOKS`` permission.
+
+        An error will be returned if a webhook name (`name`) is not valid. A webhook name is valid if:
+
+        * It does not contain the substring 'clyde' (case-insensitive)
+        * It follows the nickname guidelines in the Usernames and Nicknames documentation, with an exception that
+        webhook names can be up to 80 characters
+
+        Parameters
+        ----------
+        channel_id: Optional[:class:`~melisa.utils.types.snowflake.Snowflake`]
+            The channel id this webhook is for, if any
+        name: Optional[:class:`str`]
+            Name of the webhook (1-80 characters)
+        reason: Optional[:class:`str`]
+            The reason for pinning the message. Shows up on the audit log.
+
+        Returns
+        -------
+            ¯\_(ツ)_/¯
+        """
+
+        await self._http.post(
+            f"/channels/{channel_id}/webhooks",
+            headers={"name": name, "X-Audit-Log-Reason": reason}
+        )
