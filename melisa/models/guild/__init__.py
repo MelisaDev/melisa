@@ -4,3 +4,4 @@
 from .guild import *
 from .channel import *
 from .thread import *
+from .webhook import *
