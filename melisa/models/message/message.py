@@ -208,7 +208,7 @@ class Message(APIModelBase):
 
         Pins the message.
 
-        You must have the ``MANAGE_MESSAGES` permission to do this in a non-private channel context.
+        You must have the `MANAGE_MESSAGES` permission to do this in a non-private channel context.
 
         Parameters
         ----------
@@ -237,7 +237,7 @@ class Message(APIModelBase):
 
         Unpins the message.
 
-        You must have the ``MANAGE_MESSAGES` permission to do this in a non-private channel context.
+        You must have the `MANAGE_MESSAGES` permission to do this in a non-private channel context.
 
         Parameters
         ----------
