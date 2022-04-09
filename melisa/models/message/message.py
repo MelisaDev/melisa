@@ -203,12 +203,12 @@ class Message(APIModelBase):
 
     async def pin(
         self, *, reason: Optional[str] = None
-    ) -> None:
+    ):
         """|coro|
 
         Pins the message.
 
-        You must have the `MANAGE_MESSAGES` permission to do this in a non-private channel context.
+        You must have the ``MANAGE_MESSAGES`` permission to do this in a non-private channel context.
 
         Parameters
         ----------
@@ -232,12 +232,12 @@ class Message(APIModelBase):
 
     async def unpin(
         self, *, reason: Optional[str] = None
-    ) -> None:
+    ):
         """|coro|
 
         Unpins the message.
 
-        You must have the `MANAGE_MESSAGES` permission to do this in a non-private channel context.
+        You must have the ``MANAGE_MESSAGES`` permission to do this in a non-private channel context.
 
         Parameters
         ----------
