@@ -83,11 +83,12 @@ class Client:
 
         if isinstance(intents, Iterable):
             self.intents = sum(intents)
-
-        if intents is None:
+        elif intents is None:
             self.intents = (
                 Intents.all() - Intents.GUILD_PRESENCES - Intents.GUILD_MEMBERS
             )
+        else:
+            self.intents = intents
 
         self._token = token
 
