@@ -5,7 +5,7 @@ import logging
 import asyncio
 import signal
 
-from typing import Dict, List, Union, Any, Iterable, Optional, TYPE_CHECKING
+from typing import Dict, List, Union, Any, Iterable, Optional
 
 from .models import User, Guild, Activity
 from .models.app import Shard
@@ -15,9 +15,7 @@ from .core.http import HTTPClient
 from .core.gateway import GatewayBotInfo
 from .models.guild.channel import Channel, ChannelType, channel_types_for_converting
 from .utils.logging import init_logging
-
-if TYPE_CHECKING:
-    from .models.app.intents import Intents
+from .models.app.intents import Intents
 
 _logger = logging.getLogger("melisa")
 
