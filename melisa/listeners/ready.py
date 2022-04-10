@@ -3,8 +3,6 @@
 
 from __future__ import annotations
 
-import asyncio
-
 from ..utils.types import Coro
 from ..models.user import User
 
@@ -20,10 +18,7 @@ async def on_ready_listener(self, gateway, payload: dict):
 
     self.user = User.from_dict(payload.get("user"))
 
-    custom_listener = self._events.get("on_shard_ready")
-
-    if custom_listener is not None:
-        asyncio.ensure_future(custom_listener(gateway.shard_id))
+    await self.dispatch("on_shard_ready", gateway.shard_id)
 
     return
 

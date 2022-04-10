@@ -3,8 +3,6 @@
 
 from __future__ import annotations
 
-import asyncio
-
 from ..utils.types import Coro
 from ..models.guild import Channel, ChannelType, channel_types_for_converting
 
@@ -19,10 +17,7 @@ async def channel_update_listener(self, gateway, payload: dict):
 
     channel = channel_cls.from_dict(payload)
 
-    custom_listener = self._events.get("on_channel_update")
-
-    if custom_listener is not None:
-        asyncio.ensure_future(custom_listener(None, channel))
+    await self.dispatch("on_channel_update", None, channel)
 
     return
 

@@ -4,6 +4,8 @@
 import logging
 import asyncio
 import signal
+import sys
+import traceback
 
 from typing import Dict, List, Union, Any, Iterable, Optional
 
@@ -59,15 +61,15 @@ class Client:
     """
 
     def __init__(
-        self,
-        token: str,
-        *,
-        asyncio_debug: bool = False,
-        intents: Union[Intents, Iterable[Intents]] = None,
-        activity: Optional[Activity] = None,
-        status: str = None,
-        mobile: bool = False,
-        logs: Union[None, int, str, Dict[str, Any]] = "INFO",
+            self,
+            token: str,
+            *,
+            asyncio_debug: bool = False,
+            intents: Union[Intents, Iterable[Intents]] = None,
+            activity: Optional[Activity] = None,
+            status: str = None,
+            mobile: bool = False,
+            logs: Union[None, int, str, Dict[str, Any]] = "INFO",
     ):
         self.shards: Dict[int, Shard] = {}
         self.http: HTTPClient = HTTPClient(token)
@@ -85,7 +87,7 @@ class Client:
             self.intents = sum(intents)
         elif intents is None:
             self.intents = (
-                Intents.all() - Intents.GUILD_PRESENCES - Intents.GUILD_MEMBERS
+                    Intents.all() - Intents.GUILD_PRESENCES - Intents.GUILD_MEMBERS
             )
         else:
             self.intents = intents
@@ -134,6 +136,33 @@ class Client:
         self._events[callback.__qualname__] = callback
         _logger.debug(f"Listener {callback.__qualname__} added successfully!")
         return self
+
+    async def dispatch(
+            self,
+            name: str,
+            *args
+    ):
+        """
+        Dispatches an event
+
+        Parameters
+        ----------
+        name: :class:`str`
+            Name of the event to dispatch.
+        """
+        coro = self._events.get(name)
+
+        if coro is not None:
+            try:
+                await coro(*args)
+            except Exception as exc:
+                custom_error = self._events.get("on_error")
+
+                if custom_error is not None:
+                    asyncio.ensure_future(custom_error(exc))
+                else:
+                    print(f"Ignoring exception in {name}", file=sys.stderr)
+                    traceback.print_exc()
 
     def run(self) -> None:
         """
@@ -227,7 +256,7 @@ class Client:
         return Guild.from_dict(data)
 
     async def fetch_channel(
-        self, channel_id: Union[Snowflake, str, int]
+            self, channel_id: Union[Snowflake, str, int]
     ) -> Union[Channel, Any]:
         """
         Fetch Channel from the Discord API (by id).
