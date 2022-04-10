@@ -201,9 +201,7 @@ class Message(APIModelBase):
     sticker_items: APINullable[List] = None
     stickers: APINullable[List] = None
 
-    async def pin(
-        self, *, reason: Optional[str] = None
-    ):
+    async def pin(self, *, reason: Optional[str] = None):
         """|coro|
 
         Pins the message.
@@ -218,7 +216,8 @@ class Message(APIModelBase):
         Raises
         -------
         HTTPException
-            Pinning the message failed, probably due to the channel having more than 50 pinned messages.
+            Pinning the message failed,
+            probably due to the channel having more than 50 pinned messages.
         ForbiddenError
             You do not have permissions to pin the message.
         NotFound
@@ -230,9 +229,7 @@ class Message(APIModelBase):
             headers={"X-Audit-Log-Reason": reason},
         )
 
-    async def unpin(
-        self, *, reason: Optional[str] = None
-    ):
+    async def unpin(self, *, reason: Optional[str] = None):
         """|coro|
 
         Unpins the message.
@@ -247,7 +244,8 @@ class Message(APIModelBase):
         Raises
         -------
         HTTPException
-            Pinning the message failed, probably due to the channel having more than 50 pinned messages.
+            Pinning the message failed,
+            probably due to the channel having more than 50 pinned messages.
         ForbiddenError
             You do not have permissions to unpin the message.
         NotFound
@@ -258,4 +256,3 @@ class Message(APIModelBase):
             f"channels/{self.channel_id}/pins/{self.id}",
             headers={"X-Audit-Log-Reason": reason},
         )
-

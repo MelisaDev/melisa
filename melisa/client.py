@@ -4,9 +4,9 @@
 import logging
 import asyncio
 import signal
-from typing import Dict, List, Union, Any, Iterable
 
-from .models.app.intents import Intents
+from typing import Dict, List, Union, Any, Iterable, Optional, TYPE_CHECKING
+
 from .models import User, Guild, Activity
 from .models.app import Shard
 from .utils import Snowflake, APIModelBase
@@ -15,6 +15,9 @@ from .core.http import HTTPClient
 from .core.gateway import GatewayBotInfo
 from .models.guild.channel import Channel, ChannelType, channel_types_for_converting
 from .utils.logging import init_logging
+
+if TYPE_CHECKING:
+    from .models.app.intents import Intents
 
 _logger = logging.getLogger("melisa")
 
@@ -29,6 +32,8 @@ class Client:
     ----------
     token: :class:`str`
         The token to login (you can found it in the developer portal)
+    asyncio_debug: :class:`bool`
+        If ``True``, then debugging is enabled for the asyncio event loop in use.
     intents: :class:`Union[~melisa.Intents, Iterable[~melisa.Intents]]`
         The Discord Intents values.
     activity: :class:`~models.user.presence.BotActivity`
@@ -59,8 +64,9 @@ class Client:
         self,
         token: str,
         *,
+        asyncio_debug: bool = False,
         intents: Union[Intents, Iterable[Intents]] = None,
-        activity: Activity = None,
+        activity: Optional[Activity] = None,
         status: str = None,
         mobile: bool = False,
         logs: Union[None, int, str, Dict[str, Any]] = "INFO",
@@ -105,6 +111,9 @@ class Client:
                 self._loop.stop()
 
             print("(SIGINT received some seconds ago) Successfully stopped client loop")
+
+        if asyncio_debug:
+            self._loop.set_debug(True)
 
         signal.signal(signal.SIGINT, sigint_handler)
 

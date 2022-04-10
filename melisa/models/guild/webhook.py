@@ -25,7 +25,8 @@ class WebhookType(IntEnum):
     Incoming:
         Incoming Webhooks can post messages to channels with a generated token
     Channel_Follower:
-        Channel Follower Webhooks are internal webhooks used with Channel Following to post new messages into channels
+        Channel Follower Webhooks are internal webhooks used with Channel Following
+        to post new messages into channels
     Application:
         Application webhooks are webhooks used with Interactions
     """
@@ -64,7 +65,8 @@ class Webhook(APIModelBase):
     application_id: :class:`~melisa.utils.types.snowflake.Snowflake`
         The bot/OAuth2 application that created this webhook
     source_guild: :class:`~melisa.models.guild.guild.Guild`
-        The guild of the channel that this webhook is following (returned for Channel Follower Webhooks)
+        The guild of the channel that this webhook is following
+        (returned for Channel Follower Webhooks)
     source_channel: :class:`~melisa.models.guild.channel.Channel`
         The channel that this webhook is following (returned for Channel Follower Webhooks)
     url: :class:`str`
@@ -85,19 +87,22 @@ class Webhook(APIModelBase):
     url: APINullable[str] = None
 
     async def create(
-            self,
-            *,
-            channel_id: Optional[Snowflake] = None,
-            name: Optional[str] = None,
-            reason: Optional[str] = None
+        self,
+        *,
+        channel_id: Optional[Snowflake] = None,
+        name: Optional[str] = None,
+        reason: Optional[str] = None,
     ):
         """|coro|
-        Creates a new webhook and returns a webhook object on success. Requires the ``MANAGE_WEBHOOKS`` permission.
+        Creates a new webhook and returns a webhook object on success.
+        Requires the ``MANAGE_WEBHOOKS`` permission.
 
-        An error will be returned if a webhook name (`name`) is not valid. A webhook name is valid if:
+        An error will be returned if a webhook name (`name`) is not valid.
+        A webhook name is valid if:
 
         * It does not contain the substring 'clyde' (case-insensitive)
-        * It follows the nickname guidelines in the Usernames and Nicknames documentation, with an exception that
+        * It follows the nickname guidelines in the Usernames
+        and Nicknames documentation, with an exception that
         webhook names can be up to 80 characters
 
         Parameters
@@ -108,13 +113,9 @@ class Webhook(APIModelBase):
             Name of the webhook (1-80 characters)
         reason: Optional[:class:`str`]
             The reason for pinning the message. Shows up on the audit log.
-
-        Returns
-        -------
-            ¯\_(ツ)_/¯
         """
 
         await self._http.post(
             f"/channels/{channel_id}/webhooks",
-            headers={"name": name, "X-Audit-Log-Reason": reason}
+            headers={"name": name, "X-Audit-Log-Reason": reason},
         )
