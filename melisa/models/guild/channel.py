@@ -503,6 +503,41 @@ class MessageableChannel(Channel):
             headers={"X-Audit-Log-Reason": reason},
         )
 
+    async def send(
+        self, content: str = None
+    ) -> Message:
+        """|coro|
+
+        Sends a message to the destination with the content given.
+
+        The content must be a type that can convert to a string through str(content).
+
+        Parameters
+        ----------
+        content: Optional[:class:`str`]
+            The content of the message to send.
+
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have the proper permissions to send the message.
+        BadRequestError
+            Some of specified parameters is invalid.
+        """
+
+        # ToDo: Add other parameters
+
+        content = str(content) if content is not None else None
+
+        return Message.from_dict(
+            await self._http.post(
+                f"/channels/{self.id}/messages",
+                data={"content": content}
+            )
+        )
+
     async def purge(
         self,
         limit: int = 50,

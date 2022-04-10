@@ -277,3 +277,6 @@ class Client:
 
         channel_cls = channel_types_for_converting.get(data["type"], Channel)
         return channel_cls.from_dict(data)
+
+
+Bot = Client
