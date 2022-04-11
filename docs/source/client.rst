@@ -119,5 +119,5 @@ to handle it, which defaults to print a traceback and ignoring the exception.
     Called when particular shard becomes ready.
 
     :param shard_id: The shard ID that is ready.
-    :type shard_id: :class:`int``
+    :type shard_id: :class:`int`
 
