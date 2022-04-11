@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import IntEnum
-from typing import List, TYPE_CHECKING, Optional
+from typing import List, TYPE_CHECKING, Optional, Dict
 
 from ...utils import Snowflake, Timestamp
 from ...utils import APIModelBase
@@ -173,8 +173,8 @@ class Message(APIModelBase):
     id: APINullable[Snowflake] = None
     channel_id: APINullable[Snowflake] = None
     guild_id: APINullable[Snowflake] = None
-    author: APINullable[List] = None
-    member: APINullable[List] = None
+    author: APINullable[Dict] = None
+    member: APINullable[Dict] = None
     content: APINullable[str] = None
     timestamp: APINullable[Timestamp] = None
     edited_timestamp: APINullable[Timestamp] = None
@@ -190,12 +190,12 @@ class Message(APIModelBase):
     pinned: APINullable[bool] = None
     webhook_id: APINullable[Snowflake] = None
     type: APINullable[int] = None
-    activity: APINullable[List] = None
-    application: APINullable[List] = None
+    activity: APINullable[Dict] = None
+    application: APINullable[Dict] = None
     application_id: APINullable[Snowflake] = None
-    message_reference: APINullable[List] = None
+    message_reference: APINullable[Dict] = None
     flags: APINullable[int] = None
-    interaction: APINullable[List] = None
+    interaction: APINullable[Dict] = None
     thread: APINullable[Thread] = None
     components: APINullable[List] = None
     sticker_items: APINullable[List] = None

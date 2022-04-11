@@ -8,8 +8,6 @@ from ..models.guild import UnavailableGuild
 
 
 async def guild_delete_listener(self, gateway, payload: dict):
-    gateway.session_id = payload.get("session_id")
-
     guild = UnavailableGuild.from_dict(payload)
 
     self.guilds.pop(guild.id, None)

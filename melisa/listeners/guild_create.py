@@ -8,8 +8,6 @@ from ..models.guild import Guild
 
 
 async def guild_create_listener(self, gateway, payload: dict):
-    gateway.session_id = payload.get("session_id")
-
     guild_was_cached_as_none = False
 
     guild = Guild.from_dict(payload)

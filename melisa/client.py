@@ -7,7 +7,7 @@ import signal
 import sys
 import traceback
 
-from typing import Dict, List, Union, Any, Iterable, Optional
+from typing import Dict, List, Union, Any, Iterable, Optional, Callable
 
 from .models import User, Guild, Activity
 from .models.app import Shard
@@ -18,6 +18,7 @@ from .core.gateway import GatewayBotInfo
 from .models.guild.channel import Channel, ChannelType, channel_types_for_converting
 from .utils.logging import init_logging
 from .models.app.intents import Intents
+from .utils.waiters import WaiterMgr
 
 _logger = logging.getLogger("melisa")
 
@@ -71,15 +72,16 @@ class Client:
             mobile: bool = False,
             logs: Union[None, int, str, Dict[str, Any]] = "INFO",
     ):
+        self._loop = asyncio.get_event_loop()
+
         self.shards: Dict[int, Shard] = {}
         self.http: HTTPClient = HTTPClient(token)
         self._events: Dict[str, Coro] = {}
+        self._waiter_mgr = WaiterMgr(self._loop)
 
         # ToDo: Transfer guilds in to the cache manager
         self.guilds = {}
         self.user = None
-
-        self._loop = asyncio.get_event_loop()
 
         self._gateway_info = self._loop.run_until_complete(self._get_gateway())
 
@@ -163,6 +165,8 @@ class Client:
                 else:
                     print(f"Ignoring exception in {name}", file=sys.stderr)
                     traceback.print_exc()
+
+        self._waiter_mgr.process_events(name, *args)
 
     def run(self) -> None:
         """
@@ -277,6 +281,64 @@ class Client:
 
         channel_cls = channel_types_for_converting.get(data["type"], Channel)
         return channel_cls.from_dict(data)
+
+    async def wait_for(
+        self,
+        event_name: str,
+        *,
+        check: Optional[Callable[..., bool]] = None,
+        timeout: Optional[float] = None,
+    ):
+        """|coro|
+
+        Waits for a WebSocket event to be dispatched.
+
+        This could be used to wait for a user to reply to a message,
+        or to react to a message.
+
+        The ``timeout`` parameter is passed onto :func:`asyncio.wait_for`. By default,
+        it does not timeout. Note that this does propagate the
+        :exc:`asyncio.TimeoutError` for you in case of timeout and is provided for
+        ease of use.
+
+        In case the event returns multiple arguments, a :class:`tuple` containing those
+        arguments is returned instead.
+
+        This function returns the **first event that meets the requirements**.
+
+        Examples
+        --------
+        Waiting for a user reply: ::
+            @client.listen
+            async def on_message_create(message):
+                if message.content.startswith('$greet'):
+                    channel = await client.fetch_channel(message.channel_id)
+                    await channel.send('Say hello!')
+
+                    def check(m):
+                        return m.content == "hello" and channel.id == message.channel_id
+
+                    msg = await client.wait_for('on_message_create', check=check, timeout=10.0)
+                    await channel.send(f'Hello man!')
+
+        Parameters
+        ----------
+        event_name: :class:`str`
+            The type of event. It should starts with `on_`.
+        check: Optional[Callable[[Any], :class:`bool`]]
+            A predicate to check what to wait for. The arguments must meet the
+            parameters of the event being waited for.
+        timeout: Optional[float]
+            The number of seconds to wait before timing out and raising
+            :exc:`asyncio.TimeoutError`.
+
+        Returns
+        ------
+        Any
+            Returns no arguments, a single argument, or a :class:`tuple` of multiple
+            arguments that mirrors the parameters passed in the event.
+        """
+        return await self._waiter_mgr.wait_for(event_name, check, timeout)
 
 
 Bot = Client

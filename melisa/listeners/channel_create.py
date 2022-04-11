@@ -8,8 +8,6 @@ from ..models.guild import Channel, ChannelType, channel_types_for_converting
 
 
 async def channel_create_listener(self, gateway, payload: dict):
-    gateway.session_id = payload.get("session_id")
-
     payload.update({"type": ChannelType(payload.pop("type"))})
 
     channel_cls = channel_types_for_converting.get(payload["type"], Channel)

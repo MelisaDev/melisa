@@ -14,6 +14,11 @@ class ClientException(MelisaException):
     pass
 
 
+class MelisaTimeoutError(MelisaException):
+    """Exception raised when `wait_for` method timed out
+    """
+
+
 class LoginFailure(ClientException):
     """Fails to log you in from improper credentials or some other misc."""
 

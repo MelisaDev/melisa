@@ -8,14 +8,12 @@ from ..models.guild import Guild
 
 
 async def guild_update_listener(self, gateway, payload: dict):
-    gateway.session_id = payload.get("session_id")
-
     new_guild = Guild.from_dict(payload)
     old_guild = self.guilds.get(new_guild.id)
 
     self.guilds[new_guild.id] = new_guild
 
-    await self.dispatch("on_channel_create", old_guild, new_guild)
+    await self.dispatch("on_guild_update", (old_guild, new_guild))
 
     return
 

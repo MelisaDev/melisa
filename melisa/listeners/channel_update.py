@@ -9,15 +9,13 @@ from ..models.guild import Channel, ChannelType, channel_types_for_converting
 
 async def channel_update_listener(self, gateway, payload: dict):
     # ToDo: Replace None to the old channel object (so it requires cache manager)
-    gateway.session_id = payload.get("session_id")
-
     payload.update({"type": ChannelType(payload.pop("type"))})
 
     channel_cls = channel_types_for_converting.get(payload["type"], Channel)
 
     channel = channel_cls.from_dict(payload)
 
-    await self.dispatch("on_channel_update", None, channel)
+    await self.dispatch("on_channel_update", (None, channel))
 
     return
 
