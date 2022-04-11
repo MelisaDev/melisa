@@ -47,7 +47,6 @@ to handle it, which defaults to print a traceback and ignoring the exception.
     :type exception: :class:`Exception`
 
 .. function:: on_guild_channel_delete(channel)
-              on_guild_channel_create(channel)
 
     Called whenever a guild channel is deleted or created.
 
