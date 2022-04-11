@@ -47,12 +47,12 @@ class ChannelType(IntEnum):
     GUILD_STORE:
         A channel in which game developers can sell their game on Discord
     GUILD_NEWS_THREAD:
-        A temporary sub-channel within a **GUILD_NEWS** channel
+        A temporary sub-channel within a ``GUILD_NEWS`` channel
     GUILD_PUBLIC_THREAD:
-        A temporary sub-channel within a GUILD_TEXT channel
+        A temporary sub-channel within a ``GUILD_TEXT`` channel
     GUILD_PRIVATE_THREAD:
-        A temporary sub-channel within a GUILD_TEXT channel that is only viewable by those invited
-        and those with the MANAGE_THREADS permission
+        A temporary sub-channel within a ``GUILD_TEXT`` channel that is only viewable
+        by those invited and those with the MANAGE_THREADS permission
     GUILD_STAGE_VOICE:
         A voice channel for hosting events with an audience
     """
@@ -124,7 +124,7 @@ class Channel(APIModelBase):
     rate_limit_per_user: :class:`int`
         Amount of seconds a user has to wait before sending another message (0-21600);
         bots, as well as users with the permission
-        `manage_messages` or `manage_channel`, are unaffected
+        ``MANAGE_MESSAGES`` and ``MANAGE_CHANNEL``, are unaffected
     recipients: :class:`typing.Any`
         The recipients of the DM
     icon: :class:`str`
@@ -333,11 +333,10 @@ class MessageableChannel(Channel):
 
         Examples
         ---------
-        Flattening messages into a list:
-        .. code-block:: python
-            :linenos:
+        Flattening messages into a list: ::
 
             messages = [message async for message in channel.history(limit=111)]
+
 
         All parameters are optional.
 
@@ -468,7 +467,7 @@ class MessageableChannel(Channel):
             The request to perform the action failed with other http exception.
         ForbiddenError
             You do not have proper permissions to do the actions required.
-            (You must have **MANAGE_MESSAGES** permission)
+            (You must have ``MANAGE_MESSAGES`` permission)
         """
         await self._http.post(
             f"channels/{self.id}/messages/bulk-delete",
@@ -496,16 +495,14 @@ class MessageableChannel(Channel):
             The request to perform the action failed with other http exception.
         ForbiddenError
             You do not have proper permissions to do the actions required.
-            (You must have **MANAGE_MESSAGES** permission)
+            (You must have ``MANAGE_MESSAGES`` permission)
         """
         await self._http.delete(
             f"channels/{self.id}/messages/{message_id}",
             headers={"X-Audit-Log-Reason": reason},
         )
 
-    async def send(
-        self, content: str = None
-    ) -> Message:
+    async def send(self, content: str = None) -> Message:
         """|coro|
 
         Sends a message to the destination with the content given.
@@ -533,8 +530,7 @@ class MessageableChannel(Channel):
 
         return Message.from_dict(
             await self._http.post(
-                f"/channels/{self.id}/messages",
-                data={"content": content}
+                f"/channels/{self.id}/messages", data={"content": content}
             )
         )
 
@@ -703,7 +699,7 @@ class TextChannel(MessageableChannel):
 class Thread(MessageableChannel):
     """A subclass of ``Channel`` for threads with all the same attributes."""
 
-    async def add_user(self, user_id: Snowflake) -> None:
+    async def add_user(self, user_id: Snowflake):
         """|coro|
 
         Adds a user to this thread.
@@ -727,7 +723,7 @@ class Thread(MessageableChannel):
 
         await self._http.put(f"channels/{self.id}/thread-members/{user_id}")
 
-    async def remove_user(self, user_id: Snowflake) -> None:
+    async def remove_user(self, user_id: Snowflake):
         """|coro|
 
         Removes a user from this thread.
@@ -749,7 +745,7 @@ class Thread(MessageableChannel):
 
         await self._http.delete(f"channels/{self.id}/thread-members/{user_id}")
 
-    async def join(self) -> None:
+    async def join(self):
         """|coro|
 
         Joins this thread.
@@ -767,7 +763,7 @@ class Thread(MessageableChannel):
 
         await self._http.put(f"/channels/{self.id}/thread-members/@me")
 
-    async def leave(self) -> None:
+    async def leave(self):
         """|coro|
 
         Leaves this thread.

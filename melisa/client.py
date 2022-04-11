@@ -62,15 +62,15 @@ class Client:
     """
 
     def __init__(
-            self,
-            token: str,
-            *,
-            asyncio_debug: bool = False,
-            intents: Union[Intents, Iterable[Intents]] = None,
-            activity: Optional[Activity] = None,
-            status: str = None,
-            mobile: bool = False,
-            logs: Union[None, int, str, Dict[str, Any]] = "INFO",
+        self,
+        token: str,
+        *,
+        asyncio_debug: bool = False,
+        intents: Union[Intents, Iterable[Intents]] = None,
+        activity: Optional[Activity] = None,
+        status: str = None,
+        mobile: bool = False,
+        logs: Union[None, int, str, Dict[str, Any]] = "INFO",
     ):
         self._loop = asyncio.get_event_loop()
 
@@ -89,7 +89,7 @@ class Client:
             self.intents = sum(intents)
         elif intents is None:
             self.intents = (
-                    Intents.all() - Intents.GUILD_PRESENCES - Intents.GUILD_MEMBERS
+                Intents.all() - Intents.GUILD_PRESENCES - Intents.GUILD_MEMBERS
             )
         else:
             self.intents = intents
@@ -139,11 +139,7 @@ class Client:
         _logger.debug(f"Listener {callback.__qualname__} added successfully!")
         return self
 
-    async def dispatch(
-            self,
-            name: str,
-            *args
-    ):
+    async def dispatch(self, name: str, *args):
         """
         Dispatches an event
 
@@ -168,7 +164,7 @@ class Client:
 
         self._waiter_mgr.process_events(name, *args)
 
-    def run(self) -> None:
+    def run(self):
         """
         Run Bot without shards (only 0 shard)
         """
@@ -260,7 +256,7 @@ class Client:
         return Guild.from_dict(data)
 
     async def fetch_channel(
-            self, channel_id: Union[Snowflake, str, int]
+        self, channel_id: Union[Snowflake, str, int]
     ) -> Union[Channel, Any]:
         """
         Fetch Channel from the Discord API (by id).
@@ -309,6 +305,7 @@ class Client:
         Examples
         --------
         Waiting for a user reply: ::
+
             @client.listen
             async def on_message_create(message):
                 if message.content.startswith('$greet'):

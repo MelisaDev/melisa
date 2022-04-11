@@ -15,8 +15,7 @@ class ClientException(MelisaException):
 
 
 class MelisaTimeoutError(MelisaException):
-    """Exception raised when `wait_for` method timed out
-    """
+    """Exception raised when `wait_for` method timed out"""
 
 
 class LoginFailure(ClientException):

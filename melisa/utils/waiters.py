@@ -3,7 +3,12 @@
 
 from __future__ import annotations
 
-from asyncio import AbstractEventLoop, Event, wait_for as async_wait, TimeoutError as AsyncTimeOut
+from asyncio import (
+    AbstractEventLoop,
+    Event,
+    wait_for as async_wait,
+    TimeoutError as AsyncTimeOut,
+)
 from typing import List, Callable, Optional
 
 from ..exceptions import MelisaTimeoutError
@@ -39,7 +44,15 @@ class _Waiter:
         """Waits until ``self.event`` is set."""
         await self.event.wait()
 
-    def process(self, event_name: str, event_value):
+    def process(self, event_name: str, event_value=None):
+        """
+        Parameters
+        ----------
+        event_name: str
+            The name of the event.
+        event_value: Optional[Any]
+            evemt value
+        """
         if self.event_name != event_name:
             return False
 
@@ -83,7 +96,7 @@ class WaiterMgr:
         self,
         event_name: str,
         check: Optional[Callable[..., bool]] = None,
-        timeout: Optional[float] = None
+        timeout: Optional[float] = None,
     ):
         """
         Parameters
@@ -109,9 +122,6 @@ class WaiterMgr:
             self.waiter_list.remove(waiter)
         except AsyncTimeOut:
             self.waiter_list.remove(waiter)
-            raise MelisaTimeoutError(
-                "wait_for() timed out while waiting for an event."
-            )
+            raise MelisaTimeoutError("wait_for() timed out while waiting for an event.")
 
         return waiter.return_value
-
