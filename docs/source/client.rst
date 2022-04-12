@@ -43,7 +43,7 @@ to handle it, which defaults to print a traceback and ignoring the exception.
     .. note::
         It will not be received by :meth:`Client.wait_for`.
 
-    :param exception: Produced error.
+    :param exception: Exception.
     :type exception: :class:`Exception`
 
 .. function:: on_channel_create(channel)
@@ -112,7 +112,7 @@ to handle it, which defaults to print a traceback and ignoring the exception.
         See the docs of :attr:`Intents.MESSAGE_CONTENT` for more information.
 
     :param message: The current message.
-    :type message: :class:`models.message.message.Message
+    :type message: :class:`models.message.message.Message`
 
 .. function:: on_shard_ready(shard_id)
 

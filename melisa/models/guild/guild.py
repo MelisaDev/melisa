@@ -169,85 +169,6 @@ class SystemChannelFlags(IntEnum):
         return self.value
 
 
-class GuildFeatures(Enum):
-    """Guild Features
-
-    Attributes
-    ----------
-    ANIMATED_ICON:
-        Guild has access to set an animated guild icon
-    BANNER:
-        Guild has access to set a guild banner image
-    COMMERCE:
-        Guild has access to use commerce features (i.e. create store channels)
-    COMMUNITY:
-        Guild can enable welcome screen, Membership Screening,
-        stage channels and discovery, and receives community updates
-    DISCOVERABLE:
-        Guild is able to be discovered in the directory
-    FEATURABLE:
-        Guild is able to be featured in the directory
-    INVITE_SPLASH:
-        Guild has access to set an invite splash background
-    MEMBER_VERIFICATION_GATE_ENABLED:
-        Guild has enabled Membership Screening
-    MONETIZATION_ENABLED:
-        Guild has enabled monetization
-    MORE_STICKERS:
-        Guild has increased custom sticker slots
-    NEWS:
-        Guild has access to create news channels
-    PARTNERED:
-        Guild is partnered
-    PREVIEW_ENABLED:
-        Guild can be previewed before joining via Membership Screening or the directory
-    PRIVATE_THREADS:
-        Guild has access to create private threads
-    ROLE_ICONS:
-        Guild is able to set role icons
-    SEVEN_DAY_THREAD_ARCHIVE:
-        Guild has access to the seven day archive time for threads
-    THREE_DAY_THREAD_ARCHIVE:
-        Guild has access to the three day archive time for threads
-    TICKETED_EVENTS_ENABLED:
-        Guild has enabled ticketed events
-    VANITY_URL:
-        Guild has access to set a vanity URL
-    VERIFIED:
-        Guild is verified
-    VIP_REGIONS:
-        Guild has access to set 384kbps bitrate in voice (previously VIP voice servers)
-    WELCOME_SCREEN_ENABLED:
-        Guild has enabled the welcome screen
-    EXPOSED_TO_ACTIVITIES_WTP_EXPERIMENT:
-        Unkown. Found during testing. Not listed in Discord API docs.
-    """
-
-    ANIMATED_ICON = "ANIMATED_ICON"
-    BANNER = "BANNER"
-    COMMERCE = "COMMERCE"
-    COMMUNITY = "COMMUNITY"
-    DISCOVERABLE = "DISCOVERABLE"
-    FEATURABLE = "FEATURABLE"
-    INVITE_SPLASH = "INVITE_SPLASH"
-    MEMBER_VERIFICATION_GATE_ENABLED = "MEMBER_VERIFICATION_GATE_ENABLED"
-    MONETIZATION_ENABLED = "MONETIZATION_ENABLED"
-    MORE_STICKERS = "MORE_STICKERS"
-    NEWS = "NEWS"
-    PARTNERED = "PARTNERED"
-    PREVIEW_ENABLED = "PREVIEW_ENABLED"
-    PRIVATE_THREADS = "PRIVATE_THREADS"
-    ROLE_ICONS = "ROLE_ICONS"
-    SEVEN_DAY_THREAD_ARCHIVE = "SEVEN_DAY_THREAD_ARCHIVE"
-    THREE_DAY_THREAD_ARCHIVE = "THREE_DAY_THREAD_ARCHIVE"
-    TICKETED_EVENTS_ENABLED = "TICKETED_EVENTS_ENABLED"
-    VANITY_URL = "VANITY_URL"
-    VERIFIED = "VERIFIED"
-    VIP_REGIONS = "VIP_REGIONS"
-    WELCOME_SCREEN_ENABLED = "WELCOME_SCREEN_ENABLED"
-    EXPOSED_TO_ACTIVITIES_WTP_EXPERIMENT = "EXPOSED_TO_ACTIVITIES_WTP_EXPERIMENT"
-
-
 @dataclass(repr=False)
 class Guild(APIModelBase):
     """Guilds in Discord represent an isolated collection of users and channels,
@@ -289,7 +210,7 @@ class Guild(APIModelBase):
         Default message notifications level
     explicit_content_filter: :class:`int`
         Explicit content filter level
-    features: APINullable[:class:`typing.Any`]
+    features: APINullable[List[:class:`str`]]
         Enabled guild features
     roles: APINullable[:class:`typing.Any`]
         Roles in the guild
@@ -388,7 +309,7 @@ class Guild(APIModelBase):
     verification_level: APINullable[int] = None
     default_message_notifications: APINullable[int] = None
     explicit_content_filter: APINullable[int] = None
-    features: APINullable[List[GuildFeatures]] = None
+    features: APINullable[List[str]] = None
     roles: APINullable[List] = None
     emojis: APINullable[List] = None
     # TODO: Make a structures of emoji and role

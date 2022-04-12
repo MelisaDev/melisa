@@ -55,6 +55,28 @@ class PrivilegedIntentsRequired(ClientException):
         super().__init__(message.format(self.shard_id))
 
 
+class EmbedFieldError(MelisaException, ValueError):
+    """Occurs when an embed field is too large."""
+
+    @classmethod
+    def characters_from_desc(cls, field_type: str, current_size: int, max_size: int):
+        """Create an instance by description.
+
+        Parameters
+        ----------
+        field_type :class:`str`
+            The type/name of the field.
+        current_size :class:`int`
+            The current size of the field.
+        max_si :class:`int`
+            The maximum size of the field.
+        """
+        return cls(
+            f"{field_type} can have maximum {max_size} characters."
+            f" (Current size: {current_size})"
+        )
+
+
 class HTTPException(MelisaException):
     """Occurs when an HTTP request operation fails."""
 

@@ -18,6 +18,8 @@ from typing import (
 )
 
 from ..message.message import Message
+from ...exceptions import EmbedFieldError
+from ...models.message.embed import Embed
 from ...utils import Snowflake, Timestamp
 from ...utils import APIModelBase
 from ...utils.types import APINullable
@@ -502,7 +504,9 @@ class MessageableChannel(Channel):
             headers={"X-Audit-Log-Reason": reason},
         )
 
-    async def send(self, content: str = None) -> Message:
+    async def send(
+        self, content: str = None, *, embed: Embed = None, embeds: List[Embed] = None
+    ) -> Message:
         """|coro|
 
         Sends a message to the destination with the content given.
@@ -513,6 +517,10 @@ class MessageableChannel(Channel):
         ----------
         content: Optional[:class:`str`]
             The content of the message to send.
+        embed: Optional[:class:`~melisa.models.message.embed.Embed`]
+            Embed
+        embeds: Optional[List[:class:`~melisa.models.message.embed.Embed`]]
+            List of embeds
 
         Raises
         -------
@@ -526,11 +534,22 @@ class MessageableChannel(Channel):
 
         # ToDo: Add other parameters
 
+        if embeds is None:
+            embeds = []
+
         content = str(content) if content is not None else None
+        embeds.append(embed.to_dict()) if embed is not None else None
+
+        for _embed in embeds:
+            if embed.total_length() > 6000:
+                raise EmbedFieldError.characters_from_desc(
+                    "Embed", embed.total_length(), 6000
+                )
 
         return Message.from_dict(
             await self._http.post(
-                f"/channels/{self.id}/messages", data={"content": content}
+                f"/channels/{self.id}/messages",
+                data={"content": content, "embeds": embeds},
             )
         )
 
