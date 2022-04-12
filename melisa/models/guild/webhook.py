@@ -112,10 +112,32 @@ class Webhook(APIModelBase):
         name: Optional[:class:`str`]
             Name of the webhook (1-80 characters)
         reason: Optional[:class:`str`]
-            The reason for pinning the message. Shows up on the audit log.
+            The reason for create the webhook. Shows up on the audit log.
         """
 
         await self._http.post(
             f"/channels/{channel_id}/webhooks",
             headers={"name": name, "X-Audit-Log-Reason": reason},
+        )
+
+    async def delete(
+            self,
+            *,
+            webhook_id: Optional[Snowflake] = None,
+            reason: Optional[str] = None
+    ):
+        """|coro|
+        Delete a webhook permanently. Requires the ``MANAGE_WEBHOOKS`` permission.
+        Returns a ``204 No Content`` response on success.
+
+        Parameters
+        ----------
+        webhook_id: Optional[:class:`~melisa.utils.types.snowflake.Snowflake`]
+            ID of the webhook you want to delete
+        reason: Optional[:class:`str`]
+            The reason for delete the webhook. Shows up on the audit log.
+        """
+        await self._http.delete(
+            f"/webhooks/{webhook_id}",
+            headers={"X-Audit-Log-Reason": reason},
         )
