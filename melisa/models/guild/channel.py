@@ -252,7 +252,6 @@ class Channel(APIModelBase):
     async def create_webhook(
         self,
         *,
-        channel_id: Optional[Snowflake] = None,
         name: Optional[str] = None,
         reason: Optional[str] = None,
     ):
@@ -270,8 +269,6 @@ class Channel(APIModelBase):
 
         Parameters
         ----------
-        channel_id: Optional[:class:`~melisa.utils.types.snowflake.Snowflake`]
-            The channel id this webhook is for, if any
         name: Optional[:class:`str`]
             Name of the webhook (1-80 characters)
         reason: Optional[:class:`str`]
@@ -279,7 +276,7 @@ class Channel(APIModelBase):
         """
 
         await self._http.post(
-            f"/channels/{channel_id}/webhooks",
+            f"/channels/{self.id}/webhooks",
             headers={"name": name, "X-Audit-Log-Reason": reason},
         )
 
