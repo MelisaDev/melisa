@@ -239,47 +239,15 @@ class Channel(APIModelBase):
 
         Returns
         -------
-        Dict[:class:`str`, Any]
+        Channel
             Channel object.
         """
 
-        message = await self._http.delete(
+        data = await self._http.delete(
             f"/channels/{self.id}", headers={"X-Audit-Log-Reason": reason}
         )
 
-        return message
-
-    async def create_webhook(
-        self,
-        *,
-        name: Optional[str] = None,
-        reason: Optional[str] = None,
-    ):
-        """|coro|
-        Creates a new webhook and returns a webhook object on success.
-        Requires the ``MANAGE_WEBHOOKS`` permission.
-
-        An error will be returned if a webhook name (`name`) is not valid.
-        A webhook name is valid if:
-
-        * It does not contain the substring 'clyde' (case-insensitive)
-        * It follows the nickname guidelines in the Usernames
-        and Nicknames documentation, with an exception that
-        webhook names can be up to 80 characters
-
-        Parameters
-        ----------
-        name: Optional[:class:`str`]
-            Name of the webhook (1-80 characters)
-        reason: Optional[:class:`str`]
-            The reason for create the webhook. Shows up on the audit log.
-        """
-
-        await self._http.post(
-            f"/channels/{self.id}/webhooks",
-            headers={"name": name, "X-Audit-Log-Reason": reason},
-        )
-
+        return Channel.from_dict(data)
 
 class MessageableChannel(Channel):
     """A subclass of ``Channel`` with methods that are only available for channels,
@@ -569,7 +537,9 @@ class MessageableChannel(Channel):
             embeds = []
 
         content = str(content) if content is not None else None
-        embeds.append(embed.to_dict()) if embed is not None else None
+
+        if embed is not None:
+            embeds.append(embed.to_dict())
 
         for _embed in embeds:
             if embed.total_length() > 6000:
@@ -744,6 +714,37 @@ class TextChannel(MessageableChannel):
             The updated channel object.
         """
         return await super().edit(**kwargs)
+
+    async def create_webhook(
+        self,
+        *,
+        name: Optional[str] = None,
+        reason: Optional[str] = None,
+    ):
+        """|coro|
+        Creates a new webhook and returns a webhook object on success.
+        Requires the ``MANAGE_WEBHOOKS`` permission.
+
+        An error will be returned if a webhook name (`name`) is not valid.
+        A webhook name is valid if:
+
+        * It does not contain the substring 'clyde' (case-insensitive)
+        * It follows the nickname guidelines in the Usernames
+        and Nicknames documentation, with an exception that
+        webhook names can be up to 80 characters
+
+        Parameters
+        ----------
+        name: Optional[:class:`str`]
+            Name of the webhook (1-80 characters)
+        reason: Optional[:class:`str`]
+            The reason for create the webhook. Shows up on the audit log.
+        """
+
+        await self._http.post(
+            f"/channels/{self.id}/webhooks",
+            headers={"name": name, "X-Audit-Log-Reason": reason},
+        )
 
 
 class Thread(MessageableChannel):

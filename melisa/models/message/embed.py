@@ -184,7 +184,7 @@ class EmbedField(APIModelBase):
 
     name: str
     value: str
-    inline: APINullable[str] = None
+    inline: APINullable[bool] = False
 
 
 @dataclass(repr=False)
@@ -369,6 +369,34 @@ class Embed(APIModelBase):
         self.footer = EmbedFooter(
             text=text, icon_url=icon_url, proxy_icon_url=proxy_icon_url
         )
+
+        return self
+
+    def add_field(self, name: str, value: str, *, inline: bool = False):
+        """
+        Adds a field to the embed object.
+
+        This function returns the class instance to allow for fluent-style chaining.
+
+        Parameters
+        ----------
+        name: :class:`str`
+            The name of the field.
+        value: :class:`str`
+            The value of the field.
+        inline: :class:`bool`
+            Whether the field should be displayed inline.
+
+        Returns
+        -------
+        Embed
+            This embed.
+        """
+
+        if self.fields is None:
+            self.fields = []
+
+        self.fields.append(EmbedField(name=name, value=value, inline=inline))
 
         return self
 
