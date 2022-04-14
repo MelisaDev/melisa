@@ -44,6 +44,10 @@ class TestEmbed:
         embed = Embed().set_footer(text="cool footer text")
         assert embed.total_length() == 16
 
+    def test_total_length_field_value(self):
+        embed = Embed().add_field(name="", value="best field value")
+        assert embed.total_length() == 16
+
     def test_total_length_all(self):
         embed = Embed(title="my title", description="simple description")
         embed.set_author(name="best author")

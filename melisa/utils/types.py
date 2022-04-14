@@ -7,11 +7,37 @@ from sys import modules
 from typing import TypeVar, Callable, Coroutine, Any, Union
 
 
+class UndefinedType:
+    """The type of the `UNDEFINED`."""
+
+    def __bool__(self):
+        return False
+
+    def __copy__(self):
+        return self
+
+    def __getstate__(self):
+        return False
+
+    def __repr__(self) -> str:
+        return "<UNDEFINED>"
+
+    def __reduce__(self) -> str:
+        return "<UNDEFINED>"
+
+    def __str__(self) -> str:
+        return "<UNDEFINED>"
+
+
+UNDEFINED = UndefinedType()
+
 T = TypeVar("T")
 
 Coro = TypeVar("Coro", bound=Callable[..., Coroutine[Any, Any, Any]])
 
 APINullable = Union[T, None]
+
+UndefinedOr = Union[T, UndefinedType]
 
 
 class Singleton(type):

@@ -10,6 +10,7 @@ from enum import Enum
 from typing import List, Union, Optional
 
 from melisa.exceptions import EmbedFieldError
+from melisa.utils.types import UNDEFINED, UndefinedOr
 from melisa.utils.api_model import APIModelBase, APINullable
 from melisa.utils.timestamp import Timestamp
 
@@ -189,8 +190,6 @@ class EmbedField(APIModelBase):
 
 @dataclass(repr=False)
 class Embed(APIModelBase):
-    # ToDo: Add fields set method
-
     """Represents an embed sent in with message within Discord.
 
     Attributes
@@ -397,6 +396,85 @@ class Embed(APIModelBase):
             self.fields = []
 
         self.fields.append(EmbedField(name=name, value=value, inline=inline))
+
+        return self
+
+    def edit_field(
+        self,
+        index: int,
+        *,
+        name: UndefinedOr[str] = UNDEFINED,
+        value: UndefinedOr[str] = UNDEFINED,
+        inline: UndefinedOr[bool] = UNDEFINED,
+    ) -> Embed:
+        """Edit an existing field on this embed.
+
+        Parameters
+        ----------
+        index: :class:`int`
+            The index of the field to edit.
+        name: UndefinedOr[:class:`str`]
+            The name of the field.
+        value: UndefinedOr[:class:`str`]
+            The value of the field.
+        inline: UndefinedOr[:class:`bool`]
+            Whether the field should be displayed inline.
+
+        Returns
+        -------
+        Embed
+            This embed.
+
+        Raises
+        ------
+        :class:`IndexError`
+            Raised if the index is greater than `len(embed.fields) - 1` or
+            less than `-len(embed.fields)`
+        """
+        if not self.fields:
+            raise IndexError(index)
+
+        field = self.fields[index]
+
+        if name is not UNDEFINED:
+            field.name = name
+        if value is not UNDEFINED:
+            field.value = value
+        if inline is not UNDEFINED:
+            field.is_inline = inline
+
+        return self
+
+    def remove_field(self, index: int) -> Embed:
+        """Remove an existing field from this embed.
+
+        Parameters
+        ----------
+        index: :class:`int`
+            The index of the embed field to remove.
+
+        Returns
+        -------
+        Embed
+            This embed.
+
+        Raises
+        ------
+        :class:`IndexError`
+            Raised if the index is greater than `len(embed.fields) - 1` or
+            less than `-len(embed.fields)`
+        """
+        if self.fields:
+            del self.fields[index]
+
+        if not self.fields:
+            self.fields = None
+
+        return self
+
+    def clear_fields(self) -> Embed:
+        """Removes all fields from this embed."""
+        self.fields.clear()
 
         return self
 

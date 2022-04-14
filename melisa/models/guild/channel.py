@@ -249,6 +249,7 @@ class Channel(APIModelBase):
 
         return Channel.from_dict(data)
 
+
 class MessageableChannel(Channel):
     """A subclass of ``Channel`` with methods that are only available for channels,
     where user can send messages."""
@@ -343,13 +344,13 @@ class MessageableChannel(Channel):
 
         Parameters
         ----------
-        limit : Optional[:class:`~.melisa.Snowflake`]
+        limit : Optional[:class:`~.melisa.utils.snowflake.Snowflake`]
             Max number of messages to return (1-100).
-        around : Optional[:class:`~.melisa.Snowflake`]
+        around : Optional[:class:`~.melisa.utils.snowflake.Snowflake`]
             Get messages around this message ID.
-        before : Optional[:class:`~.melisa.Snowflake`]
+        before : Optional[:class:`~.melisa.utils.snowflake.Snowflake`]
             Get messages before this message ID.
-        after : Optional[:class:`~.melisa.Snowflake`]
+        after : Optional[:class:`~.melisa.utils.snowflake.Snowflake`]
             Get messages after this message ID.
 
         Raises
@@ -402,7 +403,7 @@ class MessageableChannel(Channel):
 
         Parameters
         ----------
-        message_id : Optional[Union[:class:`int`, :class:`str`, :class:`~.melisa.Snowflake`]]
+        message_id : Optional[:class:`~.melisa.utils.snowflake.Snowflake`]
             Id of message to fetch.
 
         Raises
@@ -457,7 +458,7 @@ class MessageableChannel(Channel):
 
         Parameters
         ----------
-        messages: List[:class:`~.melisa.Snowflake`]
+        messages: List[:class:`~.melisa.utils.snowflake.Snowflake`]
             The list of message IDs to delete (2-100).
         reason: Optional[:class:`str`]
             The reason of the bulk delete messages operation.
@@ -485,7 +486,7 @@ class MessageableChannel(Channel):
 
         Parameters
         ----------
-        message_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.Snowflake`]
+        message_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
             Id of message to delete.
         reason: Optional[:class:`str`]
             The reason of the message delete operation.
@@ -570,13 +571,13 @@ class MessageableChannel(Channel):
 
         Parameters
         ----------
-        limit : Optional[:class:`~.melisa.Snowflake`]
+        limit : Optional[:class:`~.melisa.utils.snowflake.Snowflake`]
             Max number of messages to purge.
-        around : Optional[:class:`~.melisa.Snowflake`]
+        around : Optional[:class:`~.melisa.utils.snowflake.Snowflake`]
             Get messages around this message ID.
-        before : Optional[:class:`~.melisa.Snowflake`]
+        before : Optional[:class:`~.melisa.utils.snowflake.Snowflake`]
             Get messages before this message ID.
-        after : Optional:class:`~.melisa.Snowflake`]
+        after : Optional[:class:`~.melisa.utils.snowflake.Snowflake`]
             Get messages after this message ID.
         reason: Optional[:class:`str`]
             The reason of the channel purge operation.
@@ -636,7 +637,8 @@ class MessageableChannel(Channel):
 
         Parameters
         ----------
-        before: Optional[Union[:class:`~melisa.utils.Snowflake`, :class:`~melisa.utils.Timestamp`]]
+        before: Optional[Union[:class:`~melisa.utils.snowflake.Snowflake`,
+        :class:`~melisa.utils.snowflake.Timestamp`]]
             Retrieve archived channels before the given date or ID.
         limit: Optional[:class:`int`]
             The number of threads to retrieve.
@@ -834,9 +836,9 @@ class ThreadsList(APIModelBase):
 
     Attributes
     ----------
-    threads: List[:class:`~melisa.Thread`]
+    threads: List[:class:`~melisa.models.guild.channel.Thread`]
         Async iterator of threads. To get their type use them `.type` attribute.
-    members: List[:class:`~melisa.ThreadMember`]
+    members: List[:class:`~melisa.models.guild.thread.ThreadMember`]
         Async iterator of thread members.
     has_more: Optional[:class:`bool`]
         Whether there are potentially additional threads that could be returned on a subsequent cal

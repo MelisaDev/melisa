@@ -87,10 +87,7 @@ class Webhook(APIModelBase):
     url: APINullable[str] = None
 
     async def delete(
-            self,
-            *,
-            webhook_id: Optional[Snowflake] = None,
-            reason: Optional[str] = None
+        self, *, webhook_id: Optional[Snowflake] = None, reason: Optional[str] = None
     ):
         """|coro|
         Delete a webhook permanently. Requires the ``MANAGE_WEBHOOKS`` permission.
