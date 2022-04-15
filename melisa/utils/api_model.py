@@ -196,37 +196,6 @@ class APIModelBase:
 
         return super().__str__()
 
-    @classmethod
-    def from_dict(
-        cls: Generic[T], data: Dict[str, Union[str, bool, int, Any]]
-    ) -> T:
-        """
-        Parse an API object from a dictionary.
-        """
-        if isinstance(data, cls):
-            return data
-
-        # Disable inspection for IDE because this is valid code for the
-        # inherited classes:
-        # noinspection PyArgumentList
-        return cls(
-            **dict(
-                map(
-                    lambda key: (
-                        key,
-                        data[key].value
-                        if isinstance(data[key], Enum)
-                        else data[key],
-                    ),
-                    filter(
-                        lambda object_argument: data.get(object_argument)
-                        is not None,
-                        getfullargspec(cls.__init__).args,
-                    ),
-                )
-            )
-        )
-
     def to_dict(self) -> Dict:
         """
         Transform the current object to a dictionary representation. Parameters that

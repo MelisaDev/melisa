@@ -681,6 +681,47 @@ class MessageableChannel(Channel):
 class TextChannel(MessageableChannel):
     """A subclass of ``Channel`` representing text channels with all the same attributes."""
 
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]):
+        """Generate an text channel from the given data.
+
+        Parameters
+        ----------
+        data: :class:`dict`
+            The dictionary to convert into a text channel.
+        """
+        self: TextChannel = super().__new__(cls)
+
+        self.id = data["id"]
+        self.type = data["type"]
+        self.guild_id = Snowflake(data["guild_id"])
+        self.position = data["position"]
+        self.permission_overwrites = data["permission_overwrites"]
+        self.name = data["name"]
+        self.topic = data.get("topic")
+        self.nsfw = data["nsfw"]
+
+        if data.get("last_message_id") is not None:
+            self.last_message_id = Snowflake(data["last_message_id"])
+        else:
+            self.last_message_id = None
+
+        self.rate_limit_per_user = data.get("rate_limit_per_user")
+
+        if data.get("parent_id") is not None:
+            self.parent_id = Snowflake(data["parent_id"])
+        else:
+            self.parent_id = None
+
+        if data.get("last_pin_timestamp") is not None:
+            self.last_pin_timestamp = Snowflake(data["last_pin_timestamp"])
+        else:
+            self.last_pin_timestamp = None
+
+        self.default_auto_archive_duration = data.get("default_auto_archive_duration")
+
+        return self
+
     @overload
     async def edit(
         self,
@@ -751,6 +792,59 @@ class TextChannel(MessageableChannel):
 
 class Thread(MessageableChannel):
     """A subclass of ``Channel`` for threads with all the same attributes."""
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]):
+        """Generate an thread from the given data.
+
+        Parameters
+        ----------
+        data: :class:`dict`
+            The dictionary to convert into a thread.
+        """
+        self: Thread = super().__new__(cls)
+        self.id = int(data["id"])
+        self.parent_id = int(data.get("parent_id"))
+        self.owner_id = Snowflake(data.get("owner_id"))
+        self.name = data["name"]
+        self.type = ChannelType(data.pop("type"))
+
+        if data.get("last_message_id") is not None:
+            self.last_message_id = Snowflake(data["last_message_id"])
+        else:
+            self.last_message_id = None
+
+        self.slowmode_delay = data.get("rate_limit_per_user", 0)
+        self.message_count = data.get("message_count")
+        self.member_count = data.get("member_count")
+
+        if data.get("last_pin_timestamp") is not None:
+            self.last_pin_timestamp = Snowflake(data["last_pin_timestamp"])
+        else:
+            self.last_pin_timestamp = None
+
+        self.flags = data.get("flags", 0)
+        self.__unroll_metadata(data["thread_metadata"])
+
+        self.me = data.get("member")
+
+        return self
+
+    def __unroll_metadata(self, data: Dict[str, Any]):
+        """Unroll metadata method, yup yup, you should't see this"""
+        self.archived = data["archived"]
+        self.auto_archive_duration = data["auto_archive_duration"]
+        self.locked = data.get("locked", False)
+
+        if data.get("create_timestamp") is not None:
+            self.create_timestamp = Timestamp(data["create_timestamp"])
+        else:
+            self.create_timestamp = None
+
+        if data.get("archive_timestamp") is not None:
+            self.archive_timestamp = Timestamp(data["archive_timestamp"])
+        else:
+            self.archive_timestamp = None
 
     async def add_user(self, user_id: Snowflake):
         """|coro|
@@ -846,7 +940,22 @@ class ThreadsList(APIModelBase):
 
     threads: List[Thread]
     members: List[ThreadMember]
-    has_more: APINullable[bool] = UNDEFINED
+    has_more: bool
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]):
+        """Generate an threads list from the given dict.
+
+        Parameters
+        ----------
+        data: :class:`dict`
+            The dictionary to convert into an threads list.
+        """
+        self: ThreadsList = super().__new__(cls)
+        self.threads = [Thread.from_dict(thread) for thread in data["threads"]]
+        self.members = [ThreadMember.from_dict(member) for member in data["members"]]
+        self.has_more = data.get("has_more", False)
+        return self
 
 
 # noinspection PyTypeChecker
