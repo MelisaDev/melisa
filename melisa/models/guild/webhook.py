@@ -87,7 +87,7 @@ class Webhook(APIModelBase):
     url: APINullable[str] = UNDEFINED
 
     async def delete(
-        self, *, webhook_id: Optional[Snowflake] = None, reason: Optional[str] = None
+        self, *, reason: Optional[str] = None
     ):
         """|coro|
         Delete a webhook permanently. Requires the ``MANAGE_WEBHOOKS`` permission.
@@ -95,12 +95,31 @@ class Webhook(APIModelBase):
 
         Parameters
         ----------
-        webhook_id: Optional[:class:`~melisa.utils.types.snowflake.Snowflake`]
-            ID of the webhook you want to delete
         reason: Optional[:class:`str`]
             The reason for delete the webhook. Shows up on the audit log.
         """
         await self._http.delete(
-            f"/webhooks/{webhook_id}",
+            f"/webhooks/{self.id}",
             headers={"X-Audit-Log-Reason": reason},
+        )
+
+    async def modify(
+            self, *, name: Optional[str] = None, channel_id: Optional[Snowflake] = None, reason: Optional[str] = None
+    ):
+        """|coro|
+        Modify a webhook. Requires the ``MANAGE_WEBHOOKS permission``. Returns the updated webhook object on success.
+
+        Parameters
+        ----------
+        name: Optional[:class:`str`]
+            The default name of the webhook
+        channel_id: Optional[:class:`~.melisa.utils.snowflake.Snowflake`]
+            The new channel id this webhook should be moved to
+        reason: Optional[:class:`str`]
+            The reason for modify the webhook. Shows up on the audit log.
+        """
+
+        await self._http.patch(
+            f"/webhooks/{self.id}",
+            headers={"name": name, "channel_id": channel_id, "X-Audit-Log-Reason": reason},
         )
