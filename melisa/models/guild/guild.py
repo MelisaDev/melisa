@@ -320,7 +320,6 @@ class Guild(APIModelBase):
     system_channel_flags: APINullable[int] = UNDEFINED
     rules_channel_id: APINullable[Snowflake] = UNDEFINED
     joined_at: APINullable[Timestamp] = UNDEFINED
-    # TODO: Deal with joined_at
 
     large: APINullable[bool] = UNDEFINED
     unavailable: APINullable[bool] = UNDEFINED

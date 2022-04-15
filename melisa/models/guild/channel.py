@@ -28,6 +28,13 @@ if TYPE_CHECKING:
     from .thread import ThreadMember, ThreadMetadata
 
 
+def _choose_channel_type(data):
+    data.update({"type": ChannelType(data.pop("type"))})
+
+    channel_cls = channel_types_for_converting.get(data["type"], NoneTypedChannel)
+    return channel_cls.from_dict(data)
+
+
 class ChannelType(IntEnum):
     """Channel Type
     NOTE: Type 10, 11 and 12 are only available in Discord API v9.
@@ -96,6 +103,8 @@ class VideoQualityModes(IntEnum):
 @dataclass(repr=False)
 class Channel(APIModelBase):
     """Represents a guild or DM channel within Discord
+
+    **It will be never returned!**
 
     Attributes
     ----------
@@ -213,12 +222,9 @@ class Channel(APIModelBase):
             headers={"X-Audit-Log-Reason": reason},
         )
 
-        data.update({"type": ChannelType(data.pop("type"))})
+        return _choose_channel_type(data)
 
-        channel_cls = channel_types_for_converting.get(data["type"], Channel)
-        return channel_cls.from_dict(data)
-
-    async def delete(self, *, reason: Optional[str] = None) -> Dict[str, Any]:
+    async def delete(self, *, reason: Optional[str] = None):
         """|coro|
 
         Delete a channel, or close a private message.
@@ -247,7 +253,7 @@ class Channel(APIModelBase):
             f"/channels/{self.id}", headers={"X-Audit-Log-Reason": reason}
         )
 
-        return Channel.from_dict(data)
+        return _choose_channel_type(data)
 
 
 class MessageableChannel(Channel):
@@ -602,7 +608,7 @@ class MessageableChannel(Channel):
         count = 0
 
         async for message in iterator:
-            message_ids.append(message["id"])
+            message_ids.append(message.id)
             count += 1
 
             if count == 100:
@@ -676,6 +682,40 @@ class MessageableChannel(Channel):
                 params={"before": before, "limit": limit},
             )
         )
+
+
+class NoneTypedChannel(Channel):
+    """It represents a channel, that is unknown,
+    so we don't know this type of the channel,
+    And also we can't convert it to something, but it has
+    every method, that Channel has.
+
+    You can use ``raw`` attribute to access to the original data,
+    returned from the discord.
+
+    Attributes
+    ----------
+    id: :class:`~melisa.utils.snowflake.Snowflake`
+        Id of the channel
+    raw: Dict[:class:`str`, Any]
+        Raw value channel data (returned from the discord)
+    """
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]):
+        """Generate a channel with unknown type from the given data.
+
+        Parameters
+        ----------
+        data: :class:`dict`
+            The dictionary to convert into an unknown channel.
+        """
+        self: NoneTypedChannel = super().__new__(cls)
+
+        self.id = data["id"]
+        self.raw = data
+
+        return self
 
 
 class TextChannel(MessageableChannel):
@@ -960,5 +1000,8 @@ class ThreadsList(APIModelBase):
 
 # noinspection PyTypeChecker
 channel_types_for_converting: Dict[ChannelType, Channel] = {
-    ChannelType.GUILD_TEXT: TextChannel
+    ChannelType.GUILD_TEXT: TextChannel,
+    ChannelType.GUILD_NEWS_THREAD: Thread,
+    ChannelType.GUILD_PUBLIC_THREAD: Thread,
+    ChannelType.GUILD_PRIVATE_THREAD: Thread
 }

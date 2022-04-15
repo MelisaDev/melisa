@@ -6,9 +6,6 @@
 
 <hr>
 
-<a class="github-badge" href="https://scrutinizer-ci.com/g/MelisaDev/melisa/" tabindex="-1">
-<img src="https://scrutinizer-ci.com/g/MelisaDev/melisa/badges/quality-score.png?b=master" alt="Scrutinizer" />
-</a>
 <a class="github-badge" href="https://melisa.readthedocs.io/en/latest/?badge=latest" tabindex="-1">
 <img src="https://readthedocs.org/projects/melisa/badge/?version=latest" alt="Documentation Status"/>
 </a>
