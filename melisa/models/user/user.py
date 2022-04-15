@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from ...utils.api_model import APIModelBase
-from ...utils.types import APINullable
+from ...utils.types import APINullable, UNDEFINED
 from ...utils.snowflake import Snowflake
 
 
@@ -149,20 +149,20 @@ class User(APIModelBase):
         The user their premium type in a usable enum.
     """
 
-    id: APINullable[Snowflake] = None
-    username: APINullable[str] = None
-    discriminator: APINullable[str] = None
-    avatar: APINullable[str] = None
-    bot: APINullable[bool] = None
-    system: APINullable[bool] = None
-    mfa_enabled: APINullable[bool] = None
-    banner: APINullable[str] = None
-    accent_color: APINullable[int] = None
-    local: APINullable[str] = None
-    verified: APINullable[bool] = None
-    email: APINullable[str] = None
-    premium_type: APINullable[int] = None
-    public_flags: APINullable[int] = None
+    id: APINullable[Snowflake] = UNDEFINED
+    username: APINullable[str] = UNDEFINED
+    discriminator: APINullable[str] = UNDEFINED
+    avatar: APINullable[str] = UNDEFINED
+    bot: APINullable[bool] = UNDEFINED
+    system: APINullable[bool] = UNDEFINED
+    mfa_enabled: APINullable[bool] = UNDEFINED
+    banner: APINullable[str] = UNDEFINED
+    accent_color: APINullable[int] = UNDEFINED
+    local: APINullable[str] = UNDEFINED
+    verified: APINullable[bool] = UNDEFINED
+    email: APINullable[str] = UNDEFINED
+    premium_type: APINullable[int] = UNDEFINED
+    public_flags: APINullable[int] = UNDEFINED
 
     @property
     def premium(self) -> Optional[PremiumTypes]:

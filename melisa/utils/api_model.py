@@ -6,7 +6,6 @@
 from __future__ import annotations
 
 import copy
-import datetime
 from dataclasses import _is_dataclass_instance, fields
 from enum import Enum, EnumMeta
 from inspect import getfullargspec
@@ -19,45 +18,58 @@ from typing import (
     Any,
     get_origin,
     Tuple,
-    get_args,
+    get_args, Optional,
 )
 
 from typing_extensions import get_type_hints
 
-from melisa.utils.types import APINullable, TypeCache
+from melisa.utils.types import UndefinedType, TypeCache, UNDEFINED
 
 T = TypeVar("T")
 
 
-def to_dict_without_none(model):
+def _asdict_ignore_none(obj: Generic[T]) -> Union[Tuple, Dict, T]:
     """
-    Converts discord model or other object to dict.
+    Returns a dict from a dataclass that ignores
+    all values that are None
+    Modification of _asdict_inner from dataclasses
+    Parameters
+    ----------
+    obj: Generic[T]
+        The object to convert
+    Returns
+    -------
+        A dict without None values
     """
-    if _is_dataclass_instance(model):
-        result = []
 
-        for field in fields(model):
-            value = to_dict_without_none(getattr(model, field.name))
+    if _is_dataclass_instance(obj):
+        result = []
+        for f in fields(obj):
+            value = _asdict_ignore_none(getattr(obj, f.name))
 
             if isinstance(value, Enum):
-                result.append((field.name, value.value))
-            elif value is not None and not field.name.startswith("_"):
-                result.append((field.name, value))
+                result.append((f.name, value.value))
+            # This if statement was added to the function
+            elif not isinstance(value, UndefinedType) and not f.name.startswith(
+                "_"
+            ):
+                result.append((f.name, value))
 
         return dict(result)
 
-    if isinstance(model, tuple) and hasattr(model, "_fields"):
-        return type(model)(*[to_dict_without_none(v) for v in model])
+    elif isinstance(obj, tuple) and hasattr(obj, "_fields"):
+        return type(obj)(*[_asdict_ignore_none(v) for v in obj])
 
-    if isinstance(model, (list, tuple)):
-        return type(model)(to_dict_without_none(v) for v in model)
+    elif isinstance(obj, (list, tuple)):
+        return type(obj)(_asdict_ignore_none(v) for v in obj)
 
-    if isinstance(model, dict):
-        return type(model)(
-            (to_dict_without_none(k), to_dict_without_none(v)) for k, v in model.items()
+    elif isinstance(obj, dict):
+        return type(obj)(
+            (_asdict_ignore_none(k), _asdict_ignore_none(v))
+            for k, v in obj.items()
         )
-
-    return copy.deepcopy(model)
+    else:
+        return copy.deepcopy(obj)
 
 
 class APIModelBase:
@@ -65,12 +77,12 @@ class APIModelBase:
     Represents an object which has been fetched from the Discord API.
     """
 
-    _client = None
+    _client: Optional[Any] = None
 
     @property
     def _http(self):
         if not self._client:
-            return None
+            raise AttributeError("Object is not yet linked to a client")
 
         return self._client.http
 
@@ -78,17 +90,21 @@ class APIModelBase:
     def set_client(cls, client):
         cls._client = client
 
-    def __get_types(self, arg_type: type) -> Tuple[type]:
+    def __get_types(self, attr: str, arg_type: type) -> Tuple[type]:
         origin = get_origin(arg_type)
 
         if origin is Union:
+            # Ahh yes, typing module has no type annotations for this...
             # noinspection PyTypeChecker
             args: Tuple[type] = get_args(arg_type)
 
             if 2 <= len(args) < 4:
                 return args
 
-            raise TypeError
+            raise ValueError(
+                f"Attribute `{attr}` in `{type(self).__name__}` has too many "
+                f"or not enough arguments! (got {len(args)} expected 2-3)"
+            )
 
         return (arg_type,)
 
@@ -99,17 +115,14 @@ class APIModelBase:
         if getattr(attr_type, "__factory__", None):
             factory = attr_type.__factory__
 
-        if attr_value is None:
-            return None
+        if attr_value is UNDEFINED:
+            return UNDEFINED
 
         if attr_type is not None and isinstance(attr_value, attr_type):
             return attr_value
 
         if isinstance(attr_value, dict):
             return factory(attr_value)
-
-        if isinstance(attr_value, datetime.datetime):
-            return attr_value
 
         return factory(attr_value)
 
@@ -126,14 +139,19 @@ class APIModelBase:
             if attr.startswith("_"):
                 continue
 
-            types = self.__get_types(attr_type)
+            types = self.__get_types(attr, attr_type)
 
             types = tuple(
-                filter(lambda tpe: tpe is not None and tpe is not None, types)
+                filter(
+                    lambda tpe: tpe is not None and tpe is not UNDEFINED, types
+                )
             )
 
             if not types:
-                raise TypeError
+                raise ValueError(
+                    f"Attribute `{attr}` in `{type(self).__name__}` only "
+                    "consisted of missing/optional type!"
+                )
 
             specific_tp = types[0]
 
@@ -143,7 +161,7 @@ class APIModelBase:
                 specific_tp = tp
 
             if isinstance(specific_tp, EnumMeta) and not attr_gotten:
-                attr_value = None
+                attr_value = UNDEFINED
             elif tp == list and attr_gotten and (classes := get_args(types[0])):
                 attr_value = [
                     self.__attr_convert(attr_item, classes[0])
@@ -179,23 +197,30 @@ class APIModelBase:
         return super().__str__()
 
     @classmethod
-    def from_dict(cls: Generic[T], data: Dict[str, Union[str, bool, int, Any]]) -> T:
+    def from_dict(
+        cls: Generic[T], data: Dict[str, Union[str, bool, int, Any]]
+    ) -> T:
         """
         Parse an API object from a dictionary.
         """
         if isinstance(data, cls):
             return data
 
+        # Disable inspection for IDE because this is valid code for the
+        # inherited classes:
         # noinspection PyArgumentList
         return cls(
             **dict(
                 map(
                     lambda key: (
                         key,
-                        data[key].value if isinstance(data[key], Enum) else data[key],
+                        data[key].value
+                        if isinstance(data[key], Enum)
+                        else data[key],
                     ),
                     filter(
-                        lambda object_argument: data.get(object_argument) is not None,
+                        lambda object_argument: data.get(object_argument)
+                        is not None,
                         getfullargspec(cls.__init__).args,
                     ),
                 )
@@ -203,4 +228,8 @@ class APIModelBase:
         )
 
     def to_dict(self) -> Dict:
-        return to_dict_without_none(self)
+        """
+        Transform the current object to a dictionary representation. Parameters that
+        start with an underscore are not serialized.
+        """
+        return _asdict_ignore_none(self)

@@ -1,10 +1,11 @@
 import datetime
 
-from melisa import Embed, Timestamp
+from melisa import Embed, Timestamp, Color
 
 dict_embed = {
     'title': 'my title',
     'description': 'simple description',
+    'color': 252307,
     'timestamp': datetime.datetime.utcfromtimestamp(1649748784).isoformat(),
     'footer': {
         'text': 'cool footer text'
@@ -13,6 +14,16 @@ dict_embed = {
         'name': 'best author'
     },
 }
+
+EMBED = Embed(title="my title", description="simple description")
+EMBED.set_author(name="best author")
+EMBED.set_footer(text="cool footer text")
+EMBED.set_color(Color.from_hex_code("#03d993"))
+EMBED.set_timestamp(Timestamp.parse(1649748784))
+
+
+def has_key_vals(actual, required):
+    return all(actual.get(key) == val for key, val in required.items())
 
 
 class TestEmbed:
@@ -54,9 +65,15 @@ class TestEmbed:
         embed.set_footer(text="cool footer text")
         assert embed.total_length() == 53
 
-    def test_comparing_embeds(self):
-        embed = Embed(title="my title", description="simple description")
-        embed.set_author(name="best author")
-        embed.set_footer(text="cool footer text")
-        embed.set_timestamp(Timestamp.parse(1649748784))
-        assert embed.to_dict() == dict_embed
+    def test_embed_to_dict(self):
+        """
+        Tests whether or not the dispatch class its string conversion
+        is correct.
+        """
+        assert has_key_vals(EMBED.to_dict(), dict_embed)
+
+    def test_embed_from_dict(self):
+        assert has_key_vals(
+            Embed.from_dict(dict_embed).to_dict(),
+            dict_embed
+        )

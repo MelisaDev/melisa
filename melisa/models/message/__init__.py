@@ -3,3 +3,4 @@
 
 from .message import *
 from .embed import *
+from .colors import *

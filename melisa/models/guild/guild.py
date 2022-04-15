@@ -9,8 +9,8 @@ from typing import List, Any, Optional, overload
 
 from .channel import Channel, ChannelType, channel_types_for_converting, ThreadsList
 from ...utils import Snowflake, Timestamp
-from ...utils import APIModelBase
-from ...utils.types import APINullable
+from ...utils.api_model import APIModelBase
+from ...utils.types import APINullable, UNDEFINED
 
 
 class DefaultMessageNotificationLevel(IntEnum):
@@ -292,63 +292,63 @@ class Guild(APIModelBase):
         The scheduled events in the guild
     """
 
-    id: APINullable[Snowflake] = None
-    name: APINullable[str] = None
-    icon: APINullable[str] = None
-    icon_hash: APINullable[str] = None
-    splash: APINullable[str] = None
-    discovery_splash: APINullable[str] = None
-    owner: APINullable[bool] = None
-    owner_id: APINullable[Snowflake] = None
-    permissions: APINullable[str] = None
-    region: APINullable[str] = None
-    afk_channel_id: APINullable[Snowflake] = None
-    afk_timeout: APINullable[int] = None
-    widget_enabled: APINullable[bool] = None
-    widget_channel_id: APINullable[Snowflake] = None
-    verification_level: APINullable[int] = None
-    default_message_notifications: APINullable[int] = None
-    explicit_content_filter: APINullable[int] = None
-    features: APINullable[List[str]] = None
-    roles: APINullable[List] = None
-    emojis: APINullable[List] = None
+    id: APINullable[Snowflake] = UNDEFINED
+    name: APINullable[str] = UNDEFINED
+    icon: APINullable[str] = UNDEFINED
+    icon_hash: APINullable[str] = UNDEFINED
+    splash: APINullable[str] = UNDEFINED
+    discovery_splash: APINullable[str] = UNDEFINED
+    owner: APINullable[bool] = UNDEFINED
+    owner_id: APINullable[Snowflake] = UNDEFINED
+    permissions: APINullable[str] = UNDEFINED
+    region: APINullable[str] = UNDEFINED
+    afk_channel_id: APINullable[Snowflake] = UNDEFINED
+    afk_timeout: APINullable[int] = UNDEFINED
+    widget_enabled: APINullable[bool] = UNDEFINED
+    widget_channel_id: APINullable[Snowflake] = UNDEFINED
+    verification_level: APINullable[int] = UNDEFINED
+    default_message_notifications: APINullable[int] = UNDEFINED
+    explicit_content_filter: APINullable[int] = UNDEFINED
+    features: APINullable[List[str]] = UNDEFINED
+    roles: APINullable[List] = UNDEFINED
+    emojis: APINullable[List] = UNDEFINED
     # TODO: Make a structures of emoji and role
 
-    mfa_level: APINullable[int] = None
-    application_id: APINullable[Snowflake] = None
-    system_channel_id: APINullable[Snowflake] = None
-    system_channel_flags: APINullable[int] = None
-    rules_channel_id: APINullable[Snowflake] = None
-    joined_at: APINullable[Timestamp] = None
+    mfa_level: APINullable[int] = UNDEFINED
+    application_id: APINullable[Snowflake] = UNDEFINED
+    system_channel_id: APINullable[Snowflake] = UNDEFINED
+    system_channel_flags: APINullable[int] = UNDEFINED
+    rules_channel_id: APINullable[Snowflake] = UNDEFINED
+    joined_at: APINullable[Timestamp] = UNDEFINED
     # TODO: Deal with joined_at
 
-    large: APINullable[bool] = None
-    unavailable: APINullable[bool] = None
-    member_count: APINullable[int] = None
-    voice_states: APINullable[List] = None
-    members: APINullable[List] = None
-    threads: APINullable[List] = None
-    presences: APINullable[List] = None
+    large: APINullable[bool] = UNDEFINED
+    unavailable: APINullable[bool] = UNDEFINED
+    member_count: APINullable[int] = UNDEFINED
+    voice_states: APINullable[List] = UNDEFINED
+    members: APINullable[List] = UNDEFINED
+    threads: APINullable[List] = UNDEFINED
+    presences: APINullable[List] = UNDEFINED
     # TODO: Make a structure for voice_states, members, channels, threads, presences(?)
 
-    max_presences: APINullable[int] = None
-    max_members: APINullable[int] = None
-    vanity_url_code: APINullable[str] = None
-    description: APINullable[str] = None
-    banner: APINullable[str] = None
-    premium_tier: APINullable[str] = None
-    premium_subscription_count: APINullable[int] = None
-    preferred_locale: APINullable[str] = None
-    public_updates_channel_id: APINullable[Snowflake] = None
-    max_video_channel_users: APINullable[int] = None
-    approximate_member_count: APINullable[int] = None
-    approximate_presence_count: APINullable[int] = None
-    nsfw_level: APINullable[int] = None
-    premium_progress_bar_enabled: APINullable[bool] = None
-    stage_instances: APINullable[List] = None
-    stickers: APINullable[List] = None
-    welcome_screen: APINullable = None
-    guild_scheduled_events: APINullable[List] = None
+    max_presences: APINullable[int] = UNDEFINED
+    max_members: APINullable[int] = UNDEFINED
+    vanity_url_code: APINullable[str] = UNDEFINED
+    description: APINullable[str] = UNDEFINED
+    banner: APINullable[str] = UNDEFINED
+    premium_tier: APINullable[str] = UNDEFINED
+    premium_subscription_count: APINullable[int] = UNDEFINED
+    preferred_locale: APINullable[str] = UNDEFINED
+    public_updates_channel_id: APINullable[Snowflake] = UNDEFINED
+    max_video_channel_users: APINullable[int] = UNDEFINED
+    approximate_member_count: APINullable[int] = UNDEFINED
+    approximate_presence_count: APINullable[int] = UNDEFINED
+    nsfw_level: APINullable[int] = UNDEFINED
+    premium_progress_bar_enabled: APINullable[bool] = UNDEFINED
+    stage_instances: APINullable[List] = UNDEFINED
+    stickers: APINullable[List] = UNDEFINED
+    welcome_screen: APINullable = UNDEFINED
+    guild_scheduled_events: APINullable[List] = UNDEFINED
 
     # TODO: Make a structure for welcome_screen, stage_instances,
     #  stickers and guild_scheduled_events

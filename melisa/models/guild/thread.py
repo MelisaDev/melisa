@@ -6,7 +6,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from ...utils.api_model import APIModelBase
-from ...utils.types import APINullable
+from ...utils.types import APINullable, UNDEFINED
 from ...utils.snowflake import Snowflake
 from ...utils.timestamp import Timestamp
 
@@ -40,8 +40,8 @@ class ThreadMetadata(APIModelBase):
     auto_archive_duration: int
     archive_timestamp: Timestamp
     locked: bool
-    invitable: APINullable[bool] = None
-    create_timestamp: APINullable[Timestamp] = None
+    invitable: APINullable[bool] = UNDEFINED
+    create_timestamp: APINullable[Timestamp] = UNDEFINED
 
 
 @dataclass(repr=False)
@@ -62,5 +62,5 @@ class ThreadMember(APIModelBase):
 
     join_timestamp: Timestamp
     flags: int
-    id: APINullable[Snowflake] = None
-    user_id: APINullable[Snowflake] = None
+    id: APINullable[Snowflake] = UNDEFINED
+    user_id: APINullable[Snowflake] = UNDEFINED

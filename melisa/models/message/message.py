@@ -9,7 +9,7 @@ from typing import List, TYPE_CHECKING, Optional, Dict
 
 from ...utils import Snowflake, Timestamp
 from ...utils import APIModelBase
-from ...utils.types import APINullable
+from ...utils.types import APINullable, UNDEFINED
 
 if TYPE_CHECKING:
     from ..guild.channel import Thread
@@ -170,36 +170,36 @@ class Message(APIModelBase):
         Deprecated the stickers sent with the message
     """
 
-    id: APINullable[Snowflake] = None
-    channel_id: APINullable[Snowflake] = None
-    guild_id: APINullable[Snowflake] = None
-    author: APINullable[Dict] = None
-    member: APINullable[Dict] = None
-    content: APINullable[str] = None
-    timestamp: APINullable[Timestamp] = None
-    edited_timestamp: APINullable[Timestamp] = None
-    tts: APINullable[bool] = None
-    mention_everyone: APINullable[bool] = None
-    mentions: APINullable[List] = None
-    mention_roles: APINullable[List] = None
-    mention_channels: APINullable[List] = None
-    attachments: APINullable[List] = None
-    embeds: APINullable[List] = None
-    reactions: APINullable[List] = None
-    nonce: APINullable[int] or APINullable[str] = None
-    pinned: APINullable[bool] = None
-    webhook_id: APINullable[Snowflake] = None
-    type: APINullable[int] = None
-    activity: APINullable[Dict] = None
-    application: APINullable[Dict] = None
-    application_id: APINullable[Snowflake] = None
-    message_reference: APINullable[Dict] = None
-    flags: APINullable[int] = None
-    interaction: APINullable[Dict] = None
-    thread: APINullable[Thread] = None
-    components: APINullable[List] = None
-    sticker_items: APINullable[List] = None
-    stickers: APINullable[List] = None
+    id: APINullable[Snowflake] = UNDEFINED
+    channel_id: APINullable[Snowflake] = UNDEFINED
+    guild_id: APINullable[Snowflake] = UNDEFINED
+    author: APINullable[Dict] = UNDEFINED
+    member: APINullable[Dict] = UNDEFINED
+    content: APINullable[str] = UNDEFINED
+    timestamp: APINullable[Timestamp] = UNDEFINED
+    edited_timestamp: APINullable[Timestamp] = UNDEFINED
+    tts: APINullable[bool] = UNDEFINED
+    mention_everyone: APINullable[bool] = UNDEFINED
+    mentions: APINullable[List] = UNDEFINED
+    mention_roles: APINullable[List] = UNDEFINED
+    mention_channels: APINullable[List] = UNDEFINED
+    attachments: APINullable[List] = UNDEFINED
+    embeds: APINullable[List] = UNDEFINED
+    reactions: APINullable[List] = UNDEFINED
+    nonce: APINullable[int] or APINullable[str] = UNDEFINED
+    pinned: APINullable[bool] = UNDEFINED
+    webhook_id: APINullable[Snowflake] = UNDEFINED
+    type: APINullable[int] = UNDEFINED
+    activity: APINullable[Dict] = UNDEFINED
+    application: APINullable[Dict] = UNDEFINED
+    application_id: APINullable[Snowflake] = UNDEFINED
+    message_reference: APINullable[Dict] = UNDEFINED
+    flags: APINullable[int] = UNDEFINED
+    interaction: APINullable[Dict] = UNDEFINED
+    thread: APINullable[Thread] = UNDEFINED
+    components: APINullable[List] = UNDEFINED
+    sticker_items: APINullable[List] = UNDEFINED
+    stickers: APINullable[List] = UNDEFINED
 
     async def pin(self, *, reason: Optional[str] = None):
         """|coro|

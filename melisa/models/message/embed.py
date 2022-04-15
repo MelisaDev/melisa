@@ -9,9 +9,10 @@ from enum import Enum
 
 from typing import List, Union, Optional
 
+from .colors import Color
 from melisa.exceptions import EmbedFieldError
-from melisa.utils.types import UNDEFINED, UndefinedOr
-from melisa.utils.api_model import APIModelBase, APINullable
+from ...utils.api_model import APIModelBase
+from ...utils.types import APINullable, UNDEFINED
 from melisa.utils.timestamp import Timestamp
 
 
@@ -47,7 +48,7 @@ class EmbedType(Enum):
 
 
 @dataclass(repr=False)
-class EmbedThumbnail(APIModelBase):
+class EmbedThumbnail:
     """Representation of the Embed Thumbnail
 
     Attributes
@@ -63,13 +64,13 @@ class EmbedThumbnail(APIModelBase):
     """
 
     url: str
-    proxy_url: APINullable[str] = None
-    height: APINullable[int] = None
-    width: APINullable[int] = None
+    proxy_url: APINullable[str] = UNDEFINED
+    height: APINullable[int] = UNDEFINED
+    width: APINullable[int] = UNDEFINED
 
 
 @dataclass(repr=False)
-class EmbedVideo(APIModelBase):
+class EmbedVideo:
     """Representation of the Embed Video
 
     Attributes
@@ -85,13 +86,13 @@ class EmbedVideo(APIModelBase):
     """
 
     url: str
-    proxy_url: APINullable[str] = None
-    height: APINullable[int] = None
-    width: APINullable[int] = None
+    proxy_url: APINullable[str] = UNDEFINED
+    height: APINullable[int] = UNDEFINED
+    width: APINullable[int] = UNDEFINED
 
 
 @dataclass(repr=False)
-class EmbedImage(APIModelBase):
+class EmbedImage:
     """Representation of the Embed Image
 
     Attributes
@@ -107,13 +108,13 @@ class EmbedImage(APIModelBase):
     """
 
     url: str
-    proxy_url: APINullable[str] = None
-    height: APINullable[int] = None
-    width: APINullable[int] = None
+    proxy_url: APINullable[str] = UNDEFINED
+    height: APINullable[int] = UNDEFINED
+    width: APINullable[int] = UNDEFINED
 
 
 @dataclass(repr=False)
-class EmbedProvider(APIModelBase):
+class EmbedProvider:
     """Representation of the Embed Provider
 
     Attributes
@@ -124,12 +125,12 @@ class EmbedProvider(APIModelBase):
         Url of provider
     """
 
-    name: APINullable[str] = None
-    url: APINullable[str] = None
+    name: APINullable[str] = UNDEFINED
+    url: APINullable[str] = UNDEFINED
 
 
 @dataclass(repr=False)
-class EmbedAuthor(APIModelBase):
+class EmbedAuthor:
     """Representation of the Embed Author
 
     Attributes
@@ -145,13 +146,13 @@ class EmbedAuthor(APIModelBase):
     """
 
     name: str
-    url: APINullable[str] = None
-    icon_url: APINullable[str] = None
-    proxy_icon_url: APINullable[str] = None
+    url: APINullable[str] = UNDEFINED
+    icon_url: APINullable[str] = UNDEFINED
+    proxy_icon_url: APINullable[str] = UNDEFINED
 
 
 @dataclass(repr=False)
-class EmbedFooter(APIModelBase):
+class EmbedFooter:
     """Representation of the Embed Footer
 
     Attributes
@@ -165,12 +166,12 @@ class EmbedFooter(APIModelBase):
     """
 
     text: str
-    icon_url: APINullable[str] = None
-    proxy_icon_url: APINullable[str] = None
+    icon_url: APINullable[str] = UNDEFINED
+    proxy_icon_url: APINullable[str] = UNDEFINED
 
 
 @dataclass(repr=False)
-class EmbedField(APIModelBase):
+class EmbedField:
     """Representation of the Embed Field
 
     Attributes
@@ -185,7 +186,7 @@ class EmbedField(APIModelBase):
 
     name: str
     value: str
-    inline: APINullable[bool] = False
+    inline: Optional[bool] = False
 
 
 @dataclass(repr=False)
@@ -202,7 +203,12 @@ class Embed(APIModelBase):
     description: Optional[:class:`str`]
         Description of embed
     color: Optional[:class:`int`]
-        Color code of the embed
+        Color code of the embed.
+        If you really want to do something with a color,
+        feel free to convert it to the ``Color``: ::
+
+            color = Color(embed.color)
+
     fields: Optional[List[:class:`~melisa.models.message.embed.EmbedField`]]
         Fields information.
     footer: Optional[:class:`~melisa.models.message.embed.EmbedFooter`]
@@ -221,19 +227,19 @@ class Embed(APIModelBase):
         Video information.
     """
 
-    title: APINullable[str] = None
-    type: APINullable[EmbedType] = None
-    description: APINullable[str] = None
-    url: APINullable[str] = None
-    timestamp: APINullable[Timestamp] = None
-    color: APINullable[int] = None
-    footer: APINullable[EmbedFooter] = None
-    image: APINullable[EmbedImage] = None
-    thumbnail: APINullable[EmbedThumbnail] = None
-    video: APINullable[EmbedVideo] = None
-    provider: APINullable[EmbedProvider] = None
-    author: APINullable[EmbedAuthor] = None
-    fields: APINullable[List[EmbedField]] = None
+    title: APINullable[str] = UNDEFINED
+    type: APINullable[EmbedType] = UNDEFINED
+    description: APINullable[str] = UNDEFINED
+    url: APINullable[str] = UNDEFINED
+    timestamp: APINullable[Timestamp] = UNDEFINED
+    color: APINullable[Color] = UNDEFINED
+    footer: APINullable[EmbedFooter] = UNDEFINED
+    image: APINullable[EmbedImage] = UNDEFINED
+    thumbnail: APINullable[EmbedThumbnail] = UNDEFINED
+    video: APINullable[EmbedVideo] = UNDEFINED
+    provider: APINullable[EmbedProvider] = UNDEFINED
+    author: APINullable[EmbedAuthor] = UNDEFINED
+    fields: APINullable[List[EmbedField]] = UNDEFINED
 
     def __post_init__(self):
         if self.title and len(self.title) > 256:
@@ -251,6 +257,26 @@ class Embed(APIModelBase):
         if self.fields and len(self.fields) > 25:
             raise EmbedFieldError("""You can't set more than 25 embed fields!""")
 
+    def set_color(self, color: Union[int, Color]) -> Embed:
+        """Sets color in the supported by discord format.
+
+        Parameters
+        ----------
+        color: Union[:class:`~melisa.models.message.color.Color`, :class:`int`]
+            The datetime to set the timestamp to.
+
+        Returns
+        -------
+        :class:`~melisa.models.message.embed.Embed`
+            The new embed object.
+        """
+        if isinstance(color, Color):
+            self.color = color.value
+        elif isinstance(color, int):
+            self.color = Color(value=color).value
+
+        return self
+
     def set_timestamp(self, time: Union[Timestamp, datetime]) -> Embed:
         """Sets timestamp in the supported by discord format.
 
@@ -261,7 +287,7 @@ class Embed(APIModelBase):
 
         Returns
         -------
-        :class:`~,e;osa.models.message.embed.Embed`
+        :class:`~melisa.models.message.embed.Embed`
             The new embed object.
         """
         self.timestamp = time.isoformat()
@@ -272,9 +298,9 @@ class Embed(APIModelBase):
         self,
         name: str,
         *,
-        url: Optional[str] = None,
-        icon_url: Optional[str] = None,
-        proxy_icon_url: Optional[str] = None,
+        url: Optional[str] = UNDEFINED,
+        icon_url: Optional[str] = UNDEFINED,
+        proxy_icon_url: Optional[str] = UNDEFINED,
     ) -> Embed:
         """Set the author for the embed.
 
@@ -303,7 +329,7 @@ class Embed(APIModelBase):
 
         return self
 
-    def set_image(self, url: str, *, proxy_url: Optional[str] = None) -> Embed:
+    def set_image(self, url: str, *, proxy_url: APINullable[str] = UNDEFINED) -> Embed:
         """Set the image for the embed.
 
         Parameters
@@ -322,7 +348,7 @@ class Embed(APIModelBase):
 
         return self
 
-    def set_thumbnail(self, url: str, *, proxy_url: Optional[str] = None) -> Embed:
+    def set_thumbnail(self, url: str, *, proxy_url: APINullable[str] = UNDEFINED) -> Embed:
         """Set the thumbnail for the embed.
 
         Parameters
@@ -345,8 +371,8 @@ class Embed(APIModelBase):
         self,
         text: str,
         *,
-        icon_url: Optional[str] = None,
-        proxy_icon_url: Optional[str] = None,
+        icon_url: APINullable[str] = UNDEFINED,
+        proxy_icon_url: APINullable[str] = UNDEFINED,
     ) -> Embed:
         """
         Sets the embed footer.
@@ -392,7 +418,7 @@ class Embed(APIModelBase):
             This embed.
         """
 
-        if self.fields is None:
+        if self.fields is UNDEFINED:
             self.fields = []
 
         self.fields.append(EmbedField(name=name, value=value, inline=inline))
@@ -403,9 +429,9 @@ class Embed(APIModelBase):
         self,
         index: int,
         *,
-        name: UndefinedOr[str] = UNDEFINED,
-        value: UndefinedOr[str] = UNDEFINED,
-        inline: UndefinedOr[bool] = UNDEFINED,
+        name: APINullable[str] = UNDEFINED,
+        value: APINullable[str] = UNDEFINED,
+        inline: APINullable[bool] = UNDEFINED,
     ) -> Embed:
         """Edit an existing field on this embed.
 
@@ -413,11 +439,11 @@ class Embed(APIModelBase):
         ----------
         index: :class:`int`
             The index of the field to edit.
-        name: UndefinedOr[:class:`str`]
+        name: Optional[:class:`str`]
             The name of the field.
-        value: UndefinedOr[:class:`str`]
+        value: Optional[:class:`str`]
             The value of the field.
-        inline: UndefinedOr[:class:`bool`]
+        inline: Optional[:class:`bool`]
             Whether the field should be displayed inline.
 
         Returns
@@ -468,7 +494,7 @@ class Embed(APIModelBase):
             del self.fields[index]
 
         if not self.fields:
-            self.fields = None
+            self.fields = UNDEFINED
 
         return self
 

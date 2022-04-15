@@ -7,7 +7,7 @@ from typing import Optional, Tuple, List, Literal
 
 from ...utils import Snowflake
 from ...utils import APIModelBase
-from ...utils.types import APINullable
+from ...utils.types import APINullable, UNDEFINED
 
 
 class BasePresence:
@@ -223,19 +223,19 @@ class Activity(BasePresence, APIModelBase):
 
     name: str
     type: ActivityType
-    created_at: APINullable[int] = None
-    url: APINullable[str] = None
-    timestamps: APINullable[ActivityTimestamp] = None
-    application_id: APINullable[Snowflake] = None
-    details: APINullable[str] = None
-    state: APINullable[str] = None
-    emoji: APINullable[ActivityEmoji] = None
-    party: APINullable[ActivityParty] = None
-    assets: APINullable[ActivityAssets] = None
-    secrets: APINullable[ActivitySecrets] = None
-    instance: APINullable[bool] = None
-    flags: APINullable[ActivityFlags] = None
-    buttons: APINullable[List[ActivityButton]] = None
+    created_at: APINullable[int] = UNDEFINED
+    url: APINullable[str] = UNDEFINED
+    timestamps: APINullable[ActivityTimestamp] = UNDEFINED
+    application_id: APINullable[Snowflake] = UNDEFINED
+    details: APINullable[str] = UNDEFINED
+    state: APINullable[str] = UNDEFINED
+    emoji: APINullable[ActivityEmoji] = UNDEFINED
+    party: APINullable[ActivityParty] = UNDEFINED
+    assets: APINullable[ActivityAssets] = UNDEFINED
+    secrets: APINullable[ActivitySecrets] = UNDEFINED
+    instance: APINullable[bool] = UNDEFINED
+    flags: APINullable[ActivityFlags] = UNDEFINED
+    buttons: APINullable[List[ActivityButton]] = UNDEFINED
 
 
 class StatusType(Enum):

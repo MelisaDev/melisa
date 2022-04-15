@@ -8,8 +8,8 @@ from enum import IntEnum
 from typing import TYPE_CHECKING, Optional
 
 from ...utils import Snowflake
-from ...utils import APIModelBase
-from ...utils.types import APINullable
+from ...utils.api_model import APIModelBase
+from ...utils.types import APINullable, UNDEFINED
 
 if TYPE_CHECKING:
     from ..user.user import User
@@ -73,18 +73,18 @@ class Webhook(APIModelBase):
         The url used for executing the webhook (returned by the webhooks OAuth2 flow)
     """
 
-    id: APINullable[Snowflake] = None
-    type: APINullable[int] = None
-    guild_id: APINullable[Snowflake] = None
-    channel_id: APINullable[Snowflake] = None
-    user: APINullable[User] = None
-    name: APINullable[str] = None
-    avatar: APINullable[str] = None
-    token: APINullable[str] = None
-    application_id: APINullable[Snowflake] = None
-    source_guild: APINullable[Guild] = None
-    source_channel: APINullable[Channel] = None
-    url: APINullable[str] = None
+    id: APINullable[Snowflake] = UNDEFINED
+    type: APINullable[int] = UNDEFINED
+    guild_id: APINullable[Snowflake] = UNDEFINED
+    channel_id: APINullable[Snowflake] = UNDEFINED
+    user: APINullable[User] = UNDEFINED
+    name: APINullable[str] = UNDEFINED
+    avatar: APINullable[str] = UNDEFINED
+    token: APINullable[str] = UNDEFINED
+    application_id: APINullable[Snowflake] = UNDEFINED
+    source_guild: APINullable[Guild] = UNDEFINED
+    source_channel: APINullable[Channel] = UNDEFINED
+    url: APINullable[str] = UNDEFINED
 
     async def delete(
         self, *, webhook_id: Optional[Snowflake] = None, reason: Optional[str] = None
