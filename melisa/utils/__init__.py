@@ -5,6 +5,14 @@ from .types import Coro, UNDEFINED
 from .timestamp import Timestamp
 from .snowflake import Snowflake
 from .api_model import APIModelBase
-from .conversion import remove_none
+from .conversion import remove_none, try_enum
 
-__all__ = ("Coro", "Snowflake", "APIModelBase", "remove_none", "Timestamp", "UNDEFINED")
+__all__ = (
+    "Coro",
+    "Snowflake",
+    "APIModelBase",
+    "remove_none",
+    "Timestamp",
+    "UNDEFINED",
+    "try_enum",
+)
