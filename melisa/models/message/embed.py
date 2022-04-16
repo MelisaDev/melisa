@@ -7,10 +7,11 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 
-from typing import List, Union, Optional
+from typing import List, Union, Optional, Dict, Any
 
 from .colors import Color
 from melisa.exceptions import EmbedFieldError
+from ...utils.conversion import try_enum
 from ...utils.api_model import APIModelBase
 from ...utils.types import APINullable, UNDEFINED
 from melisa.utils.timestamp import Timestamp
@@ -64,9 +65,9 @@ class EmbedThumbnail:
     """
 
     url: str
-    proxy_url: APINullable[str] = UNDEFINED
-    height: APINullable[int] = UNDEFINED
-    width: APINullable[int] = UNDEFINED
+    proxy_url: APINullable[str] = None
+    height: APINullable[int] = None
+    width: APINullable[int] = None
 
 
 @dataclass(repr=False)
@@ -86,9 +87,9 @@ class EmbedVideo:
     """
 
     url: str
-    proxy_url: APINullable[str] = UNDEFINED
-    height: APINullable[int] = UNDEFINED
-    width: APINullable[int] = UNDEFINED
+    proxy_url: APINullable[str] = None
+    height: APINullable[int] = None
+    width: APINullable[int] = None
 
 
 @dataclass(repr=False)
@@ -108,9 +109,9 @@ class EmbedImage:
     """
 
     url: str
-    proxy_url: APINullable[str] = UNDEFINED
-    height: APINullable[int] = UNDEFINED
-    width: APINullable[int] = UNDEFINED
+    proxy_url: APINullable[str] = None
+    height: APINullable[int] = None
+    width: APINullable[int] = None
 
 
 @dataclass(repr=False)
@@ -125,8 +126,8 @@ class EmbedProvider:
         Url of provider
     """
 
-    name: APINullable[str] = UNDEFINED
-    url: APINullable[str] = UNDEFINED
+    name: APINullable[str] = None
+    url: APINullable[str] = None
 
 
 @dataclass(repr=False)
@@ -146,9 +147,9 @@ class EmbedAuthor:
     """
 
     name: str
-    url: APINullable[str] = UNDEFINED
-    icon_url: APINullable[str] = UNDEFINED
-    proxy_icon_url: APINullable[str] = UNDEFINED
+    url: APINullable[str] = None
+    icon_url: APINullable[str] = None
+    proxy_icon_url: APINullable[str] = None
 
 
 @dataclass(repr=False)
@@ -166,8 +167,8 @@ class EmbedFooter:
     """
 
     text: str
-    icon_url: APINullable[str] = UNDEFINED
-    proxy_icon_url: APINullable[str] = UNDEFINED
+    icon_url: APINullable[str] = None
+    proxy_icon_url: APINullable[str] = None
 
 
 @dataclass(repr=False)
@@ -227,19 +228,101 @@ class Embed(APIModelBase):
         Video information.
     """
 
-    title: APINullable[str] = UNDEFINED
-    type: APINullable[EmbedType] = UNDEFINED
-    description: APINullable[str] = UNDEFINED
-    url: APINullable[str] = UNDEFINED
-    timestamp: APINullable[Timestamp] = UNDEFINED
-    color: APINullable[Color] = UNDEFINED
-    footer: APINullable[EmbedFooter] = UNDEFINED
-    image: APINullable[EmbedImage] = UNDEFINED
-    thumbnail: APINullable[EmbedThumbnail] = UNDEFINED
-    video: APINullable[EmbedVideo] = UNDEFINED
-    provider: APINullable[EmbedProvider] = UNDEFINED
-    author: APINullable[EmbedAuthor] = UNDEFINED
-    fields: APINullable[List[EmbedField]] = UNDEFINED
+    title: APINullable[str] = None
+    type: APINullable[EmbedType] = None
+    description: APINullable[str] = None
+    url: APINullable[str] = None
+    timestamp: APINullable[Timestamp] = None
+    color: APINullable[Color] = None
+    footer: APINullable[EmbedFooter] = None
+    image: APINullable[EmbedImage] = None
+    thumbnail: APINullable[EmbedThumbnail] = None
+    video: APINullable[EmbedVideo] = None
+    provider: APINullable[EmbedProvider] = None
+    author: APINullable[EmbedAuthor] = None
+    fields: APINullable[List[EmbedField]] = None
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]):
+        """Generate a message from the given data.
+
+        Parameters
+        ----------
+        data: :class:`dict`
+            The dictionary to convert into an unknown channel.
+        """
+        self: Embed = super().__new__(cls)
+
+        self.title = data.get("title")
+        self.type = (
+            try_enum(EmbedType, data["type"]) if data.get("type") is not None else None
+        )
+        self.description = data.get("description")
+        self.url = data.get("url")
+        self.timestamp = (
+            Timestamp.parse(data["timestamp"])
+            if data.get("timestamp") is not None
+            else None
+        )
+        self.color = Color(data["color"]) if data.get("color") is not None else None
+
+        self.footer = None
+        self.image = None
+        self.thumbnail = None
+        self.video = None
+        self.provider = None
+        self.author = None
+        self.fields = []
+
+        if data.get("footer") is not None:
+            self.footer = EmbedFooter(
+                text=data["footer"]["text"],
+                icon_url=data["footer"].get("icon_url"),
+                proxy_icon_url=data["footer"].get("proxy_icon_url"),
+            )
+
+        if data.get("image") is not None:
+            self.image = EmbedImage(
+                url=data["image"]["url"],
+                proxy_url=data["image"].get("proxy_url"),
+                height=data["image"].get("height"),
+                width=data["image"].get("width"),
+            )
+
+        if data.get("video") is not None:
+            self.video = EmbedVideo(
+                url=data["video"]["url"],
+                proxy_url=data["video"].get("proxy_url"),
+                height=data["video"].get("height"),
+                width=data["video"].get("width"),
+            )
+
+        if data.get("provider") is not None:
+            self.provider = EmbedProvider(
+                name=data["provider"].get("name"), url=data["provider"].get("url")
+            )
+
+        if data.get("author") is not None:
+            self.author = EmbedAuthor(
+                name=data["author"]["name"],
+                url=data["author"].get("url"),
+                icon_url=data["author"].get("icon_url"),
+                proxy_icon_url=data["author"].get("proxy_icon_url"),
+            )
+
+        if data.get("fields") is not None:
+            for field in data["fields"]:
+                self.fields.append(
+                    EmbedField(
+                        name=field["name"],
+                        value=field["value"],
+                        inline=field["inline"]
+                        if field.get("inline") is not None
+                        else False,
+                    )
+                )
+
+        return self
 
     def __post_init__(self):
         if self.title and len(self.title) > 256:
@@ -420,7 +503,7 @@ class Embed(APIModelBase):
             This embed.
         """
 
-        if self.fields is UNDEFINED:
+        if self.fields is None:
             self.fields = []
 
         self.fields.append(EmbedField(name=name, value=value, inline=inline))
