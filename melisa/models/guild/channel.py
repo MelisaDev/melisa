@@ -148,7 +148,7 @@ class Channel(APIModelBase):
         For guild channels: id of the parent category for a channel
         (each parent category can contain up to 50 channels),
         for threads: id of the text channel this thread was created
-    last_pin_timestamp: :class:`int`
+    last_pin_timestamp: :class:`~melisa.utils.timestamp.Timestamp`
         When the last pinned message was pinned.
         This may be `null` in events such as `GUILD_CREATE` when a message is not pinned.
     rtc_region: :class:`str`
@@ -171,32 +171,32 @@ class Channel(APIModelBase):
         only included when part of the `resolved` data received on a slash command interaction
     """
 
-    id: APINullable[Snowflake] = UNDEFINED
-    type: APINullable[int] = UNDEFINED
-    guild_id: APINullable[Snowflake] = UNDEFINED
-    position: APINullable[int] = UNDEFINED
-    permission_overwrites: APINullable[List] = UNDEFINED
-    name: APINullable[str] = UNDEFINED
-    topic: APINullable[str] = UNDEFINED
-    nsfw: APINullable[bool] = UNDEFINED
-    last_message_id: APINullable[Snowflake] = UNDEFINED
-    bitrate: APINullable[int] = UNDEFINED
-    user_limit: APINullable[int] = UNDEFINED
-    rate_limit_per_user: APINullable[int] = UNDEFINED
-    recipients: APINullable[List] = UNDEFINED
-    icon: APINullable[str] = UNDEFINED
-    owner_id: APINullable[Snowflake] = UNDEFINED
-    application_id: APINullable[Snowflake] = UNDEFINED
-    parent_id: APINullable[Snowflake] = UNDEFINED
-    last_pin_timestamp: APINullable[Timestamp] = UNDEFINED
-    rtc_region: APINullable[str] = UNDEFINED
-    video_quality_mode: APINullable[int] = UNDEFINED
-    message_count: APINullable[int] = UNDEFINED
-    member_count: APINullable[int] = UNDEFINED
-    thread_metadata: APINullable[ThreadMetadata] = UNDEFINED
-    member: APINullable[List] = UNDEFINED
-    default_auto_archive_duration: APINullable[int] = UNDEFINED
-    permissions: APINullable[str] = UNDEFINED
+    id: APINullable[Snowflake] = None
+    type: APINullable[int] = None
+    guild_id: APINullable[Snowflake] = None
+    position: APINullable[int] = None
+    permission_overwrites: APINullable[List] = None
+    name: APINullable[str] = None
+    topic: APINullable[str] = None
+    nsfw: APINullable[bool] = None
+    last_message_id: APINullable[Snowflake] = None
+    bitrate: APINullable[int] = None
+    user_limit: APINullable[int] = None
+    rate_limit_per_user: APINullable[int] = None
+    recipients: APINullable[List] = None
+    icon: APINullable[str] = None
+    owner_id: APINullable[Snowflake] = None
+    application_id: APINullable[Snowflake] = None
+    parent_id: APINullable[Snowflake] = None
+    last_pin_timestamp: APINullable[Timestamp] = None
+    rtc_region: APINullable[str] = None
+    video_quality_mode: APINullable[int] = None
+    message_count: APINullable[int] = None
+    member_count: APINullable[int] = None
+    thread_metadata: APINullable[ThreadMetadata] = None
+    member: APINullable[List] = None
+    default_auto_archive_duration: APINullable[int] = None
+    permissions: APINullable[str] = None
 
     @property
     def mention(self):
@@ -734,17 +734,21 @@ class TextChannel(MessageableChannel):
 
         self.id = data["id"]
         self.type = data["type"]
-        self.guild_id = Snowflake(data["guild_id"])
-        self.position = data["position"]
+        self.position = data.get("position")
         self.permission_overwrites = data["permission_overwrites"]
-        self.name = data["name"]
+        self.name = data.get("name")
         self.topic = data.get("topic")
-        self.nsfw = data["nsfw"]
+        self.nsfw = data.get("nsfw")
 
         if data.get("last_message_id") is not None:
             self.last_message_id = Snowflake(data["last_message_id"])
         else:
             self.last_message_id = None
+
+        if data.get("guild_id") is not None:
+            self.guild_id = Snowflake(data["guild_id"])
+        else:
+            self.guild_id = None
 
         self.rate_limit_per_user = data.get("rate_limit_per_user")
 
@@ -754,7 +758,7 @@ class TextChannel(MessageableChannel):
             self.parent_id = None
 
         if data.get("last_pin_timestamp") is not None:
-            self.last_pin_timestamp = Snowflake(data["last_pin_timestamp"])
+            self.last_pin_timestamp = Timestamp.parse(data["last_pin_timestamp"])
         else:
             self.last_pin_timestamp = None
 
@@ -859,7 +863,7 @@ class Thread(MessageableChannel):
         self.member_count = data.get("member_count")
 
         if data.get("last_pin_timestamp") is not None:
-            self.last_pin_timestamp = Snowflake(data["last_pin_timestamp"])
+            self.last_pin_timestamp = Timestamp.parse(data["last_pin_timestamp"])
         else:
             self.last_pin_timestamp = None
 

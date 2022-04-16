@@ -28,6 +28,16 @@ class GatewayBotInfo(APIModelBase):
     shards: int
     session_start_limit: dict
 
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]):
+        self: GatewayBotInfo = super().__new__(cls)
+
+        self.url = data.get("url")
+        self.shards = data.get("shards")
+        self.session_start_limit = data.get("session_start_limit")
+
+        return self
+
 
 class Gateway:
 
