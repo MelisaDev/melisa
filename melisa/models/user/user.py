@@ -5,8 +5,13 @@ from __future__ import annotations
 
 from enum import IntEnum
 from dataclasses import dataclass
-from typing import Optional
+from typing import (
+    Optional,
+    Dict,
+    Any
+)
 
+from ...utils.conversion import try_enum
 from ...utils.api_model import APIModelBase
 from ...utils.types import APINullable, UNDEFINED
 from ...utils.snowflake import Snowflake
@@ -193,3 +198,28 @@ class User(APIModelBase):
         return await self._http.post(
             "/users/@me/channels", data={"recipient_id": self.id}
         )
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> User:
+        self: User = super().__new__(cls)
+
+        self.id = int(data["id"])
+        self.username = data.get("username")
+        self.discriminator = data.get("discriminator")
+        self.avatar = data.get("avatar")
+        self.bot = data.get("bot")
+        self.system = data.get("system")
+        self.mfa_enabled = data.get("mfa_enable")
+        self.banner = data.get("banner")
+        self.accent_color = data.get("accent_color")
+        self.local = data.get("local")
+        self.verified = data.get("verified")
+        self.email = data.get("email")
+        self.premium_type = try_enum(
+            PremiumTypes, data.get("premium_type")
+        )
+        self.public_flags = try_enum(
+            UserFlags, data.get("public_flags")
+        )
+
+        return self
