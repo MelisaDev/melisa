@@ -18,7 +18,8 @@ from typing import (
     Any,
     get_origin,
     Tuple,
-    get_args, Optional,
+    get_args,
+    Optional,
 )
 
 from typing_extensions import get_type_hints
@@ -50,9 +51,7 @@ def _asdict_ignore_none(obj: Generic[T]) -> Union[Tuple, Dict, T]:
             if isinstance(value, Enum):
                 result.append((f.name, value.value))
             # This if statement was added to the function
-            elif not isinstance(value, UndefinedType) and not f.name.startswith(
-                "_"
-            ):
+            elif not isinstance(value, UndefinedType) and not f.name.startswith("_"):
                 result.append((f.name, value))
 
         return dict(result)
@@ -65,8 +64,7 @@ def _asdict_ignore_none(obj: Generic[T]) -> Union[Tuple, Dict, T]:
 
     elif isinstance(obj, dict):
         return type(obj)(
-            (_asdict_ignore_none(k), _asdict_ignore_none(v))
-            for k, v in obj.items()
+            (_asdict_ignore_none(k), _asdict_ignore_none(v)) for k, v in obj.items()
         )
     else:
         return copy.deepcopy(obj)
@@ -142,9 +140,7 @@ class APIModelBase:
             types = self.__get_types(attr, attr_type)
 
             types = tuple(
-                filter(
-                    lambda tpe: tpe is not None and tpe is not UNDEFINED, types
-                )
+                filter(lambda tpe: tpe is not None and tpe is not UNDEFINED, types)
             )
 
             if not types:

@@ -348,7 +348,9 @@ class Embed(APIModelBase):
 
         return self
 
-    def set_thumbnail(self, url: str, *, proxy_url: APINullable[str] = UNDEFINED) -> Embed:
+    def set_thumbnail(
+        self, url: str, *, proxy_url: APINullable[str] = UNDEFINED
+    ) -> Embed:
         """Set the thumbnail for the embed.
 
         Parameters

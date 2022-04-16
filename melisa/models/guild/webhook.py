@@ -86,9 +86,7 @@ class Webhook(APIModelBase):
     source_channel: APINullable[Channel] = UNDEFINED
     url: APINullable[str] = UNDEFINED
 
-    async def delete(
-        self, *, reason: Optional[str] = None
-    ):
+    async def delete(self, *, reason: Optional[str] = None):
         """|coro|
         Delete a webhook permanently. Requires the ``MANAGE_WEBHOOKS`` permission.
         Returns a ``204 No Content`` response on success.
@@ -104,7 +102,11 @@ class Webhook(APIModelBase):
         )
 
     async def modify(
-            self, *, name: Optional[str] = None, channel_id: Optional[Snowflake] = None, reason: Optional[str] = None
+        self,
+        *,
+        name: Optional[str] = None,
+        channel_id: Optional[Snowflake] = None,
+        reason: Optional[str] = None,
     ):
         """|coro|
         Modify a webhook. Requires the ``MANAGE_WEBHOOKS permission``. Returns the updated webhook object on success.
@@ -121,5 +123,9 @@ class Webhook(APIModelBase):
 
         await self._http.patch(
             f"/webhooks/{self.id}",
-            headers={"name": name, "channel_id": channel_id, "X-Audit-Log-Reason": reason},
+            headers={
+                "name": name,
+                "channel_id": channel_id,
+                "X-Audit-Log-Reason": reason,
+            },
         )

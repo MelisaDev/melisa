@@ -1007,5 +1007,5 @@ channel_types_for_converting: Dict[ChannelType, Channel] = {
     ChannelType.GUILD_TEXT: TextChannel,
     ChannelType.GUILD_NEWS_THREAD: Thread,
     ChannelType.GUILD_PUBLIC_THREAD: Thread,
-    ChannelType.GUILD_PRIVATE_THREAD: Thread
+    ChannelType.GUILD_PRIVATE_THREAD: Thread,
 }

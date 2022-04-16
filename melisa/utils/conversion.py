@@ -25,4 +25,3 @@ def try_enum(cls: Type[T], val: Any) -> T:
         return cls(val)
     except (KeyError, TypeError, AttributeError, ValueError):
         return val
-

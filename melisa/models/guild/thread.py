@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Dict, Any
 
 from ...utils.api_model import APIModelBase
 from ...utils.types import APINullable, UNDEFINED
@@ -40,8 +41,33 @@ class ThreadMetadata(APIModelBase):
     auto_archive_duration: int
     archive_timestamp: Timestamp
     locked: bool
-    invitable: APINullable[bool] = UNDEFINED
-    create_timestamp: APINullable[Timestamp] = UNDEFINED
+    invitable: APINullable[bool] = None
+    create_timestamp: APINullable[Timestamp] = None
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]):
+        """Generate a thread metadata object from the given data.
+
+        Parameters
+        ----------
+        data: :class:`dict`
+            The dictionary to convert into thread metadata.
+        """
+        self: ThreadMetadata = super().__new__(cls)
+
+        self.archived = data["archived"]
+        self.auto_archive_duration = data["auto_archive_duration"]
+        self.archive_timestamp = Timestamp.parse(data["archive_timestamp"])
+        self.locked = data["locked"]
+
+        self.invitable = data.get("invitable", None)
+
+        if data.get("create_timestamp"):
+            self.create_timestamp = Timestamp.parse(data["create_timestamp"])
+        else:
+            self.create_timestamp = None
+
+        return self
 
 
 @dataclass(repr=False)
@@ -62,5 +88,26 @@ class ThreadMember(APIModelBase):
 
     join_timestamp: Timestamp
     flags: int
-    id: APINullable[Snowflake] = UNDEFINED
-    user_id: APINullable[Snowflake] = UNDEFINED
+    id: APINullable[Snowflake] = None
+    user_id: APINullable[Snowflake] = None
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]):
+        """Generate a thread member object from the given data.
+
+        Parameters
+        ----------
+        data: :class:`dict`
+            The dictionary to convert into thread member.
+        """
+        self: ThreadMember = super().__new__(cls)
+
+        self.archived = data["flags"]
+        self.archive_timestamp = Timestamp.parse(data["join_timestamp"])
+
+        self.id = Snowflake(data["id"]) if data.get("id") is not None else None
+        self.user_id = (
+            Snowflake(data["user_id"]) if data.get("user_id") is not None else None
+        )
+
+        return self

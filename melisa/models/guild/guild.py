@@ -7,7 +7,15 @@ from dataclasses import dataclass
 from enum import IntEnum, Enum
 from typing import List, Any, Optional, overload, Dict
 
-from .channel import Channel, ChannelType, channel_types_for_converting, ThreadsList, Thread, _choose_channel_type
+from .channel import (
+    Channel,
+    ChannelType,
+    channel_types_for_converting,
+    ThreadsList,
+    Thread,
+    _choose_channel_type,
+    NoneTypedChannel,
+)
 from ...utils import Snowflake, Timestamp
 from ...utils.api_model import APIModelBase
 from ...utils.conversion import try_enum
@@ -356,6 +364,13 @@ class Guild(APIModelBase):
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> Guild:
+        """Generate a guild from the given data.
+
+        Parameters
+        ----------
+        data: :class:`dict`
+            The dictionary to convert into a guild.
+        """
         self: Guild = super().__new__(cls)
 
         self.id = int(data["id"])
@@ -389,11 +404,15 @@ class Guild(APIModelBase):
         self.max_video_channel_users = data.get("max_video_channel_users")
         self.premium_tier = try_enum(PremiumTier, data.get("premium_tier", 0))
         self.premium_subscription_count = data.get("premium_subscription_count", 0)
-        self.system_channel_flags = try_enum(SystemChannelFlags, data.get("system_channel_flags", 0))
+        self.system_channel_flags = try_enum(
+            SystemChannelFlags, data.get("system_channel_flags", 0)
+        )
         self.preferred_locale = data.get("preferred_locale")
         self.discovery_splash = data.get("discovery_splash")
         self.nsfw_level = data.get("nsfw_level", 0)
-        self.premium_progress_bar_enabled = data.get("premium_progress_bar_enabled", False)
+        self.premium_progress_bar_enabled = data.get(
+            "premium_progress_bar_enabled", False
+        )
         self.approximate_presence_count = data.get("approximate_presence_count")
         self.approximate_member_count = data.get("approximate_member_count")
         self.widget_enabled = data.get("widget_enabled")
@@ -414,7 +433,9 @@ class Guild(APIModelBase):
             self.rules_channel_id = None
 
         if data.get("public_updates_channel_id") is not None:
-            self.public_updates_channel_id = Snowflake(data["public_updates_channel_id"])
+            self.public_updates_channel_id = Snowflake(
+                data["public_updates_channel_id"]
+            )
         else:
             self.public_updates_channel_id = None
 
@@ -524,10 +545,7 @@ class Guild(APIModelBase):
             headers={"X-Audit-Log-Reason": reason},
         )
 
-        data.update({"type": ChannelType(data.pop("type"))})
-
-        channel_cls = channel_types_for_converting.get(data["type"], Channel)
-        return channel_cls.from_dict(data)
+        return _choose_channel_type(data)
 
     async def active_threads(self) -> ThreadsList:
         """|coro|
