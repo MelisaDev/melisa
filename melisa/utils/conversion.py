@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+from typing import Type, TypeVar, Any
+
 
 def remove_none(obj):
     if isinstance(obj, list):
@@ -13,3 +15,14 @@ def remove_none(obj):
         return obj - {None}
     elif isinstance(obj, dict):
         return {k: v for k, v in obj.items() if None not in (k, v)}
+
+
+T = TypeVar("T")
+
+
+def try_enum(cls: Type[T], val: Any) -> T:
+    try:
+        return cls(val)
+    except (KeyError, TypeError, AttributeError, ValueError):
+        return val
+

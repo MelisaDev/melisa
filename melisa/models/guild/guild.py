@@ -5,11 +5,12 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import IntEnum, Enum
-from typing import List, Any, Optional, overload
+from typing import List, Any, Optional, overload, Dict
 
-from .channel import Channel, ChannelType, channel_types_for_converting, ThreadsList
+from .channel import Channel, ChannelType, channel_types_for_converting, ThreadsList, Thread, _choose_channel_type
 from ...utils import Snowflake, Timestamp
 from ...utils.api_model import APIModelBase
+from ...utils.conversion import try_enum
 from ...utils.types import APINullable, UNDEFINED
 
 
@@ -314,10 +315,10 @@ class Guild(APIModelBase):
     emojis: APINullable[List] = UNDEFINED
     # TODO: Make a structures of emoji and role
 
-    mfa_level: APINullable[int] = UNDEFINED
+    mfa_level: APINullable[MFALevel] = UNDEFINED
     application_id: APINullable[Snowflake] = UNDEFINED
     system_channel_id: APINullable[Snowflake] = UNDEFINED
-    system_channel_flags: APINullable[int] = UNDEFINED
+    system_channel_flags: APINullable[SystemChannelFlags] = UNDEFINED
     rules_channel_id: APINullable[Snowflake] = UNDEFINED
     joined_at: APINullable[Timestamp] = UNDEFINED
 
@@ -328,6 +329,7 @@ class Guild(APIModelBase):
     members: APINullable[List] = UNDEFINED
     threads: APINullable[List] = UNDEFINED
     presences: APINullable[List] = UNDEFINED
+    channels: APINullable[List] = UNDEFINED
     # TODO: Make a structure for voice_states, members, channels, threads, presences(?)
 
     max_presences: APINullable[int] = UNDEFINED
@@ -352,9 +354,101 @@ class Guild(APIModelBase):
     # TODO: Make a structure for welcome_screen, stage_instances,
     #  stickers and guild_scheduled_events
 
-    @property
-    def channels(self):
-        return []
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> Guild:
+        self: Guild = super().__new__(cls)
+
+        self.id = int(data["id"])
+        self.member_count = data.get("member_count", 0)
+        self.name = data.get("name", "")
+        self.region = data.get("region")
+        self.verification_level = try_enum(
+            VerificationLevel, data.get("verification_level")
+        )
+        self.vanity_url_code = data.get("vanity_url_code")
+        self.default_notifications = data.get("default_message_notifications")
+        self.explicit_content_filter = data.get("explicit_content_filter", 0)
+        self.afk_timeout = data.get("afk_timeout", 0)
+        self.icon = data.get("icon")
+        self.icon_hash = data.get("icon_hash")
+        self.banner = data.get("banner")
+        self.unavailable = data.get("unavailable", False)
+        self.roles = data.get("roles", {})
+        self.permissions = data.get("permissions")
+        self.welcome_screen = data.get("welcome_screen")
+        self.guild_scheduled_events = data.get("guild_scheduled_events")
+
+        self.mfa_level = try_enum(MFALevel, data.get("mfa_level", 0))
+        self.emojis = data.get("emojis", {})
+        self.stickers = data.get("stickers", {})
+        self.features = data.get("features", [])
+        self.splash = data.get("splash")
+        self.description = data.get("description")
+        self.max_presences = data.get("max_presences")
+        self.max_members = data.get("max_members")
+        self.max_video_channel_users = data.get("max_video_channel_users")
+        self.premium_tier = try_enum(PremiumTier, data.get("premium_tier", 0))
+        self.premium_subscription_count = data.get("premium_subscription_count", 0)
+        self.system_channel_flags = try_enum(SystemChannelFlags, data.get("system_channel_flags", 0))
+        self.preferred_locale = data.get("preferred_locale")
+        self.discovery_splash = data.get("discovery_splash")
+        self.nsfw_level = data.get("nsfw_level", 0)
+        self.premium_progress_bar_enabled = data.get("premium_progress_bar_enabled", False)
+        self.approximate_presence_count = data.get("approximate_presence_count")
+        self.approximate_member_count = data.get("approximate_member_count")
+        self.widget_enabled = data.get("widget_enabled")
+
+        if data.get("widget_channel_id") is not None:
+            self.widget_channel_id = Snowflake(data["widget_channel_id"])
+        else:
+            self.widget_channel_id = None
+
+        if data.get("system_channel_id") is not None:
+            self.system_channel_id = Snowflake(data["system_channel_id"])
+        else:
+            self.system_channel_id = None
+
+        if data.get("rules_channel_id") is not None:
+            self.rules_channel_id = Snowflake(data["rules_channel_id"])
+        else:
+            self.rules_channel_id = None
+
+        if data.get("public_updates_channel_id") is not None:
+            self.public_updates_channel_id = Snowflake(data["public_updates_channel_id"])
+        else:
+            self.public_updates_channel_id = None
+
+        if data.get("owner_id") is not None:
+            self.owner_id = Snowflake(data["owner_id"])
+        else:
+            self.owner_id = None
+
+        if data.get("afk_channel_id") is not None:
+            self.afk_channel_id = Snowflake(data["afk_channel_id"])
+        else:
+            self.afk_channel_id = None
+
+        if data.get("joined_at") is not None:
+            self.joined_at = Timestamp(data["joined_at"])
+        else:
+            self.joined_at = None
+
+        self.stage_instances = data.get("stage_instances")
+        self.scheduled_events = data.get("guild_scheduled_events")
+        self.owner = None if data.get("owner") is None else data["owner"]
+        self.large = None if self.member_count == 0 else self.member_count >= 250
+        self.voice_states = data.get("voice_states")
+        self.members = data.get("members")
+        self.presences = data.get("presences")
+
+        for thread in data.get("threads", []):
+            self.threads[thread["id"]] = Thread.from_dict(thread)
+
+        for channel in data.get("channels", []):
+            channel = _choose_channel_type(channel)
+            self.channels[channel.id] = channel
+
+        return self
 
     @overload
     async def create_channel(

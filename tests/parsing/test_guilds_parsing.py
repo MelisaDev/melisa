@@ -62,15 +62,3 @@ class TestGuildParsing:
             "BANNER",
             "COMMUNITY"
         ]
-
-    def test_model_to_dict_without_none(self):
-        data = parsed_model.to_dict()
-
-        new_guild_data = guild_data
-
-        for i in data.keys():
-            del new_guild_data[i]
-
-        for j in new_guild_data.values():
-            if j is not None:
-                raise TypeError

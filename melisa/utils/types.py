@@ -35,7 +35,7 @@ T = TypeVar("T")
 
 Coro = TypeVar("Coro", bound=Callable[..., Coroutine[Any, Any, Any]])
 
-APINullable = Union[T, UndefinedType]
+APINullable = Union[T, UndefinedType, None]
 
 
 class Singleton(type):
