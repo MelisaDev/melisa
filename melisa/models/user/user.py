@@ -5,11 +5,7 @@ from __future__ import annotations
 
 from enum import IntEnum
 from dataclasses import dataclass
-from typing import (
-    Optional,
-    Dict,
-    Any
-)
+from typing import Optional, Dict, Any
 
 from ...utils.conversion import try_enum
 from ...utils.api_model import APIModelBase
@@ -215,11 +211,7 @@ class User(APIModelBase):
         self.local = data.get("local")
         self.verified = data.get("verified")
         self.email = data.get("email")
-        self.premium_type = try_enum(
-            PremiumTypes, data.get("premium_type")
-        )
-        self.public_flags = try_enum(
-            UserFlags, data.get("public_flags")
-        )
+        self.premium_type = try_enum(PremiumTypes, data.get("premium_type"))
+        self.public_flags = try_enum(UserFlags, data.get("public_flags"))
 
         return self

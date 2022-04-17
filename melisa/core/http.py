@@ -9,7 +9,7 @@ from typing import Dict, Optional, Any
 
 from aiohttp import ClientSession, ClientResponse
 
-from melisa.exceptions import (
+from ..exceptions import (
     NotModifiedError,
     BadRequestError,
     ForbiddenError,

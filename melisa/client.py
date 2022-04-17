@@ -1,6 +1,3 @@
-# Copyright MelisaDev 2022 - Present
-# Full MIT License can be found in `LICENSE.txt` at the project root.
-
 import logging
 import asyncio
 import signal
@@ -26,9 +23,7 @@ _logger = logging.getLogger("melisa")
 class Client:
     """
     This is the main instance which is between the programmer and the Discord API.
-
     This Client represents your bot.
-
     Parameters
     ----------
     token: :class:`str`
@@ -50,7 +45,6 @@ class Client:
         If you pass a :class:`str` or a :class:`int`, it is interpreted as
         the global logging level to use, and should match one of **DEBUG**,
         **INFO**, **WARNING**, **ERROR** or **CRITICAL**, if :class:`str`.
-
     Attributes
     ----------
     user: :class:`~models.user.user.User`
@@ -126,7 +120,6 @@ class Client:
 
     def listen(self, callback: Coro):
         """Method or Decorator to set the listener.
-
         Parameters
         ----------
         callback : :class:`melisa.utils.types.Coro`
@@ -142,7 +135,6 @@ class Client:
     async def dispatch(self, name: str, *args):
         """
         Dispatches an event
-
         Parameters
         ----------
         name: :class:`str`
@@ -183,7 +175,6 @@ class Client:
     def run_shards(self, num_shards: int, *, shard_ids: List[int] = None):
         """
         Run Bot with shards specified by the user.
-
         Parameters
         ----------
         num_shards : :class:`int`
@@ -226,7 +217,6 @@ class Client:
     async def fetch_user(self, user_id: Union[Snowflake, str, int]):
         """
         Fetch User from the Discord API (by id).
-
         Parameters
         ----------
         user_id : :class:`Union[Snowflake, str, int]`
@@ -242,7 +232,6 @@ class Client:
     async def fetch_guild(self, guild_id: Union[Snowflake, str, int]):
         """
         Fetch Guild from the Discord API (by id).
-
         Parameters
         ----------
         guild_id : :class:`Union[Snowflake, str, int]`
@@ -262,7 +251,6 @@ class Client:
         Fetch Channel from the Discord API (by id).
         If type of channel is unknown:
         it will return just :class:`melisa.models.guild.channel.Channel` object.
-
         Parameters
         ----------
         channel_id : :class:`Union[Snowflake, str, int]`
@@ -286,38 +274,28 @@ class Client:
         timeout: Optional[float] = None,
     ):
         """|coro|
-
         Waits for a WebSocket event to be dispatched.
-
         This could be used to wait for a user to reply to a message,
         or to react to a message.
-
         The ``timeout`` parameter is passed onto :func:`asyncio.wait_for`. By default,
         it does not timeout. Note that this does propagate the
         :exc:`asyncio.TimeoutError` for you in case of timeout and is provided for
         ease of use.
-
         In case the event returns multiple arguments, a :class:`tuple` containing those
         arguments is returned instead.
-
         This function returns the **first event that meets the requirements**.
-
         Examples
         --------
         Waiting for a user reply: ::
-
             @client.listen
             async def on_message_create(message):
                 if message.content.startswith('$greet'):
                     channel = await client.fetch_channel(message.channel_id)
                     await channel.send('Say hello!')
-
                     def check(m):
                         return m.content == "hello" and channel.id == message.channel_id
-
                     msg = await client.wait_for('on_message_create', check=check, timeout=10.0)
                     await channel.send(f'Hello man!')
-
         Parameters
         ----------
         event_name: :class:`str`
@@ -328,7 +306,6 @@ class Client:
         timeout: Optional[:class:`float`]
             The number of seconds to wait before timing out and raising
             :exc:`asyncio.TimeoutError`.
-
         Returns
         ------
         Any
