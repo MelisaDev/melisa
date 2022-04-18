@@ -71,9 +71,3 @@ class TestEmbed:
         is correct.
         """
         assert has_key_vals(EMBED.to_dict(), dict_embed)
-
-    def test_embed_from_dict(self):
-        assert has_key_vals(
-            Embed.from_dict(dict_embed).to_dict(),
-            dict_embed
-        )
