@@ -201,6 +201,13 @@ class User(APIModelBase):
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> User:
+        """Generate a user from the given data.
+
+        Parameters
+        ----------
+        data: :class:`dict`
+            The dictionary to convert into a user.
+        """
         self: User = super().__new__(cls)
 
         self.id = int(data["id"])
