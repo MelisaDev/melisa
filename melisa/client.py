@@ -1,20 +1,20 @@
-import logging
 import asyncio
+import logging
 import signal
 import sys
 import traceback
-
 from typing import Dict, List, Union, Any, Iterable, Optional, Callable
 
-from .models import User, Guild, Activity
-from .models.app import Shard
-from .utils import Snowflake, APIModelBase
-from .utils.types import Coro
-from .core.http import HTTPClient
+from rest import RESTApp
 from .core.gateway import GatewayBotInfo
 from .models.guild.channel import Channel, ChannelType, channel_types_for_converting
-from .utils.logging import init_logging
+from .models import User, Guild, Activity
+from .models.app import Shard
 from .models.app.intents import Intents
+from .utils.snowflake import Snowflake
+from .utils import APIModelBase
+from .utils.logging import init_logging
+from .utils.types import Coro
 from .utils.waiters import WaiterMgr
 
 _logger = logging.getLogger("melisa")
@@ -69,7 +69,8 @@ class Client:
         self._loop = asyncio.get_event_loop()
 
         self.shards: Dict[int, Shard] = {}
-        self.http: HTTPClient = HTTPClient(token)
+        self.rest: RESTApp = RESTApp(token)
+        self.http = self.rest.http
         self._events: Dict[str, Coro] = {}
         self._waiter_mgr = WaiterMgr(self._loop)
 
