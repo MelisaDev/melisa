@@ -65,9 +65,7 @@ class RateLimiter:
         if bucket.remaining == 0:
             sleep_time = time() - bucket.since_timestamp + bucket.reset_after
 
-            _logger.info(
-                "Waiting until rate limit for bucket %s is over.", bucket_id
-            )
+            _logger.info("Waiting until rate limit for bucket %s is over.", bucket_id)
 
             await sleep(sleep_time)
 
