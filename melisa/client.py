@@ -5,7 +5,7 @@ import sys
 import traceback
 from typing import Dict, List, Union, Any, Iterable, Optional, Callable
 
-from rest import RESTApp
+from .rest import RESTApp
 from .core.gateway import GatewayBotInfo
 from .models.guild.channel import Channel, ChannelType, channel_types_for_converting
 from .models import User, Guild, Activity
