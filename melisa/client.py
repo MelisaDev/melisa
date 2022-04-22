@@ -1,3 +1,6 @@
+# Copyright MelisaDev 2022 - Present
+# Full MIT License can be found in `LICENSE.txt` at the project root.
+
 import asyncio
 import logging
 import signal
@@ -7,8 +10,8 @@ from typing import Dict, List, Union, Any, Iterable, Optional, Callable
 
 from .rest import RESTApp
 from .core.gateway import GatewayBotInfo
-from .models.guild.channel import Channel, ChannelType, channel_types_for_converting
-from .models import User, Guild, Activity
+from .models.guild.channel import Channel
+from .models import Activity
 from .models.app.shard import Shard
 from .models.app.intents import Intents
 from .utils.snowflake import Snowflake
@@ -277,9 +280,11 @@ class Client:
         In case the event returns multiple arguments, a :class:`tuple` containing those
         arguments is returned instead.
         This function returns the **first event that meets the requirements**.
+
         Examples
         --------
         Waiting for a user reply: ::
+
             @client.listen
             async def on_message_create(message):
                 if message.content.startswith('$greet'):
@@ -289,6 +294,7 @@ class Client:
                         return m.content == "hello" and channel.id == message.channel_id
                     msg = await client.wait_for('on_message_create', check=check, timeout=10.0)
                     await channel.send(f'Hello man!')
+
         Parameters
         ----------
         event_name: :class:`str`
@@ -299,6 +305,7 @@ class Client:
         timeout: Optional[:class:`float`]
             The number of seconds to wait before timing out and raising
             :exc:`asyncio.TimeoutError`.
+
         Returns
         ------
         Any

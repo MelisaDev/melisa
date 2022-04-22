@@ -104,7 +104,7 @@ class Gateway:
         try:
             self.ws = await self.__session.ws_connect(
                 "wss://gateway.discord.gg/?v=10&encoding=json&compress=zlib-stream",
-                timeout=30.0
+                timeout=30.0,
             )
             _logger.debug("(Shard %s) Starting...", self.shard_id)
 

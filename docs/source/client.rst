@@ -16,6 +16,15 @@ Client
         :decorator:
 
 
+RESTApp
+-------
+
+.. attributetable:: RESTApp
+
+.. autoclass:: Client
+    :inherited-members:
+
+
 Event Reference
 ---------------
 
