@@ -21,7 +21,7 @@ RESTApp
 
 .. attributetable:: RESTApp
 
-.. autoclass:: Client
+.. autoclass:: RESTApp
     :inherited-members:
 
 

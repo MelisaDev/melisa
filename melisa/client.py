@@ -27,6 +27,7 @@ class Client:
     """
     This is the main instance which is between the programmer and the Discord API.
     This Client represents your bot.
+
     Parameters
     ----------
     token: :class:`str`
@@ -48,6 +49,7 @@ class Client:
         If you pass a :class:`str` or a :class:`int`, it is interpreted as
         the global logging level to use, and should match one of **DEBUG**,
         **INFO**, **WARNING**, **ERROR** or **CRITICAL**, if :class:`str`.
+
     Attributes
     ----------
     user: :class:`~models.user.user.User`
