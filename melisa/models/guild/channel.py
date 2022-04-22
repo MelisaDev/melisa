@@ -17,6 +17,7 @@ from typing import (
     TYPE_CHECKING,
 )
 
+from ..message.file import File, create_form
 from ..message.message import Message
 from ...exceptions import EmbedFieldError
 from ...models.message.embed import Embed
@@ -511,7 +512,13 @@ class MessageableChannel(Channel):
         )
 
     async def send(
-        self, content: str = None, *, embed: Embed = None, embeds: List[Embed] = None
+        self,
+        content: str = None,
+        *,
+        embed: Embed = None,
+        embeds: List[Embed] = None,
+        file: File = None,
+        files: List[File] = None,
     ) -> Message:
         """|coro|
 
@@ -527,6 +534,10 @@ class MessageableChannel(Channel):
             Embed
         embeds: Optional[List[:class:`~melisa.models.message.embed.Embed`]]
             List of embeds
+        file: Optional[:class:`~melisa.models.message.file.File`]
+            File
+        files: Optional[List[:class:`~melisa.models.message.file.File`]]
+            List of files
 
         Raises
         -------
@@ -539,14 +550,14 @@ class MessageableChannel(Channel):
         """
 
         # ToDo: Add other parameters
+        # ToDo: add file checks
 
         if embeds is None:
-            embeds = []
+            embeds = [embed.to_dict()] if embed is not None else []
+        if files is None:
+            files = [file] if file is not None else []
 
-        content = str(content) if content is not None else None
-
-        if embed is not None:
-            embeds.append(embed.to_dict())
+        payload = {"content": str(content) if content is not None else None}
 
         for _embed in embeds:
             if embed.total_length() > 6000:
@@ -554,10 +565,17 @@ class MessageableChannel(Channel):
                     "Embed", embed.total_length(), 6000
                 )
 
+        payload["embeds"] = embeds
+
+        print(create_form(payload, files))
+
+        content_type, data = create_form(payload, files)
+
         return Message.from_dict(
             await self._http.post(
                 f"/channels/{self.id}/messages",
-                data={"content": content, "embeds": embeds},
+                data=data,
+                headers={"Content-Type": content_type}
             )
         )
 
