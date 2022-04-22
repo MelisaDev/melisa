@@ -78,6 +78,7 @@ class Gateway:
         self.listeners = listeners
 
         self._last_send = 0
+        self._max_connect_retries = 5
 
         self.auth = {
             "token": self.client._token,
@@ -100,18 +101,24 @@ class Gateway:
         self._buffer: bytearray = bytearray()
 
     async def connect(self) -> None:
-        self.ws = await self.__session.ws_connect(
-            "wss://gateway.discord.gg/?v=10&encoding=json&compress=zlib-stream"
-        )
-        _logger.debug("(Shard %s) Starting...", self.shard_id)
+        try:
+            self.ws = await self.__session.ws_connect(
+                "wss://gateway.discord.gg/?v=10&encoding=json&compress=zlib-stream",
+                timeout=30.0
+            )
+            _logger.debug("(Shard %s) Starting...", self.shard_id)
 
-        self._zlib: zlib._Decompress = zlib.decompressobj()
-        self._buffer = bytearray()
-        self.not_closed = True
+            self._zlib: zlib._Decompress = zlib.decompressobj()
+            self._buffer = bytearray()
+            self.not_closed = True
 
-        await self.send_identify()
-        self.loop.create_task(self.receive())
-        await self.check_heartbeating()
+            await self.send_identify()
+            self.loop.create_task(self.receive())
+            await self.check_heartbeating()
+        except (aiohttp.ClientConnectionError, asyncio.TimeoutError) as exc:
+            _logger.error("(Shard %s) Connecting failed!", self.shard_id)
+
+            raise exc
 
     async def check_heartbeating(self):
         while self.not_closed:

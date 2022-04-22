@@ -9,10 +9,10 @@ from .rest import RESTApp
 from .core.gateway import GatewayBotInfo
 from .models.guild.channel import Channel, ChannelType, channel_types_for_converting
 from .models import User, Guild, Activity
-from .models.app import Shard
+from .models.app.shard import Shard
 from .models.app.intents import Intents
 from .utils.snowflake import Snowflake
-from .utils import APIModelBase
+from .utils.api_model import APIModelBase
 from .utils.logging import init_logging
 from .utils.types import Coro
 from .utils.waiters import WaiterMgr
