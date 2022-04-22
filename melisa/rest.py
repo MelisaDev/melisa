@@ -63,8 +63,6 @@ class RESTApp:
             Id of channel to fetch
         """
 
-        # ToDo: Update cache if CHANNEL_CACHE enabled.
-
         data = await self.http.get(f"channels/{channel_id}")
 
         return _choose_channel_type(data)

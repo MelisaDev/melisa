@@ -218,6 +218,7 @@ class Client:
     async def fetch_user(self, user_id: Union[Snowflake, str, int]):
         """
         Fetch User from the Discord API (by id).
+
         Parameters
         ----------
         user_id : :class:`Union[Snowflake, str, int]`
@@ -226,13 +227,12 @@ class Client:
 
         # ToDo: Update cache if USER_CACHING enabled.
 
-        data = await self.http.get(f"users/{user_id}")
-
-        return User.from_dict(data)
+        return await self.rest.fetch_user(user_id)
 
     async def fetch_guild(self, guild_id: Union[Snowflake, str, int]):
         """
         Fetch Guild from the Discord API (by id).
+
         Parameters
         ----------
         guild_id : :class:`Union[Snowflake, str, int]`
@@ -241,17 +241,14 @@ class Client:
 
         # ToDo: Update cache if GUILD_CACHE enabled.
 
-        data = await self.http.get(f"guilds/{guild_id}")
-
-        return Guild.from_dict(data)
+        return await self.rest.fetch_guild(guild_id)
 
     async def fetch_channel(
         self, channel_id: Union[Snowflake, str, int]
     ) -> Union[Channel, Any]:
         """
         Fetch Channel from the Discord API (by id).
-        If type of channel is unknown:
-        it will return just :class:`melisa.models.guild.channel.Channel` object.
+
         Parameters
         ----------
         channel_id : :class:`Union[Snowflake, str, int]`
@@ -260,12 +257,7 @@ class Client:
 
         # ToDo: Update cache if CHANNEL_CACHE enabled.
 
-        data = (await self.http.get(f"channels/{channel_id}")) or {}
-
-        data.update({"type": ChannelType(data.pop("type"))})
-
-        channel_cls = channel_types_for_converting.get(data["type"], Channel)
-        return channel_cls.from_dict(data)
+        return await self.rest.fetch_channel(channel_id)
 
     async def wait_for(
         self,
