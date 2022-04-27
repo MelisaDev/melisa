@@ -18,7 +18,7 @@ from typing import (
 )
 
 from ..message.file import File, create_form
-from ..message.message import Message
+from ..message.message import Message, AllowedMentions
 from ...exceptions import EmbedFieldError
 from ...models.message.embed import Embed
 from ...utils import Snowflake, Timestamp
@@ -519,6 +519,7 @@ class MessageableChannel(Channel):
         embeds: List[Embed] = None,
         file: File = None,
         files: List[File] = None,
+        allowed_mentions: AllowedMentions = None,
     ) -> Message:
         """|coro|
 
@@ -567,7 +568,9 @@ class MessageableChannel(Channel):
 
         payload["embeds"] = embeds
 
-        print(create_form(payload, files))
+        # ToDo: add auto allowed_mentions from client
+        if allowed_mentions is not None:
+            payload["allowed_mentions"] = allowed_mentions.to_dict()
 
         content_type, data = create_form(payload, files)
 
@@ -575,7 +578,7 @@ class MessageableChannel(Channel):
             await self._http.post(
                 f"/channels/{self.id}/messages",
                 data=data,
-                headers={"Content-Type": content_type}
+                headers={"Content-Type": content_type},
             )
         )
 

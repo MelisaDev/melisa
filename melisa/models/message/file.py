@@ -28,7 +28,7 @@ def create_form(payload: Dict[str, Any], files: List[File]):
         )
 
     payload = form()
-    return payload.headers['Content-Type'], payload
+    return payload.headers["Content-Type"], payload
 
 
 class File:

@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import IntEnum
-from typing import List, TYPE_CHECKING, Optional, Dict, Any
+from typing import List, TYPE_CHECKING, Optional, Dict, Any, Union
 
 from .embed import Embed
 from ...utils import Snowflake, Timestamp, try_enum, APIModelBase
@@ -98,6 +98,79 @@ class MessageFlags(IntEnum):
 
     def __int__(self):
         return self.value
+
+
+@dataclass(repr=False)
+class AllowedMentions:
+    """A class that represents what mentions are allowed in a message.
+
+    Attributes
+    ----------
+    everyone: :class:`bool`
+        Whether to allow everyone and here mentions. Defaults to ``True``.
+    users: Union[:class:`bool`, List[:class:`~melisa.utils.snowflake.Snowflake`]]
+        Controls the users being mentioned. If ``True`` (the default) then
+        users are mentioned based on the message content. If ``False`` then
+        users are not mentioned at all. Or you can specify list of ids.
+    roles: Union[:class:`bool`, List[:class:`~melisa.utils.snowflake.Snowflake`]]
+        Controls the roles being mentioned. If ``True`` then
+        roles are mentioned based on the message content. If ``False`` then
+        roles are not mentioned at all.
+    replied_user: :class:`bool`
+        Whether to mention the author of the message being replied to.
+    """
+
+    __slots__ = ("everyone", "users", "roles", "replied_user")
+
+    def __init__(
+        self,
+        *,
+        everyone: bool = True,
+        users: Union[bool, List[Union[Snowflake, int, str]]] = True,
+        roles: Union[bool, List[Union[Snowflake, int, str]]] = True,
+        replied_user: bool = True,
+    ):
+        self.everyone = everyone
+        self.users = users
+        self.roles = roles
+        self.replied_user = replied_user
+
+    @classmethod
+    def enabled(cls):
+        """A factory method that returns a :class:`AllowedMentions`
+        with all fields explicitly set to ``True``"""
+        return cls(everyone=True, users=True, roles=True, replied_user=True)
+
+    @classmethod
+    def disabled(cls):
+        """A factory method that returns a :class:`AllowedMentions`
+        with all fields set to ``False``"""
+        return cls(everyone=False, users=False, roles=False, replied_user=False)
+
+    def to_dict(self):
+        to_parse = []
+        data = {}
+
+        if self.everyone:
+            to_parse.append("everyone")
+
+        # `None` cannot be specified by the default
+        if self.users is True:
+            to_parse.append("users")
+        elif self.users is not False:
+            data["users"] = [str(user) for user in self.users]
+
+        if self.roles is True:
+            to_parse.append("roles")
+        elif self.roles is not False:
+            data["roles"] = [str(role) for role in self.roles]
+
+        if self.replied_user:
+            data["replied_user"] = True
+
+        data["parse"] = to_parse
+
+        return data
 
 
 @dataclass(repr=False)
