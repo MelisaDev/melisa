@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from dataclasses import dataclass
 from enum import IntEnum
 from typing import List, TYPE_CHECKING, Optional, Dict, Any, Union
@@ -405,3 +406,33 @@ class Message(APIModelBase):
             f"channels/{self.channel_id}/pins/{self.id}",
             headers={"X-Audit-Log-Reason": reason},
         )
+
+    async def delete(self, *, delay: Optional[float] = None) -> None:
+        """|coro|
+
+        Deletes the message.
+
+        Parameters
+        ----------
+        delay: Optional[:class:`float`]
+            If provided, the number of seconds to wait in the background
+            before deleting the message.
+
+        Raises
+        ------
+        Forbidden
+            You do not have proper permissions to delete the message.
+        NotFound
+            The message was deleted already
+        HTTPException
+            Deleting the message failed.
+        """
+
+        if delay is not None:
+            async def delete(delete_after: float):
+                await asyncio.sleep(delete_after)
+                await self._client.rest.delete_message(self.channel_id, self.id)
+
+            asyncio.create_task(delete(delay))
+        else:
+            await self._client.rest.delete_message(self.channel_id, self.id)

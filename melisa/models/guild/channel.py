@@ -485,7 +485,7 @@ class MessageableChannel(Channel):
         )
 
     async def delete_message(
-        self, message_id: Optional[Snowflake, str, int], *, reason: Optional[str] = None
+        self, message_id: Union[Snowflake, str, int], *, reason: Optional[str] = None
     ):
         """|coro|
 
@@ -506,20 +506,21 @@ class MessageableChannel(Channel):
             You do not have proper permissions to do the actions required.
             (You must have ``MANAGE_MESSAGES`` permission)
         """
-        await self._http.delete(
-            f"channels/{self.id}/messages/{message_id}",
-            headers={"X-Audit-Log-Reason": reason},
+        await self._client.rest.delete_message(
+            self.id, message_id, reason=reason
         )
 
     async def send(
         self,
         content: str = None,
         *,
+        tts: bool = False,
         embed: Embed = None,
         embeds: List[Embed] = None,
         file: File = None,
         files: List[File] = None,
         allowed_mentions: AllowedMentions = None,
+        delete_after: int = None
     ) -> Message:
         """|coro|
 
@@ -531,6 +532,8 @@ class MessageableChannel(Channel):
         ----------
         content: Optional[:class:`str`]
             The content of the message to send.
+        tts: Optional[:class:`bool`]
+            Whether the message should be sent using text-to-speech.
         embed: Optional[:class:`~melisa.models.message.embed.Embed`]
             Embed
         embeds: Optional[List[:class:`~melisa.models.message.embed.Embed`]]
@@ -539,6 +542,12 @@ class MessageableChannel(Channel):
             File
         files: Optional[List[:class:`~melisa.models.message.file.File`]]
             List of files
+        allowed_mentions: Optional[:class:`~melisa.models.message.message.AllowedMentions`]
+            Controls the mentions being processed in this message.
+        delete_after: Optional[:class:`int`]
+            Provided value must be an int.
+            if provided, deletes message after some seconds.
+            May raise ``ForbiddenError`` or ``NotFoundError``.
 
         Raises
         -------
@@ -567,6 +576,7 @@ class MessageableChannel(Channel):
                 )
 
         payload["embeds"] = embeds
+        payload["tts"] = tts
 
         # ToDo: add auto allowed_mentions from client
         if allowed_mentions is not None:
@@ -574,13 +584,18 @@ class MessageableChannel(Channel):
 
         content_type, data = create_form(payload, files)
 
-        return Message.from_dict(
+        message_data = Message.from_dict(
             await self._http.post(
                 f"/channels/{self.id}/messages",
                 data=data,
                 headers={"Content-Type": content_type},
             )
         )
+
+        if delete_after:
+            await message_data.delete(delay=delete_after)
+
+        return message_data
 
     async def purge(
         self,

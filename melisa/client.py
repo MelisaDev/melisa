@@ -75,7 +75,7 @@ class Client:
 
         self.shards: Dict[int, Shard] = {}
         self.rest: RESTApp = RESTApp(token)
-        self.http = self.rest.http
+        self.http = self.rest._http
         self._events: Dict[str, Coro] = {}
         self._waiter_mgr = WaiterMgr(self._loop)
 
