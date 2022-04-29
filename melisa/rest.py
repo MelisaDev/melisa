@@ -69,10 +69,10 @@ class RESTApp:
 
     async def delete_message(
         self,
-            channel_id: Union[Snowflake, str, int],
-            message_id: Union[Snowflake, str, int],
-            *,
-            reason: Optional[str] = None
+        channel_id: Union[Snowflake, str, int],
+        message_id: Union[Snowflake, str, int],
+        *,
+        reason: Optional[str] = None,
     ):
         """|coro|
 

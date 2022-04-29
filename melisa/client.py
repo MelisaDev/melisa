@@ -11,7 +11,7 @@ from typing import Dict, List, Union, Any, Iterable, Optional, Callable
 from .rest import RESTApp
 from .core.gateway import GatewayBotInfo
 from .models.guild.channel import Channel
-from .models import Activity
+from .models import Activity, AllowedMentions
 from .models.app.shard import Shard
 from .models.app.intents import Intents
 from .utils.snowflake import Snowflake
@@ -43,6 +43,8 @@ class Client:
         Can be generated using :class:`~models.user.presence.StatusType`
     mobile: :class:`bool`
         Set user device as mobile?
+    allowed_mentions: Optional[:class:`~melisa.models.message.message.AllowedMentions`]
+        Controls the mentions being processed in every message.
     logs: :class:`Optional[None, str, Dict[str, Any]]`
         The hint for configuring logging.
         This can be `None` to disable logging automatically.
@@ -69,6 +71,7 @@ class Client:
         activity: Optional[Activity] = None,
         status: str = None,
         mobile: bool = False,
+        allowed_mentions: Optional[AllowedMentions] = None,
         logs: Union[None, int, str, Dict[str, Any]] = "INFO",
     ):
         self._loop = asyncio.get_event_loop()
@@ -94,11 +97,13 @@ class Client:
         else:
             self.intents = intents
 
-        self._token = token
+        self._token: str = token
 
         self._activity = activity
         self._status = status
-        self._mobile = mobile
+        self._mobile: bool = mobile
+        self.allowed_mentions: AllowedMentions = allowed_mentions
+
         self._none_guilds_cached = False
 
         APIModelBase.set_client(self)

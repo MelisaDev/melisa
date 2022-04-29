@@ -109,7 +109,8 @@ class Webhook(APIModelBase):
         reason: Optional[str] = None,
     ):
         """|coro|
-        Modify a webhook. Requires the ``MANAGE_WEBHOOKS permission``. Returns the updated webhook object on success.
+        Modify a webhook. Requires the ``MANAGE_WEBHOOKS permission``.
+        Returns the updated webhook object on success.
 
         Parameters
         ----------

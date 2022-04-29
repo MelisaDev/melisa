@@ -506,9 +506,7 @@ class MessageableChannel(Channel):
             You do not have proper permissions to do the actions required.
             (You must have ``MANAGE_MESSAGES`` permission)
         """
-        await self._client.rest.delete_message(
-            self.id, message_id, reason=reason
-        )
+        await self._client.rest.delete_message(self.id, message_id, reason=reason)
 
     async def send(
         self,
@@ -520,7 +518,7 @@ class MessageableChannel(Channel):
         file: File = None,
         files: List[File] = None,
         allowed_mentions: AllowedMentions = None,
-        delete_after: int = None
+        delete_after: int = None,
     ) -> Message:
         """|coro|
 
@@ -581,6 +579,8 @@ class MessageableChannel(Channel):
         # ToDo: add auto allowed_mentions from client
         if allowed_mentions is not None:
             payload["allowed_mentions"] = allowed_mentions.to_dict()
+        elif self._client.allowed_mentions is not None:
+            payload["allowed_mentions"] = self._client.allowed_mentions.to_dict()
 
         content_type, data = create_form(payload, files)
 

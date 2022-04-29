@@ -429,6 +429,7 @@ class Message(APIModelBase):
         """
 
         if delay is not None:
+
             async def delete(delete_after: float):
                 await asyncio.sleep(delete_after)
                 await self._client.rest.delete_message(self.channel_id, self.id)
