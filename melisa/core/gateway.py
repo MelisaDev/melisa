@@ -115,7 +115,7 @@ class Gateway:
             await self.send_identify()
             self.loop.create_task(self.receive())
             await self.check_heartbeating()
-        except (aiohttp.ClientConnectionError, asyncio.TimeoutError) as exc:
+        except Exception as exc:
             _logger.error("(Shard %s) Connecting failed!", self.shard_id)
 
             raise exc
