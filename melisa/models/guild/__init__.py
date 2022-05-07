@@ -5,3 +5,5 @@ from .guild import *
 from .channel import *
 from .thread import *
 from .webhook import *
+from .emoji import *
+from .role import *
