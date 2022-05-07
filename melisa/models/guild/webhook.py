@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import IntEnum
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Dict
 
 from ...utils import Snowflake
 from ...utils.api_model import APIModelBase
@@ -85,6 +85,39 @@ class Webhook(APIModelBase):
     source_guild: APINullable[Guild] = UNDEFINED
     source_channel: APINullable[Channel] = UNDEFINED
     url: APINullable[str] = UNDEFINED
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, any]) -> Webhook:
+        """Generate a webhook from the given data.
+
+        Parameters
+        ----------
+        data: :class:`dict`
+            The dictionary to convert into a webhook.
+        """
+
+        self: Webhook = super().__new__(cls)
+
+        self.id = int(data["id"])
+        self.type = data.get("type")
+        self.guild_id = data.get("guild_id")
+        self.channel_id = data.get("channel_id")
+        self.user = data.get("user", {})
+        self.avatar = data.get("avatar")
+        self.token = data.get("token")
+        self.application_id = data.get("application_id")
+
+        if data.get("source_guild") is not None:
+            self.source_guild = data.get("source_guild", {})
+        else:
+            self.source_guild = None
+        
+        if data.get("source_channel") is not None:
+            self.source_channel = data.get("source_channel", {})
+        else:
+            self.source_channel = None
+        
+        self.url = data.get("url")
 
     async def delete(self, *, reason: Optional[str] = None):
         """|coro|
