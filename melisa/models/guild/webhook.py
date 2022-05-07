@@ -119,6 +119,8 @@ class Webhook(APIModelBase):
         
         self.url = data.get("url")
 
+        return self
+
     async def delete(self, *, reason: Optional[str] = None):
         """|coro|
         Delete a webhook permanently. Requires the ``MANAGE_WEBHOOKS`` permission.

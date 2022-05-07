@@ -165,6 +165,34 @@ class User(APIModelBase):
     premium_type: APINullable[int] = UNDEFINED
     public_flags: APINullable[int] = UNDEFINED
 
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> User:
+        """Generate a user from the given data.
+
+        Parameters
+        ----------
+        data: :class:`dict`
+            The dictionary to convert into a user.
+        """
+        self: User = super().__new__(cls)
+
+        self.id = int(data["id"])
+        self.username = data.get("username")
+        self.discriminator = data.get("discriminator")
+        self.avatar = data.get("avatar")
+        self.bot = data.get("bot", False)
+        self.system = data.get("system", False)
+        self.mfa_enabled = data.get("mfa_enable", False)
+        self.banner = data.get("banner")
+        self.accent_color = data.get("accent_color")
+        self.local = data.get("local")
+        self.verified = data.get("verified", False)
+        self.email = data.get("email")
+        self.premium_type = try_enum(PremiumTypes, data.get("premium_type"))
+        self.public_flags = try_enum(UserFlags, data.get("public_flags"))
+
+        return self
+
     @property
     def premium(self) -> Optional[PremiumTypes]:
         return None if self.premium_type is None else PremiumTypes(self.premium_type)
@@ -194,31 +222,3 @@ class User(APIModelBase):
         return await self._http.post(
             "/users/@me/channels", data={"recipient_id": self.id}
         )
-
-    @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> User:
-        """Generate a user from the given data.
-
-        Parameters
-        ----------
-        data: :class:`dict`
-            The dictionary to convert into a user.
-        """
-        self: User = super().__new__(cls)
-
-        self.id = int(data["id"])
-        self.username = data.get("username")
-        self.discriminator = data.get("discriminator")
-        self.avatar = data.get("avatar")
-        self.bot = data.get("bot", False)
-        self.system = data.get("system", False)
-        self.mfa_enabled = data.get("mfa_enable", False)
-        self.banner = data.get("banner")
-        self.accent_color = data.get("accent_color")
-        self.local = data.get("local")
-        self.verified = data.get("verified", False)
-        self.email = data.get("email")
-        self.premium_type = try_enum(PremiumTypes, data.get("premium_type"))
-        self.public_flags = try_enum(UserFlags, data.get("public_flags"))
-
-        return self
