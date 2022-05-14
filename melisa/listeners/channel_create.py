@@ -10,7 +10,7 @@ from ..utils.types import Coro
 async def channel_create_listener(self, gateway, payload: dict):
     channel = _choose_channel_type(payload)
 
-    await self.dispatch("on_channel_create", (channel, ))
+    await self.dispatch("on_channel_create", (channel,))
 
     return
 

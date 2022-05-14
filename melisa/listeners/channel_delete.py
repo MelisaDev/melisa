@@ -14,7 +14,7 @@ async def channel_delete_listener(self, gateway, payload: dict):
 
     channel = channel_cls.from_dict(payload)
 
-    await self.dispatch("on_channel_delete", (channel, ))
+    await self.dispatch("on_channel_delete", (channel,))
 
     return
 

@@ -31,7 +31,7 @@ class CacheManager:
         self,
         *,
         auto_models: Optional[List[AutoCacheModels]] = None,
-        auto_unused_attributes: Optional[Dict[Any, List[str]]] = None
+        auto_unused_attributes: Optional[Dict[Any, List[str]]] = None,
     ):
         self._auto_models: List[AutoCacheModels] = (
             [] if auto_models is None else auto_models
@@ -98,7 +98,7 @@ class CacheManager:
         if hasattr(guild, "channels"):
             channels = guild.channels.values()
 
-            if not AutoCacheModels.TEXT_CHANNELS in self._auto_models:
+            if AutoCacheModels.TEXT_CHANNELS not in self._auto_models:
                 channels = filter(
                     lambda channel: channel.type != ChannelType.GUILD_TEXT, channels
                 )
@@ -137,7 +137,9 @@ class CacheManager:
             Data of guilds tso insert to the cache
         """
 
-        guilds_dict = dict(map(lambda i: (i["id"], UnavailableGuild.from_dict(i)), guilds))
+        guilds_dict = dict(
+            map(lambda i: (i["id"], UnavailableGuild.from_dict(i)), guilds)
+        )
 
         self._raw_guilds.update(guilds_dict)
         return None

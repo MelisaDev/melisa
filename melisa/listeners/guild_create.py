@@ -18,7 +18,7 @@ async def guild_create_listener(self, gateway, payload: dict):
     self.cache.set_guild(guild)
 
     if guild_was_cached_as_none is False:
-        await self.dispatch("on_guild_create", (guild, ))
+        await self.dispatch("on_guild_create", (guild,))
 
     return
 

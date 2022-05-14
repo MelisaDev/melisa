@@ -16,7 +16,7 @@ async def on_ready_listener(self, gateway, payload: dict):
 
     self.user = User.from_dict(payload.get("user"))
 
-    await self.dispatch("on_shard_ready", (gateway.shard_id, ))
+    await self.dispatch("on_shard_ready", (gateway.shard_id,))
 
     return
 

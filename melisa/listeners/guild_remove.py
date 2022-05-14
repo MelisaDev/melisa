@@ -15,7 +15,7 @@ async def guild_delete_listener(self, gateway, payload: dict):
 
     self.cache.remove_guild(guild.id)
 
-    await self.dispatch("on_guild_remove", (guild, ))
+    await self.dispatch("on_guild_remove", (guild,))
 
     return
 

@@ -74,7 +74,7 @@ class Client:
         mobile: bool = False,
         allowed_mentions: Optional[AllowedMentions] = None,
         logs: Union[None, int, str, Dict[str, Any]] = "INFO",
-        cache: CacheManager = None
+        cache: CacheManager = None,
     ):
         self._loop = asyncio.get_event_loop()
 
