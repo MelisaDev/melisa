@@ -8,6 +8,7 @@ import sys
 import traceback
 from typing import Dict, List, Union, Any, Iterable, Optional, Callable
 
+from .models.app.cache import CacheManager
 from .rest import RESTApp
 from .core.gateway import GatewayBotInfo
 from .models.guild.channel import Channel
@@ -73,6 +74,7 @@ class Client:
         mobile: bool = False,
         allowed_mentions: Optional[AllowedMentions] = None,
         logs: Union[None, int, str, Dict[str, Any]] = "INFO",
+        cache: CacheManager = None
     ):
         self._loop = asyncio.get_event_loop()
 
@@ -82,8 +84,7 @@ class Client:
         self._events: Dict[str, Coro] = {}
         self._waiter_mgr = WaiterMgr(self._loop)
 
-        # ToDo: Transfer guilds in to the cache manager
-        self.guilds = {}
+        self.cache = cache if cache is not None else CacheManager()
         self.user = None
 
         self._gateway_info = self._loop.run_until_complete(self._get_gateway())
@@ -103,8 +104,6 @@ class Client:
         self._status = status
         self._mobile: bool = mobile
         self.allowed_mentions: AllowedMentions = allowed_mentions
-
-        self._none_guilds_cached = False
 
         APIModelBase.set_client(self)
 
@@ -143,7 +142,7 @@ class Client:
         _logger.debug(f"Listener {callback.__qualname__} added successfully!")
         return self
 
-    async def dispatch(self, name: str, *args):
+    async def dispatch(self, name: str, args):
         """
         Dispatches an event
         Parameters
@@ -165,7 +164,7 @@ class Client:
                     print(f"Ignoring exception in {name}", file=sys.stderr)
                     traceback.print_exc()
 
-        self._waiter_mgr.process_events(name, *args)
+        self._waiter_mgr.process_events(name, args)
 
     def run(self):
         """
@@ -249,7 +248,7 @@ class Client:
             Id of guild to fetch
         """
 
-        # ToDo: Update cache if GUILD_CACHE enabled.
+        # ToDo: Update cache if FULL_GUILD_CACHE enabled.
 
         return await self.rest.fetch_guild(guild_id)
 

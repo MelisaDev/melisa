@@ -12,13 +12,13 @@ async def guild_create_listener(self, gateway, payload: dict):
 
     guild = Guild.from_dict(payload)
 
-    if self.guilds.get(guild.id, "empty") != "empty":
+    if self.cache.get_guild(guild.id) is not None:
         guild_was_cached_as_none = True
 
-    self.guilds[str(guild.id)] = guild
+    self.cache.set_guild(guild)
 
     if guild_was_cached_as_none is False:
-        await self.dispatch("on_guild_create", guild)
+        await self.dispatch("on_guild_create", (guild, ))
 
     return
 

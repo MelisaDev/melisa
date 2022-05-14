@@ -8,11 +8,14 @@ from ..models.guild import UnavailableGuild
 
 
 async def guild_delete_listener(self, gateway, payload: dict):
-    guild = UnavailableGuild.from_dict(payload)
+    guild = self.cache.get_guild(payload["data"]["id"])
 
-    self.guilds.pop(guild.id, None)
+    if guild is None:
+        guild = UnavailableGuild.from_dict(payload)
 
-    await self.dispatch("on_guild_remove", guild)
+    self.cache.remove_guild(guild.id)
+
+    await self.dispatch("on_guild_remove", (guild, ))
 
     return
 

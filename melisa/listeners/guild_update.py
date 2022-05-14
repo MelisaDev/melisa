@@ -9,9 +9,9 @@ from ..models.guild import Guild
 
 async def guild_update_listener(self, gateway, payload: dict):
     new_guild = Guild.from_dict(payload)
-    old_guild = self.guilds.get(new_guild.id)
+    old_guild = self.cache.get_guild(payload["id"])
 
-    self.guilds[new_guild.id] = new_guild
+    self.cache.set_guild(new_guild)
 
     await self.dispatch("on_guild_update", (old_guild, new_guild))
 

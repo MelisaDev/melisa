@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 @dataclass(repr=False)
 class Emoji(APIModelBase):
     """Emoji Structure
-    
+
     Attributes
     ----------
     id: :class:`~melisa.utils.types.Snowflake`

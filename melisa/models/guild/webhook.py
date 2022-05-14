@@ -111,12 +111,12 @@ class Webhook(APIModelBase):
             self.source_guild = data.get("source_guild", {})
         else:
             self.source_guild = None
-        
+
         if data.get("source_channel") is not None:
             self.source_channel = data.get("source_channel", {})
         else:
             self.source_channel = None
-        
+
         self.url = data.get("url")
 
         return self

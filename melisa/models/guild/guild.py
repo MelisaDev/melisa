@@ -586,3 +586,19 @@ class UnavailableGuild(APIModelBase):
 
     id: APINullable[Snowflake] = None
     unavailable: APINullable[bool] = True
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> UnavailableGuild:
+        """Generate a unavailable guild from the given data.
+
+        Parameters
+        ----------
+        data: :class:`dict`
+            The dictionary to convert into an unavailable guild.
+        """
+        self: UnavailableGuild = super().__new__(cls)
+
+        self.id = Snowflake(int(data["id"]))
+        self.unavailable = data["unavailable"]
+
+        return self

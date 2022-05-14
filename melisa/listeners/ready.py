@@ -12,13 +12,11 @@ async def on_ready_listener(self, gateway, payload: dict):
 
     guilds = payload.get("guilds")
 
-    if self._none_guilds_cached is False:
-        self.guilds = dict(map(lambda i: (i["id"], None), guilds))
-        self._none_guilds_cached = True
+    self.cache._set_none_guilds(guilds)
 
     self.user = User.from_dict(payload.get("user"))
 
-    await self.dispatch("on_shard_ready", gateway.shard_id)
+    await self.dispatch("on_shard_ready", (gateway.shard_id, ))
 
     return
 
