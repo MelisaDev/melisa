@@ -11,7 +11,7 @@ from typing import Dict, List, Union, Any, Iterable, Optional, Callable
 from .models.app.cache import CacheManager
 from .rest import RESTApp
 from .core.gateway import GatewayBotInfo
-from .models.guild.channel import Channel
+from .models.guild.channel import Channel, ChannelType
 from .models import Activity, AllowedMentions
 from .models.app.shard import Shard
 from .models.app.intents import Intents
@@ -266,7 +266,12 @@ class Client:
 
         # ToDo: Update cache if CHANNEL_CACHE enabled.
 
-        return await self.rest.fetch_channel(channel_id)
+        data = await self.rest.fetch_channel(channel_id)
+
+        if data.type not in [ChannelType.DM, ChannelType.GROUP_DM]:
+            self.cache.set_guild_channel(data)
+
+        return data
 
     async def wait_for(
         self,

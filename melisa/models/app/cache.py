@@ -7,7 +7,7 @@ from enum import Enum
 from typing import List, Dict, Optional, Any, Union
 
 from melisa.utils.types import UNDEFINED
-from melisa.models.guild import Guild, ChannelType, UnavailableGuild
+from melisa.models.guild import Guild, ChannelType, UnavailableGuild, Channel
 from melisa.utils.snowflake import Snowflake
 
 
@@ -16,6 +16,7 @@ class AutoCacheModels(Enum):
 
     """ """
 
+    FULL_GUILDS = "FULL_GUILDS"
     GUILD_ROLES = "GUILD_ROLES"
     GUILD_THREADS = "GUILD_THREADS"
     GUILD_EMOJIS = "GUILD_EMOJIS"
@@ -30,6 +31,7 @@ class CacheManager:
     def __init__(
         self,
         *,
+        disabled: bool = False,
         auto_models: Optional[List[AutoCacheModels]] = None,
         auto_unused_attributes: Optional[Dict[Any, List[str]]] = None,
     ):
@@ -43,6 +45,8 @@ class CacheManager:
         self._raw_guilds: Dict[Snowflake, Any] = {}
         self._raw_users: Dict[Snowflake, Any] = {}
         self._raw_dm_channels: Dict[Snowflake, Any] = {}
+
+        self._disabled = disabled
 
         # We use symlinks to cache guild channels
         # like we save channel in Guild and save it here
@@ -90,6 +94,9 @@ class CacheManager:
             Guild to save into cache
         """
 
+        if self._disabled:
+            return
+
         if guild is None:
             return None
 
@@ -104,14 +111,74 @@ class CacheManager:
                 )
 
             for sym in channels:
-                if self._channel_symlinks.get(sym.id, UNDEFINED) is not UNDEFINED:
-                    self._channel_symlinks.pop(sym.id)
+                sym_id = Snowflake(int(sym.id))
+                if self._channel_symlinks.get(sym_id, UNDEFINED) is not UNDEFINED:
+                    self._channel_symlinks.pop(sym_id)
 
-                self._channel_symlinks[sym.id] = guild.id
+                self._channel_symlinks[sym_id] = guild.id
 
         self._raw_guilds.update({guild.id: guild})
 
         return guild
+
+    def set_guild_channel(self, channel: Optional[Channel] = None):
+        """
+        Save Guild into cache
+
+        Parameters
+        ----------
+        channel: Optional[`~melisa.models.guild.Channel`]
+            Guild Channel to save into cache
+        """
+
+        if self._disabled:
+            return
+
+        if channel is None:
+            return None
+
+        channel = self.__remove_unused_attributes(channel, Channel)  # ToDo: add channel type
+
+        guild = self._raw_guilds.get(channel.guild_id, UNDEFINED)
+
+        channel_id = Snowflake(int(channel.id))
+
+        if guild != UNDEFINED:
+            if hasattr(guild, "channels"):
+                self._raw_guilds[guild.id].channels.update({channel_id: channel})
+
+        self._channel_symlinks.update({channel_id: channel.guild_id})
+
+        return channel
+
+    def get_guild_channel(self, channel_id: Union[Snowflake, str, int]):
+        """
+        Get guild channel from cache
+
+        Parameters
+        ----------
+        channel_id: Optional[:class:`~melisa.utils.snowflake.Snowflake`, `str`, `int`]
+            ID of guild channel to get from cache.
+        """
+
+        if self._disabled:
+            return None
+
+        channel_id = Snowflake(int(channel_id))
+        guild_id = self._channel_symlinks.get(channel_id, UNDEFINED)
+
+        if guild_id == UNDEFINED:
+            return None
+
+        guild = self.get_guild(guild_id)
+
+        if guild is None:
+            return None
+
+        if hasattr(guild, "channels") is False:
+            return None
+
+        return guild.channels.get(channel_id)
 
     def get_guild(self, guild_id: Union[Snowflake, str, int]):
         """
@@ -122,6 +189,9 @@ class CacheManager:
         guild_id: Optional[:class:`~melisa.utils.snowflake.Snowflake`, `str`, `int`]
             ID of guild to get from cache.
         """
+
+        if self._disabled:
+            return None
 
         if not isinstance(guild_id, Snowflake):
             guild_id = Snowflake(int(guild_id))
@@ -137,8 +207,11 @@ class CacheManager:
             Data of guilds tso insert to the cache
         """
 
+        if self._disabled:
+            return
+
         guilds_dict = dict(
-            map(lambda i: (i["id"], UnavailableGuild.from_dict(i)), guilds)
+            map(lambda i: (Snowflake(int(i["id"])), UnavailableGuild.from_dict(i)), guilds)
         )
 
         self._raw_guilds.update(guilds_dict)
@@ -153,6 +226,9 @@ class CacheManager:
         guild_id: Optional[:class:`~melisa.utils.snowflake.Snowflake`, `str`, `int`]
             ID of guild to remove from cache.
         """
+
+        if self._disabled:
+            return
 
         if not isinstance(guild_id, Snowflake):
             guild_id = Snowflake(int(guild_id))

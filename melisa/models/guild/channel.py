@@ -769,7 +769,7 @@ class TextChannel(MessageableChannel):
         self: TextChannel = super().__new__(cls)
 
         self.id = data["id"]
-        self.type = data["type"]
+        self.type = ChannelType(data["type"])
         self.position = data.get("position")
         self.permission_overwrites = data["permission_overwrites"]
         self.name = data.get("name")
