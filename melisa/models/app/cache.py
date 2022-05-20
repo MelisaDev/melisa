@@ -32,11 +32,11 @@ class CacheManager:
         self,
         *,
         disabled: bool = False,
-        auto_models: Optional[List[AutoCacheModels]] = None,
+        disabled_auto_models: Optional[List[AutoCacheModels]] = None,
         auto_unused_attributes: Optional[Dict[Any, List[str]]] = None,
     ):
-        self._auto_models: List[AutoCacheModels] = (
-            [] if auto_models is None else auto_models
+        self._disabled_auto_models: List[AutoCacheModels] = (
+            [] if disabled_auto_models is None else disabled_auto_models
         )
         self.auto_unused_attributes: Dict[Any, List[str]] = (
             {} if auto_unused_attributes is not None else auto_unused_attributes
@@ -105,9 +105,9 @@ class CacheManager:
         if hasattr(guild, "channels"):
             channels = guild.channels.values()
 
-            if AutoCacheModels.TEXT_CHANNELS not in self._auto_models:
+            if AutoCacheModels.TEXT_CHANNELS not in self._disabled_auto_models:
                 channels = filter(
-                    lambda channel: channel.type != ChannelType.GUILD_TEXT, channels
+                    lambda channel: channel.type == ChannelType.GUILD_TEXT, channels
                 )
 
             for sym in channels:

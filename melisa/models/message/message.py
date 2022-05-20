@@ -184,6 +184,10 @@ class Message(APIModelBase):
         Id of the message
     channel_id: :class:`~melisa.utils.types.snowflake.Snowflake`
         Id of the channel the message was sent in
+    channel: :class:`~melisa.models.guild.Channel`
+        Object of channel where message was sent in
+    guild: :class:`~melisa.models.guild.Guild`
+        Object of guild where message was sent in
     guild_id: :class:`~melisa.utils.types.snowflake.Snowflake`
         Id of the guild the message was sent in
     author: :class:`typing.Any`
@@ -350,6 +354,21 @@ class Message(APIModelBase):
             self.embeds.append(Embed.from_dict(embed))
 
         return self
+
+    @property
+    def guild(self):
+        if self.guild_id is not None:
+            return self._client.cache.get_guild(self.guild_id)
+        return None
+
+    @property
+    def channel(self):
+        print(self.channel_id)
+        print(self._client.cache._channel_symlinks)
+        if self.channel_id is not None:
+            return self._client.cache.get_guild_channel(self.channel_id)
+
+        return None
 
     async def pin(self, *, reason: Optional[str] = None):
         """|coro|
