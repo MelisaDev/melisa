@@ -40,6 +40,35 @@ We are trying to make our library optimized.
 We are going to create really cool Cache configuration, so don't worry about the RAM :)
 
 ---
+## Install MelisaPy
+
+At first clone this repo
+
+```commandline
+git clone https://github.com/MelisaDev/melisa
+```
+
+Second, move to `melisa` folder
+
+```commandline
+cd melisa
+```
+
+Third, build melisa package
+
+```commandline
+python setup.py build
+```
+
+And install
+
+```commandline
+python setup.py install
+```
+
+And you can use Melisa in your projects!
+
+---
 
 ## Events Listening
 
