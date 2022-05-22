@@ -116,6 +116,8 @@ class Channel(APIModelBase):
     guild_id: :class:`~melisa.utils.types.Snowflake`
         The id of the guild
         (may be missing for some channel objects received over gateway guild dispatches)
+    guild: Optional[:class:`~melisa.models.guild.Guild`]
+        Object of guild where channel is
     position: :class:`int`
         Sorting position of the channel
     permission_overwrites: :class:`typing.Any`
@@ -202,6 +204,12 @@ class Channel(APIModelBase):
     @property
     def mention(self):
         return f"<#{self.id}>"
+
+    @property
+    def guild(self):
+        if self.guild_id is not None:
+            return self._client.cache.get_guild(self.guild_id)
+        return None
 
     async def edit(self, *, reason: Optional[str] = None, **kwargs):
         """|coro|
@@ -769,7 +777,7 @@ class TextChannel(MessageableChannel):
         self: TextChannel = super().__new__(cls)
 
         self.id = data["id"]
-        self.type = data["type"]
+        self.type = ChannelType(data["type"])
         self.position = data.get("position")
         self.permission_overwrites = data["permission_overwrites"]
         self.name = data.get("name")
