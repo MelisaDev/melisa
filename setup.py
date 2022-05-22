@@ -33,7 +33,8 @@ packages = [
     'melisa.models.guild',
     'melisa.models.message',
     'melisa.models.user',
-    'melisa.utils'
+    'melisa.utils',
+    'melisa.core'
 ]
 
 setup(
