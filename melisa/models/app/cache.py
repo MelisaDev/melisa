@@ -137,7 +137,9 @@ class CacheManager:
         if channel is None:
             return None
 
-        channel = self.__remove_unused_attributes(channel, Channel)  # ToDo: add channel type
+        channel = self.__remove_unused_attributes(
+            channel, Channel
+        )  # ToDo: add channel type
 
         guild = self._raw_guilds.get(channel.guild_id, UNDEFINED)
 
@@ -211,7 +213,10 @@ class CacheManager:
             return
 
         guilds_dict = dict(
-            map(lambda i: (Snowflake(int(i["id"])), UnavailableGuild.from_dict(i)), guilds)
+            map(
+                lambda i: (Snowflake(int(i["id"])), UnavailableGuild.from_dict(i)),
+                guilds,
+            )
         )
 
         self._raw_guilds.update(guilds_dict)
@@ -234,3 +239,78 @@ class CacheManager:
             guild_id = Snowflake(int(guild_id))
 
         return self._raw_guilds.pop(guild_id, None)
+
+    def remove_guild_channel(self, channel_id: Union[Snowflake, str, int]):
+        """
+        Remove guild channel from cache
+
+        Parameters
+        ----------
+        channel_id: Optional[:class:`~melisa.utils.snowflake.Snowflake`, `str`, `int`]
+            ID of guild channel to remove from cache.
+        """
+
+        if self._disabled:
+            return
+
+        if not isinstance(channel_id, Snowflake):
+            channel_id = Snowflake(int(channel_id))
+
+        guild_id = self._channel_symlinks.pop(channel_id, None)
+
+        if guild_id is None:
+            return None
+
+        guild = self.get_guild(guild_id)
+
+        if guild is None:
+            return None
+
+        if hasattr(guild, "channels") is False:
+            return None
+
+        return guild.channels.pop(channel_id, None)
+
+    def set_guild_channel_last_message_id(
+        self,
+        channel_id: Union[Snowflake, str, int],
+        guild_id: Union[Snowflake, str, int],
+        message_id: Union[Snowflake, str, int],
+    ):
+        """
+        Set guild channel last message id
+
+        Parameters
+        ----------
+        channel_id: Optional[:class:`~melisa.utils.snowflake.Snowflake`, `str`, `int`]
+            ID of channel to set.
+        guild_id: Optional[:class:`~melisa.utils.snowflake.Snowflake`, `str`, `int`]
+            ID of guild to set.
+        message_id: Optional[:class:`~melisa.utils.snowflake.Snowflake`, `str`, `int`]
+            ID of message to set.
+        """
+        if not isinstance(channel_id, Snowflake):
+            channel_id = Snowflake(int(channel_id))
+
+        if not isinstance(guild_id, Snowflake):
+            guild_id = Snowflake(int(guild_id))
+
+        if not isinstance(message_id, Snowflake):
+            message_id = Snowflake(int(message_id))
+
+        guild = self.get_guild(guild_id)
+
+        if guild is None:
+            return None
+
+        if hasattr(guild, "channels") is False:
+            return None
+
+        if guild.channels.get(channel_id) is None:
+            return None
+
+        channel = self._raw_guilds[guild_id].channels[channel_id]
+
+        channel.last_message_id = message_id
+
+        self._raw_guilds[guild_id].channels[channel_id] = channel

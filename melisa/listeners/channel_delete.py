@@ -8,9 +8,9 @@ from ..models.guild.channel import ChannelType, _choose_channel_type
 
 
 async def channel_delete_listener(self, gateway, payload: dict):
-    payload.update({"type": ChannelType(payload.pop("type"))})
-
     channel = _choose_channel_type(payload)
+
+    self.cache.remove_guild_channel(channel.id)
 
     await self.dispatch("on_channel_delete", (channel,))
 
