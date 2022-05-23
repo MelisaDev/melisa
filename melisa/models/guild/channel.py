@@ -779,13 +779,13 @@ class TextChannel(MessageableChannel):
         self.id = data["id"]
         self.type = ChannelType(data["type"])
         self.position = data.get("position")
-        self.permission_overwrites = data["permission_overwrites"]
+        self.permission_overwrites = data.get("permission_overwrites")
         self.name = data.get("name")
         self.topic = data.get("topic")
         self.nsfw = data.get("nsfw")
 
         if data.get("last_message_id") is not None:
-            self.last_message_id = Snowflake(data["last_message_id"])
+            self.last_message_id = Snowflake(data.get("last_message_id", 0))
         else:
             self.last_message_id = None
 
@@ -802,7 +802,7 @@ class TextChannel(MessageableChannel):
             self.parent_id = None
 
         if data.get("last_pin_timestamp") is not None:
-            self.last_pin_timestamp = Timestamp.parse(data["last_pin_timestamp"])
+            self.last_pin_timestamp = Timestamp.parse(data.get("last_pin_timestamp", 0))
         else:
             self.last_pin_timestamp = None
 

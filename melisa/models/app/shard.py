@@ -10,6 +10,10 @@ from ..user import Activity
 
 
 class Shard:
+    _num_shards: int
+    _shard_id: int
+    _gateway: Gateway
+
     def __init__(self, client, shard_id: int, num_shards: int):
         self._client = client
 

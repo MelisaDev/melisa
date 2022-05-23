@@ -10,16 +10,14 @@ from typing import List, Any, Optional, overload, Dict
 from .channel import (
     Channel,
     ChannelType,
-    channel_types_for_converting,
     ThreadsList,
     Thread,
     _choose_channel_type,
-    NoneTypedChannel,
 )
 from ...utils import Snowflake, Timestamp
 from ...utils.api_model import APIModelBase
 from ...utils.conversion import try_enum
-from ...utils.types import APINullable, UNDEFINED
+from ...utils.types import APINullable
 
 
 class DefaultMessageNotificationLevel(IntEnum):
@@ -302,11 +300,11 @@ class Guild(APIModelBase):
     """
 
     id: Snowflake
-    roles: APINullable[List]
-    emojis: APINullable[List]
-    members: APINullable[List]
+    roles: APINullable[Dict]
+    emojis: APINullable[Dict]
+    members: APINullable[Dict]
     threads: APINullable[Dict]
-    presences: APINullable[List]
+    presences: APINullable[Dict]
     channels: APINullable[Dict]
     name: APINullable[str] = None
     icon: APINullable[str] = None
