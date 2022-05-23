@@ -3,16 +3,12 @@ import datetime
 from melisa import Embed, Timestamp, Color
 
 dict_embed = {
-    'title': 'my title',
-    'description': 'simple description',
-    'color': 252307,
-    'timestamp': datetime.datetime.utcfromtimestamp(1649748784).isoformat(),
-    'footer': {
-        'text': 'cool footer text'
-    },
-    'author': {
-        'name': 'best author'
-    },
+    "title": "my title",
+    "description": "simple description",
+    "color": 252307,
+    "timestamp": datetime.datetime.utcfromtimestamp(1649748784).isoformat(),
+    "footer": {"text": "cool footer text"},
+    "author": {"name": "best author"},
 }
 
 EMBED = Embed(title="my title", description="simple description")

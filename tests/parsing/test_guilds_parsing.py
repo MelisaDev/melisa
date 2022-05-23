@@ -16,7 +16,7 @@ guild_data = {
         "MORE_EMOJI",
         "INVITE_SPLASH",
         "BANNER",
-        "COMMUNITY"
+        "COMMUNITY",
     ],
     "emojis": [],
     "banner": "9b6439a7de04f1d26af92f84ac9e1e4a",
@@ -41,7 +41,7 @@ guild_data = {
     "system_channel_flags": 0,
     "preferred_locale": "en-US",
     "rules_channel_id": "441688182833020939",
-    "public_updates_channel_id": "281283303326089216"
+    "public_updates_channel_id": "281283303326089216",
 }
 
 parsed_model = Guild.from_dict(guild_data)
@@ -60,5 +60,5 @@ class TestGuildParsing:
             "MORE_EMOJI",
             "INVITE_SPLASH",
             "BANNER",
-            "COMMUNITY"
+            "COMMUNITY",
         ]
