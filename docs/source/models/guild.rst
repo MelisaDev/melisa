@@ -33,6 +33,24 @@ TextChannel
 .. autoclass:: TextChannel()
     :inherited-members:
 
+NoneTypedChannel
+~~~~~~~~~~~~~~~~~~
+
+.. attributetable:: NoneTypedChannel
+
+.. autoclass:: NoneTypedChannel()
+    :inherited-members:
+
+Member
+------
+
+GuildMember
+~~~~~~~~~~~~~~~~~~
+
+.. attributetable:: GuildMember
+
+.. autoclass:: GuildMember()
+    :inherited-members:
 
 Guild
 ------
@@ -122,4 +140,20 @@ ThreadsList
 .. attributetable:: ThreadsList
 
 .. autoclass:: ThreadsList()
+    :inherited-members:
+
+
+Webhook
+-------
+
+WebhookType
+~~~~~~~~~~~
+
+.. autoclass:: WebhookType()
+
+Webhook
+~~~~~~~~~~~~~
+.. attributetable:: Webhook
+
+.. autoclass:: Webhook()
     :inherited-members:

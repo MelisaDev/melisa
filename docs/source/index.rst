@@ -7,6 +7,7 @@ Welcome to Melisa's documentation!
 
    client
    models/index
+   cache
 
 
 Indices and tables

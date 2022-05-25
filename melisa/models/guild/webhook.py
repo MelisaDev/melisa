@@ -22,18 +22,18 @@ class WebhookType(IntEnum):
 
     Attributes
     ----------
-    Incoming:
+    INCOMING:
         Incoming Webhooks can post messages to channels with a generated token
-    Channel_Follower:
+    CHANNEL_FOLLOWER:
         Channel Follower Webhooks are internal webhooks used with Channel Following
         to post new messages into channels
-    Application:
+    APPLICATION:
         Application webhooks are webhooks used with Interactions
     """
 
-    Incoming = 1
-    Channel_Follower = 2
-    Application = 3
+    INCOMING = 1
+    CHANNEL_FOLLOWER = 2
+    APPLICATION = 3
 
     def __int__(self):
         return self.value
