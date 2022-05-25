@@ -1,6 +1,7 @@
 import pytest
 
-from melisa import CacheManager, Snowflake, Guild, TextChannel
+from melisa import Snowflake, Guild, TextChannel
+from melisa.cache import CacheManager
 
 
 class TestCache:

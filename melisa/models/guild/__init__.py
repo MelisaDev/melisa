@@ -21,7 +21,7 @@ from .channel import (
     TextChannel,
     Thread,
     ThreadsList,
-    _choose_channel_type
+    _choose_channel_type,
 )
 from .thread import *
 from .webhook import *

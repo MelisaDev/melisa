@@ -136,7 +136,7 @@ class RESTApp:
         files: List[File] = None,
         allowed_mentions: AllowedMentions = None,
         delete_after: int = None,
-        _client_allowed_mentions: AllowedMentions = None
+        _client_allowed_mentions: AllowedMentions = None,
     ) -> Message:
         """|coro|
 
@@ -333,7 +333,9 @@ class RESTApp:
 
         return Message.from_dict(message)
 
-    async def fetch_channel_pins(self, channel_id: Union[Snowflake, int, str]) -> AsyncIterator[Message]:
+    async def fetch_channel_pins(
+        self, channel_id: Union[Snowflake, int, str]
+    ) -> AsyncIterator[Message]:
         """|coro|
 
         Retrieves all messages that are currently pinned in the channel.

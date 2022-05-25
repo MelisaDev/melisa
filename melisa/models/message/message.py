@@ -340,7 +340,7 @@ class Message(APIModelBase):
         )
         self.interaction = data.get("interaction")
         self.thread = (
-            Thread.from_dict(data['thread']) if data.get("thread") is not None else None
+            Thread.from_dict(data["thread"]) if data.get("thread") is not None else None
         )
         self.components = data.get("components")
         self.sticker_items = data.get("sticker_items")

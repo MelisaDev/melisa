@@ -14,7 +14,7 @@ from typing import (
     Union,
     Dict,
     overload,
-    TYPE_CHECKING
+    TYPE_CHECKING,
 )
 
 from ...utils import Snowflake, Timestamp
@@ -380,7 +380,9 @@ class MessageableChannel(Channel):
             An iterator of messages.
         """
 
-        data = self._client.rest.get_channel_messages_history(self.id, limit, around=around, before=before, after=after)
+        data = self._client.rest.get_channel_messages_history(
+            self.id, limit, around=around, before=before, after=after
+        )
 
         for i in data:
             yield i
@@ -536,7 +538,18 @@ class MessageableChannel(Channel):
             Some of specified parameters is invalid.
         """
 
-        return self._client.rest.create_message(self.id, content, tts=tts, embed=embed, embeds=embeds, file=file, files=files, allowed_mentions=allowed_mentions, delete_after=delete_after, _client_allowed_mentions=self._client.allowed_mentions)
+        return self._client.rest.create_message(
+            self.id,
+            content,
+            tts=tts,
+            embed=embed,
+            embeds=embeds,
+            file=file,
+            files=files,
+            allowed_mentions=allowed_mentions,
+            delete_after=delete_after,
+            _client_allowed_mentions=self._client.allowed_mentions,
+        )
 
     async def purge(
         self,

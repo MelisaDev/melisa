@@ -1,9 +1,7 @@
 # Copyright MelisaDev 2022 - Present
 # Full MIT License can be found in `LICENSE.txt` at the project root.
 
-from .client import (
-    Client, Bot
-)
+from .client import Client, Bot
 from .models import *
 from .exceptions import *
 
