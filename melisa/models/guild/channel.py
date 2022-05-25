@@ -14,19 +14,18 @@ from typing import (
     Union,
     Dict,
     overload,
-    TYPE_CHECKING,
+    TYPE_CHECKING
 )
 
-from ..message.file import File, create_form
-from ..message.message import Message, AllowedMentions
-from ...exceptions import EmbedFieldError
-from ...models.message.embed import Embed
 from ...utils import Snowflake, Timestamp
 from ...utils.api_model import APIModelBase
-from ...utils.types import APINullable, UNDEFINED
+from ...utils.types import APINullable
+from .thread import ThreadMember, ThreadMetadata
 
 if TYPE_CHECKING:
-    from .thread import ThreadMember, ThreadMetadata
+    from ...models.message.embed import Embed
+    from ..message.file import File
+    from ..message.message import AllowedMentions, Message
 
 
 def _choose_channel_type(data):
@@ -381,32 +380,10 @@ class MessageableChannel(Channel):
             An iterator of messages.
         """
 
-        # ToDo: Add check parameter
+        data = self._client.rest.get_channel_messages_history(self.id, limit, around=around, before=before, after=after)
 
-        if limit is None:
-            limit = 100
-
-        while limit > 0:
-            search_limit = min(limit, 100)
-
-            raw_messages = await self._http.get(
-                f"/channels/{self.id}/messages",
-                params={
-                    "limit": search_limit,
-                    "before": before,
-                    "after": after,
-                    "around": around,
-                },
-            )
-
-            if not raw_messages:
-                break
-
-            for message_data in raw_messages:
-                yield Message.from_dict(message_data)
-
-            before = raw_messages[-1]["id"]
-            limit -= search_limit
+        for i in data:
+            yield i
 
     async def fetch_message(
         self,
@@ -434,11 +411,7 @@ class MessageableChannel(Channel):
             Message object.
         """
 
-        message = await self._http.get(
-            f"/channels/{self.id}/messages/{message_id}",
-        )
-
-        return Message.from_dict(message)
+        return self._client.rest.fetch_message(self.id, message_id)
 
     async def pins(self) -> AsyncIterator[Message]:
         """|coro|
@@ -456,12 +429,10 @@ class MessageableChannel(Channel):
             AsyncIterator of Message objects.
         """
 
-        messages = await self._http.get(
-            f"/channels/{self.id}/pins",
-        )
+        data = self._client.rest.fetch_channel_pins(self.id)
 
-        for message in messages:
-            yield Message.from_dict(message)
+        for i in data:
+            yield i
 
     async def bulk_delete_messages(
         self, messages: List[Snowflake], *, reason: Optional[str] = None
@@ -565,45 +536,7 @@ class MessageableChannel(Channel):
             Some of specified parameters is invalid.
         """
 
-        # ToDo: Add other parameters
-        # ToDo: add file checks
-
-        if embeds is None:
-            embeds = [embed.to_dict()] if embed is not None else []
-        if files is None:
-            files = [file] if file is not None else []
-
-        payload = {"content": str(content) if content is not None else None}
-
-        for _embed in embeds:
-            if embed.total_length() > 6000:
-                raise EmbedFieldError.characters_from_desc(
-                    "Embed", embed.total_length(), 6000
-                )
-
-        payload["embeds"] = embeds
-        payload["tts"] = tts
-
-        # ToDo: add auto allowed_mentions from client
-        if allowed_mentions is not None:
-            payload["allowed_mentions"] = allowed_mentions.to_dict()
-        elif self._client.allowed_mentions is not None:
-            payload["allowed_mentions"] = self._client.allowed_mentions.to_dict()
-
-        content_type, data = create_form(payload, files)
-
-        message_data = Message.from_dict(
-            await self._http.post(
-                f"/channels/{self.id}/messages",
-                data=data,
-                headers={"Content-Type": content_type},
-            )
-        )
-
-        if delete_after:
-            await message_data.delete(delay=delete_after)
-
-        return message_data
+        return self._client.rest.create_message(self.id, content, tts=tts, embed=embed, embeds=embeds, file=file, files=files, allowed_mentions=allowed_mentions, delete_after=delete_after, _client_allowed_mentions=self._client.allowed_mentions)
 
     async def purge(
         self,

@@ -12,8 +12,11 @@ from .embed import Embed
 from ...utils import Snowflake, Timestamp, try_enum, APIModelBase
 from ...utils.types import APINullable, UNDEFINED
 
-if TYPE_CHECKING:
-    from ..guild.channel import Thread, _choose_channel_type
+# if TYPE_CHECKING:
+# from . import Thread, _choose_channel_type
+
+from ..guild.channel import Thread, _choose_channel_type
+from ..guild.member import GuildMember
 
 
 class MessageType(IntEnum):
@@ -190,10 +193,8 @@ class Message(APIModelBase):
         Object of guild where message was sent in
     guild_id: :class:`~melisa.utils.types.snowflake.Snowflake`
         Id of the guild the message was sent in
-    author: :class:`typing.Any`
-        The author of this message (not guaranteed to be a valid user, see below)
-    member: :class:`typing.Any`
-        Member properties for this message's author
+    author: :class:`~melisa.models.guild.member.GuildMember`
+        The author of this message.
     content: :class:`str`
         Contents of the message
     timestamp: :class:`~melisa.utils.timestamp.Timestamp`
@@ -251,8 +252,7 @@ class Message(APIModelBase):
     id: APINullable[Snowflake] = None
     channel_id: APINullable[Snowflake] = None
     guild_id: APINullable[Snowflake] = None
-    author: APINullable[Dict] = None
-    member: APINullable[Dict] = None
+    author: APINullable[GuildMember] = None
     content: APINullable[str] = None
     timestamp: APINullable[Timestamp] = None
     edited_timestamp: APINullable[Timestamp] = None
@@ -291,13 +291,16 @@ class Message(APIModelBase):
         """
         self: Message = super().__new__(cls)
 
+        _member = data.get("member")
+
+        _member.update({"user": data.get("author")})
+
         self.id = data["id"]
         self.channel_id = Snowflake(data["channel_id"])
         self.guild_id = (
             Snowflake(data["guild_id"]) if data.get("guild_id") is not None else None
         )
-        self.author = data.get("author")  # ToDo: User object
-        self.member = data.get("member")
+        self.author = _member
         self.content = data.get("content", "")
         self.timestamp = Timestamp.parse(data["timestamp"])
         self.edited_timestamp = (
@@ -337,7 +340,7 @@ class Message(APIModelBase):
         )
         self.interaction = data.get("interaction")
         self.thread = (
-            Thread.from_dict(data["thread"]) if data.get("thread") is not None else None
+            Thread.from_dict(data['thread']) if data.get("thread") is not None else None
         )
         self.components = data.get("components")
         self.sticker_items = data.get("sticker_items")
@@ -363,8 +366,6 @@ class Message(APIModelBase):
 
     @property
     def channel(self):
-        print(self.channel_id)
-        print(self._client.cache._channel_symlinks)
         if self.channel_id is not None:
             return self._client.cache.get_guild_channel(self.channel_id)
 

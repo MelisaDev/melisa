@@ -6,9 +6,10 @@ from __future__ import annotations
 from enum import Enum
 from typing import List, Dict, Optional, Any, Union
 
-from melisa.utils.types import UNDEFINED
-from melisa.models.guild import Guild, ChannelType, UnavailableGuild, Channel
-from melisa.utils.snowflake import Snowflake
+from .utils.types import UNDEFINED
+from .models.guild.guild import Guild, UnavailableGuild
+from .models.guild.channel import ChannelType, Channel
+from .utils.snowflake import Snowflake
 
 
 class AutoCacheModels(Enum):

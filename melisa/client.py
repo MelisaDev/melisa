@@ -8,7 +8,7 @@ import sys
 import traceback
 from typing import Dict, List, Union, Any, Iterable, Optional, Callable
 
-from .models.app.cache import CacheManager
+from .cache import CacheManager
 from .rest import RESTApp
 from .core.gateway import GatewayBotInfo
 from .models.guild.channel import Channel, ChannelType

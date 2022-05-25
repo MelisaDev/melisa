@@ -4,20 +4,24 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import IntEnum, Enum
-from typing import List, Any, Optional, overload, Dict
+from enum import IntEnum
+from typing import List, Any, Optional, overload, Dict, TYPE_CHECKING
 
 from .channel import (
-    Channel,
-    ChannelType,
     ThreadsList,
     Thread,
     _choose_channel_type,
 )
+
+
+from .member import GuildMember
 from ...utils import Snowflake, Timestamp
 from ...utils.api_model import APIModelBase
 from ...utils.conversion import try_enum
 from ...utils.types import APINullable
+
+if TYPE_CHECKING:
+    from .channel import ChannelType, Channel
 
 
 class DefaultMessageNotificationLevel(IntEnum):
@@ -244,7 +248,7 @@ class Guild(APIModelBase):
         Total number of members in this guild
     voice_states:
         States of members currently in voice channels; lacks the `guild_id` key
-    members: APINullable[:class:`typing.Any`]
+    members: APINullable[:class:`~melisa.models.guild.member.GuildMember`]
         Users in the guild
     channels: APINullable[Dict[:class:`~melisa.models.guild.channel.Channel`]]
         Channels in the guild
@@ -457,11 +461,15 @@ class Guild(APIModelBase):
         self.owner = None if data.get("owner") is None else data["owner"]
         self.large = None if self.member_count == 0 else self.member_count >= 250
         self.voice_states = data.get("voice_states")
-        self.members = data.get("members")
         self.presences = data.get("presences")
 
         self.threads = {}
         self.channels = {}
+        self.members = {}
+
+        for member in data.get("members", []):
+            member = GuildMember.from_dict(member)
+            self.members[member.user.id] = member
 
         for thread in data.get("threads", []):
             self.threads[thread["id"]] = Thread.from_dict(thread)

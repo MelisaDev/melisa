@@ -53,6 +53,7 @@ class GuildMember(APIModelBase):
     guild_id: List[:class:`~melisa.utils.snowflake.Snowflake`]
         The id of the guild this member belongs to.
     """
+
     user: APINullable[User] = None
     nick: APINullable[str] = None
     guild_avatar: APINullable[str] = None
@@ -91,17 +92,31 @@ class GuildMember(APIModelBase):
 
         self: GuildMember = super().__new__(cls)
 
-        self.user = User.from_dict(data['user']) if data.get('user') is not None else None
+        self.user = (
+            User.from_dict(data["user"]) if data.get("user") is not None else None
+        )
         self.nick = data.get("nick")
-        self.guild_avatar = data.get('avatar')
-        self.role_ids = [Snowflake(x) for x in data['roles']]
-        self.joined_at = Timestamp.parse(data['joined_at']) if data.get('joined_at') is not None else None
-        self.premium_since = Timestamp.parse(data['premium_since']) if data.get('premium_since') is not None else None
+        self.guild_avatar = data.get("avatar")
+        self.role_ids = [Snowflake(x) for x in data["roles"]]
+        self.joined_at = (
+            Timestamp.parse(data["joined_at"])
+            if data.get("joined_at") is not None
+            else None
+        )
+        self.premium_since = (
+            Timestamp.parse(data["premium_since"])
+            if data.get("premium_since") is not None
+            else None
+        )
         self.is_deaf = data.get("deaf")
         self.is_mute = data.get("mute")
         self.is_pending = data.get("pending")
         self.permissions = data.get("permissions")
-        self.communication_disabled_until = Timestamp.parse(data['communication_disabled_until']) if data.get('communication_disabled_until') is not None else None
+        self.communication_disabled_until = (
+            Timestamp.parse(data["communication_disabled_until"])
+            if data.get("communication_disabled_until") is not None
+            else None
+        )
         self.guild_id = data.get("guild_id")
 
         return self

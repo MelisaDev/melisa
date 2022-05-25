@@ -5,30 +5,7 @@ from __future__ import annotations
 
 import io
 import os
-from typing import Union, Dict, Any, List, Tuple
-
-from aiohttp import FormData, Payload
-
-import melisa.utils.json as json
-
-
-def create_form(payload: Dict[str, Any], files: List[File]):
-    """
-    Creates an aiohttp payload from an array of File objects.
-    """
-    form = FormData()
-    form.add_field("payload_json", json.dumps(payload))
-
-    for index, file in enumerate(files):
-        form.add_field(
-            "file",
-            file.filepath,
-            filename=file.filename,
-            content_type="application/octet-stream",
-        )
-
-    payload = form()
-    return payload.headers["Content-Type"], payload
+from typing import Union
 
 
 class File:
