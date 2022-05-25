@@ -27,3 +27,4 @@ from .thread import *
 from .webhook import *
 from .emoji import *
 from .role import *
+from .member import GuildMember

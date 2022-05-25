@@ -90,11 +90,6 @@ SystemChannelFlags
 
 .. autoclass:: SystemChannelFlags()
 
-GuildFeatures
-~~~~~~~~~~~~~~~~
-
-.. autoclass:: GuildFeatures()
-
 Guild
 ~~~~~
 .. attributetable:: Guild

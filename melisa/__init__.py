@@ -4,6 +4,8 @@
 from .client import Client, Bot
 from .models import *
 from .exceptions import *
+from .rest import RESTApp
+from .cache import (CacheManager, AutoCacheModels)
 
 __package__ = "melisa"
 __title__ = "Melisa"
