@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Dict
+from typing import List, Dict, Optional, Union
 
 from melisa.utils.timestamp import Timestamp
 from melisa.utils.snowflake import Snowflake
@@ -120,3 +120,9 @@ class GuildMember(APIModelBase):
         self.guild_id = data.get("guild_id")
 
         return self
+
+    async def timeout(self, *, duration: Optional[float] = None,
+                      until: Optional[Timestamp] = None):
+        """
+
+        """

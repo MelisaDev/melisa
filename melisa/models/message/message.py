@@ -300,7 +300,7 @@ class Message(APIModelBase):
         self.guild_id = (
             Snowflake(data["guild_id"]) if data.get("guild_id") is not None else None
         )
-        self.author = _member
+        self.author = GuildMember.from_dict(_member)
         self.content = data.get("content", "")
         self.timestamp = Timestamp.parse(data["timestamp"])
         self.edited_timestamp = (

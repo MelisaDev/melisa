@@ -360,7 +360,7 @@ class Embed(APIModelBase):
 
         return self
 
-    def set_timestamp(self, time: Union[Timestamp, datetime]) -> Embed:
+    def set_timestamp(self, time: datetime) -> Embed:
         """Sets timestamp in the supported by discord format.
 
         Parameters
