@@ -3,13 +3,14 @@
 
 from __future__ import annotations
 
+import datetime
 from dataclasses import dataclass
 from typing import List, Dict, Optional, Union
 
 from melisa.utils.timestamp import Timestamp
 from melisa.utils.snowflake import Snowflake
 from melisa.models.user.user import User
-from melisa.utils.types import APINullable
+from melisa.utils.types import APINullable, UNDEFINED
 from melisa.utils.api_model import APIModelBase
 
 
@@ -59,12 +60,12 @@ class GuildMember(APIModelBase):
     guild_avatar: APINullable[str] = None
     role_ids: List[Snowflake] = None
     joined_at: APINullable[Timestamp] = None
-    premium_since: APINullable[Timestamp] = None
+    premium_since: APINullable[datetime.datetime] = None
     is_deaf: bool = None
     is_mute: bool = None
     is_pending: APINullable[bool] = None
     permissions: APINullable[str] = None
-    communication_disabled_until: APINullable[Timestamp] = None
+    communication_disabled_until: APINullable[datetime.datetime] = None
     guild_id: APINullable[Snowflake] = None
 
     def make_guild_avatar_url(self, size: int = 1024) -> str:
@@ -122,7 +123,37 @@ class GuildMember(APIModelBase):
         return self
 
     async def timeout(self, *, duration: Optional[float] = None,
-                      until: Optional[Timestamp] = None):
+                      until: Optional[datetime.datetime] = None):
+        """|coro|
+
+        Times out the member from the guild;
+        until then, the member will not be able to interact with the guild.
+
+        **Required permissions:** ``MODERATE_MEMBERS``
+
+        duration: Optional[class:`float`]
+            The duration (seconds) of the member's timeout. Set to ``None`` to remove the timeout.
+            Supports up to 28 days in the future.
+        until: Optional[:class:`datetime.datetime`]
+            The expiry date/time of the member's timeout. Set to ``None`` to remove the timeout.
+            Supports up to 28 days in the future.
         """
 
-        """
+        if duration is None and until is None:
+            await self._client.rest.modify_guild_member(
+                self.guild_id,
+                self.user.id,
+                communication_disabled_until=None
+            )
+        elif duration is not None:
+            await self._client.rest.modify_guild_member(
+                self.guild_id,
+                self.user.id,
+                communication_disabled_until=datetime.datetime.utcnow() + datetime.timedelta(seconds=duration)
+            )
+        else:
+            await self._client.rest.modify_guild_member(
+                self.guild_id,
+                self.user.id,
+                communication_disabled_until=until
+            )

@@ -291,15 +291,20 @@ class Message(APIModelBase):
         """
         self: Message = super().__new__(cls)
 
-        _member = data.get("member")
-
-        _member.update({"user": data.get("author")})
-
         self.id = data["id"]
         self.channel_id = Snowflake(data["channel_id"])
         self.guild_id = (
             Snowflake(data["guild_id"]) if data.get("guild_id") is not None else None
         )
+
+        _member = data.get("member")
+
+        if _member is None:
+            _member = {}
+
+        _member.update({"user": data.get("author")})
+        _member.update({"guild_id": self.guild_id})
+
         self.author = GuildMember.from_dict(_member)
         self.content = data.get("content", "")
         self.timestamp = Timestamp.parse(data["timestamp"])

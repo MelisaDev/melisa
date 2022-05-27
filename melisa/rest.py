@@ -51,7 +51,8 @@ class RESTApp:
         self._http: HTTPClient = HTTPClient(token)
 
     async def fetch_user(self, user_id: Union[Snowflake, int, str]) -> User:
-        """
+        """|coro|
+
         [**REST API**] Fetch User from the Discord API (by id).
 
         Parameters
@@ -65,7 +66,8 @@ class RESTApp:
         return User.from_dict(data)
 
     async def fetch_guild(self, guild_id: Union[Snowflake, int, str]) -> Guild:
-        """
+        """|coro|
+
         [**REST API**] Fetch Guild from the Discord API (by id).
 
         Parameters
@@ -79,7 +81,8 @@ class RESTApp:
         return Guild.from_dict(data)
 
     async def fetch_channel(self, channel_id: Union[Snowflake, str, int]) -> Channel:
-        """
+        """|coro|
+
         [**REST API**] Fetch Channel from the Discord API (by id).
 
         Parameters
