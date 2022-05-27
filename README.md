@@ -28,7 +28,7 @@
 THIS LIBRARY IS CURRENTLY UNDER DEVELOPMENT!
 </h2>
 
-<h3 align="center">Every provided example or a feature is not ready or may sbe changed in the future</h3>
+<h3 align="center">Every provided example or a feature is not ready or may be changed in the future</h3>
 
 ## About
 <strong>MelisaPy</strong> is a Discord microframework for Python 3 
@@ -37,7 +37,7 @@ for the [Discord API](https://discord.com/developers/docs/intro).
 It supports Discord V10 REST API and Gateway
 
 We are trying to make our library optimized. 
-We are going to create really cool Cache configuration, so don't worry about the RAM :)
+We are going to create really cool cache configuration, so don't worry about the RAM :)
 
 ---
 
