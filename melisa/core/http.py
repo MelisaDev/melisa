@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from urllib.parse import quote
 from typing import Dict, Optional, Any
 
 from aiohttp import ClientSession, ClientResponse
@@ -84,6 +85,11 @@ class HTTPClient:
         await self.__rate_limiter.wait_until_not_ratelimited(endpoint, method)
 
         url = f"{self.url}/{endpoint}"
+
+        if headers is not None and headers.get("X-Audit-Log-Reason") is not None:
+            headers["X-Audit-Log-Reason"] = quote(
+                headers["X-Audit-Log-Reason"], safe="/ "
+            )
 
         async with self.__aiohttp_session.request(
             method,
