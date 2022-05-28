@@ -534,3 +534,83 @@ class RESTApp:
             data={"delete_message_days": delete_message_days},
             headers={"X-Audit-Log-Reason": reason},
         )
+
+    async def add_guild_member_role(
+        self,
+        guild_id: Union[Snowflake, str, int],
+        user_id: Union[Snowflake, str, int],
+        role_id: Union[Snowflake, str, int],
+        *,
+        reason: Optional[str] = None,
+    ):
+        """|coro|
+
+        [**REST API**] Adds a role to a guild member.
+
+        **Required permissions:** ``MANAGE_ROLES``
+
+        Parameters
+        ----------
+        guild_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
+            Id of guild where we will give member role
+        user_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
+            Id of user to operate with.
+        role_id: Optional[:class:`int`]
+            Id of role to give.
+        reason: Optional[:class:`str`]
+            The reason of the action.
+
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have proper permissions to do the actions required.
+        BadRequestError
+            You provided a wrong guild, user or something else
+        """
+
+        await self._http.put(
+            f"guilds/{guild_id}/members/{user_id}/roles/{role_id}",
+            headers={"X-Audit-Log-Reason": reason},
+        )
+
+    async def remove_guild_member_role(
+        self,
+        guild_id: Union[Snowflake, str, int],
+        user_id: Union[Snowflake, str, int],
+        role_id: Union[Snowflake, str, int],
+        *,
+        reason: Optional[str] = None,
+    ):
+        """|coro|
+
+        [**REST API**] Removes a role from a guild member.
+
+        **Required permissions:** ``MANAGE_ROLES``
+
+        Parameters
+        ----------
+        guild_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
+            Id of guild where we will remove member role
+        user_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
+            Id of user to operate with.
+        role_id: Optional[:class:`int`]
+            Id of role to remove.
+        reason: Optional[:class:`str`]
+            The reason of the action.
+
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have proper permissions to do the actions required.
+        BadRequestError
+            You provided a wrong guild, user or something else
+        """
+
+        await self._http.delete(
+            f"guilds/{guild_id}/members/{user_id}/roles/{role_id}",
+            headers={"X-Audit-Log-Reason": reason},
+        )

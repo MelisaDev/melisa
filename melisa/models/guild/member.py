@@ -242,3 +242,69 @@ class GuildMember(APIModelBase):
             delete_message_days=delete_message_days,
             reason=reason,
         )
+
+    async def add_role(
+        self,
+        role_id: Union[Snowflake, str, int],
+        *,
+        reason: Optional[str] = None,
+    ):
+        """|coro|
+
+        Add a role to a guild member.
+
+        **Required permissions:** ``MANAGE_ROLES``
+
+        Parameters
+        ----------
+        role_id: Optional[:class:`int`]
+            Id of role to add.
+        reason: Optional[:class:`str`]
+            The reason of the action.
+
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have proper permissions to do the actions required.
+        BadRequestError
+            You provided a wrong guild, user or something else
+        """
+
+        await self._client.rest.add_guild_member_role(
+            self.guild_id, self.user.id, role_id, reason=reason
+        )
+
+    async def remove_role(
+        self,
+        role_id: Union[Snowflake, str, int],
+        *,
+        reason: Optional[str] = None,
+    ):
+        """|coro|
+
+        Add a role to remove from a guild member.
+
+        **Required permissions:** ``MANAGE_ROLES``
+
+        Parameters
+        ----------
+        role_id: Optional[:class:`int`]
+            Id of role to remove.
+        reason: Optional[:class:`str`]
+            The reason of the action.
+
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have proper permissions to do the actions required.
+        BadRequestError
+            You provided a wrong guild, user or something else
+        """
+
+        await self._client.rest.remove_guild_member_role(
+            self.guild_id, self.user.id, role_id, reason=reason
+        )
