@@ -2,16 +2,15 @@ import re
 
 from setuptools import setup
 
-extras_require = {
-    'speed': [
-        'orjson>=3.5.4'
-    ]
-}
 
+extras_require = []
 requirements = []
 
 with open('requirements.txt', encoding='utf-8') as file:
     requirements = file.read().splitlines()
+
+with open('speed-requirements.txt', encoding='utf-8') as file:
+    extras_require = file.read().splitlines()
 
 with open('melisa/__init__.py', encoding='utf-8') as file:
     version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', file.read(), re.MULTILINE).group(1)
@@ -39,7 +38,7 @@ packages = [
 
 setup(
     name='melisa',
-    author='gray-cat, TheMisterSenpai',
+    author='grey-cat, TheMisterSenpai',
     url='https://github.com/MelisaDev/melisa',
     version=version,
     packages=packages,
@@ -48,6 +47,7 @@ setup(
     long_description=readme,
     long_description_content_type="text/markdown",
     include_package_data=True,
+    python_requires='>=3.8',
     install_requires=requirements,
     extras_require=extras_require,
     classifiers=[
