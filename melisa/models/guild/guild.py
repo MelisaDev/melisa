@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import IntEnum
-from typing import List, Any, Optional, overload, Dict, TYPE_CHECKING
+from typing import List, Any, Optional, overload, Dict, TYPE_CHECKING, Union
 
 from .channel import (
     ThreadsList,
@@ -574,6 +574,38 @@ class Guild(APIModelBase):
         return ThreadsList.from_dict(
             await self._http.get(f"/guilds/{self.id}/threads/active")
         )
+
+    async def unban(
+        self,
+        user_id: Union[Snowflake, str, int],
+        *,
+        reason: Optional[str] = None,
+    ):
+        """|coro|
+
+        Remove the ban for a user.
+
+        **Required permissions:** ``BAN_MEMBERS``
+
+        Parameters
+        ----------
+        user_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
+            Id of user to operate with.
+        reason: Optional[:class:`str`]
+            The reason of the action.
+
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have proper permissions to do the actions required.
+        BadRequestError
+            You provided a wrong guild, user or something else
+            Or if the user is not banned
+        """
+
+        await self._client.rest.remove_guild_ban(self.id, user_id, reason=reason)
 
 
 @dataclass(repr=False)
