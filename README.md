@@ -40,6 +40,15 @@ We are trying to make our library optimized.
 We are going to create really cool cache configuration, so don't worry about the RAM :)
 
 ---
+## Install MelisaPy
+
+NOTE: Currently, installation is only possible using GitHub
+
+```commandline
+pip install git+https://github.com/MelisaDev/melisa
+```
+
+---
 
 ## Events Listening
 
