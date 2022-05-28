@@ -96,11 +96,11 @@ class RESTApp:
         return _choose_channel_type(data)
 
     async def delete_message(
-            self,
-            channel_id: Union[Snowflake, str, int],
-            message_id: Union[Snowflake, str, int],
-            *,
-            reason: Optional[str] = None,
+        self,
+        channel_id: Union[Snowflake, str, int],
+        message_id: Union[Snowflake, str, int],
+        *,
+        reason: Optional[str] = None,
     ):
         """|coro|
 
@@ -129,18 +129,18 @@ class RESTApp:
         )
 
     async def create_message(
-            self,
-            channel_id: Union[Snowflake, str, int],
-            content: str = None,
-            *,
-            tts: bool = False,
-            embed: Embed = None,
-            embeds: List[Embed] = None,
-            file: File = None,
-            files: List[File] = None,
-            allowed_mentions: AllowedMentions = None,
-            delete_after: int = None,
-            _client_allowed_mentions: AllowedMentions = None,
+        self,
+        channel_id: Union[Snowflake, str, int],
+        content: str = None,
+        *,
+        tts: bool = False,
+        embed: Embed = None,
+        embeds: List[Embed] = None,
+        file: File = None,
+        files: List[File] = None,
+        allowed_mentions: AllowedMentions = None,
+        delete_after: int = None,
+        _client_allowed_mentions: AllowedMentions = None,
     ) -> Message:
         """|coro|
 
@@ -224,13 +224,13 @@ class RESTApp:
         return message_data
 
     async def get_channel_messages_history(
-            self,
-            channel_id: Union[Snowflake, str, int],
-            limit: int = 50,
-            *,
-            before: Optional[Snowflake] = None,
-            after: Optional[Snowflake] = None,
-            around: Optional[Snowflake] = None,
+        self,
+        channel_id: Union[Snowflake, str, int],
+        limit: int = 50,
+        *,
+        before: Optional[Snowflake] = None,
+        after: Optional[Snowflake] = None,
+        around: Optional[Snowflake] = None,
     ) -> AsyncIterator[Message]:
         """|coro|
 
@@ -301,9 +301,9 @@ class RESTApp:
             limit -= search_limit
 
     async def fetch_message(
-            self,
-            channel_id: Union[Snowflake, int, str],
-            message_id: Union[Snowflake, int, str],
+        self,
+        channel_id: Union[Snowflake, int, str],
+        message_id: Union[Snowflake, int, str],
     ) -> Message:
         """|coro|
 
@@ -338,7 +338,7 @@ class RESTApp:
         return Message.from_dict(message)
 
     async def fetch_channel_pins(
-            self, channel_id: Union[Snowflake, int, str]
+        self, channel_id: Union[Snowflake, int, str]
     ) -> AsyncIterator[Message]:
         """|coro|
 
@@ -368,17 +368,17 @@ class RESTApp:
             yield Message.from_dict(message)
 
     async def modify_guild_member(
-            self,
-            guild_id: Union[Snowflake, str, int],
-            user_id: Union[Snowflake, str, int],
-            *,
-            nick: Optional[str] = UNDEFINED,
-            roles: Optional[List[Snowflake]] = UNDEFINED,
-            is_mute: Optional[bool] = UNDEFINED,
-            is_deaf: Optional[bool] = UNDEFINED,
-            voice_channel_id: Optional[Snowflake] = UNDEFINED,
-            communication_disabled_until: Optional[datetime.datetime] = UNDEFINED,
-            reason: Optional[str] = None,
+        self,
+        guild_id: Union[Snowflake, str, int],
+        user_id: Union[Snowflake, str, int],
+        *,
+        nick: Optional[str] = UNDEFINED,
+        roles: Optional[List[Snowflake]] = UNDEFINED,
+        is_mute: Optional[bool] = UNDEFINED,
+        is_deaf: Optional[bool] = UNDEFINED,
+        voice_channel_id: Optional[Snowflake] = UNDEFINED,
+        communication_disabled_until: Optional[datetime.datetime] = UNDEFINED,
+        reason: Optional[str] = None,
     ):
         """|coro|
 
@@ -420,7 +420,7 @@ class RESTApp:
 
             **Required permissions:** ``MODERATE_MEMBERS``
         reason: Optional[:class:`str`]
-            The reason of the message delete operation.
+            The reason of the action.
 
         Raises
         -------
@@ -446,10 +446,49 @@ class RESTApp:
         if voice_channel_id is not UNDEFINED:
             data["channel_id"] = voice_channel_id
         if communication_disabled_until is not UNDEFINED:
-            data["communication_disabled_until"] = communication_disabled_until.isoformat()
+            data[
+                "communication_disabled_until"
+            ] = communication_disabled_until.isoformat()
 
         await self._http.patch(
             f"guilds/{guild_id}/members/{user_id}",
             data=data,
+            headers={"X-Audit-Log-Reason": reason},
+        )
+
+    async def remove_guild_member(
+        self,
+        guild_id: Union[Snowflake, str, int],
+        user_id: Union[Snowflake, str, int],
+        *,
+        reason: Optional[str] = None,
+    ):
+        """|coro|
+
+        [**REST API**] Remove a member from a guild.
+
+        **Required permissions:** ``KICK_MEMBERS``
+
+        Parameters
+        ----------
+        guild_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
+            Id of guild where we will remove member
+        user_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
+            Id of user to operate with.
+        reason: Optional[:class:`str`]
+            The reason of the action.
+
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have proper permissions to do the actions required.
+        BadRequestError
+            You provided a wrong guild, user or something else.
+        """
+
+        await self._http.delete(
+            f"guilds/{guild_id}/members/{user_id}",
             headers={"X-Audit-Log-Reason": reason},
         )

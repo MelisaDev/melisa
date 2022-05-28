@@ -122,8 +122,12 @@ class GuildMember(APIModelBase):
 
         return self
 
-    async def timeout(self, *, duration: Optional[float] = None,
-                      until: Optional[datetime.datetime] = None):
+    async def timeout(
+        self,
+        *,
+        duration: Optional[float] = None,
+        until: Optional[datetime.datetime] = None,
+    ):
         """|coro|
 
         Times out the member from the guild;
@@ -137,23 +141,64 @@ class GuildMember(APIModelBase):
         until: Optional[:class:`datetime.datetime`]
             The expiry date/time of the member's timeout. Set to ``None`` to remove the timeout.
             Supports up to 28 days in the future.
+
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have proper permissions to do the actions required.
+        BadRequestError
+            You provided a wrong type of argument/
+
+        Returns
+        -------
+        :class:`~melisa.models.guild.member.GuildMember`
+            This member object.
         """
 
         if duration is None and until is None:
             await self._client.rest.modify_guild_member(
-                self.guild_id,
-                self.user.id,
-                communication_disabled_until=None
+                self.guild_id, self.user.id, communication_disabled_until=None
             )
         elif duration is not None:
             await self._client.rest.modify_guild_member(
                 self.guild_id,
                 self.user.id,
-                communication_disabled_until=datetime.datetime.utcnow() + datetime.timedelta(seconds=duration)
+                communication_disabled_until=datetime.datetime.utcnow()
+                + datetime.timedelta(seconds=duration),
             )
         else:
             await self._client.rest.modify_guild_member(
-                self.guild_id,
-                self.user.id,
-                communication_disabled_until=until
+                self.guild_id, self.user.id, communication_disabled_until=until
             )
+
+        return self
+
+    async def kick(
+        self,
+        *,
+        reason: Optional[str] = None,
+    ):
+        """|coro|
+
+        Kicks member from a guild.
+
+        **Required permissions:** ``KICK_MEMBERS``
+
+        Parameters
+        ----------
+        reason: Optional[:class:`str`]
+            The reason of the action.
+
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have proper permissions to do the actions required.
+        """
+
+        await self._client.rest.remove_guild_member(
+            self.guild_id, self.user.id, reason=reason
+        )
