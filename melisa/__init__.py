@@ -9,8 +9,8 @@ from .cache import CacheManager, AutoCacheModels
 
 __package__ = "melisa"
 __title__ = "Melisa"
-__description__ = "Cache-configurable module to interact with the Discord API."
+__description__ = "Cache-optimized Discord microframework for Python 3"
 __author__ = "MelisaDev"
 __license__ = "MIT"
-__version__ = '0.0.1a0'
+__version__ = '0.0.1.dev1'
 
