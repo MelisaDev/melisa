@@ -23,7 +23,8 @@ class GuildMember(APIModelBase):
     attached to ``MESSAGE_CREATE`` and ``MESSAGE_UPDATE`` gateway events.**
 
     In ``GUILD_`` events, ``pending`` will always be included as true or false.
-    In non ``GUILD_`` events which can only be triggered by non-``pending`` users, ``pending`` will not be included.
+    In non ``GUILD_`` events which can only be
+    triggered by non-``pending`` users, ``pending`` will not be included.
 
     Attributes
     -----------
@@ -49,7 +50,8 @@ class GuildMember(APIModelBase):
         Total permissions of the member in the channel,
         including overwrites, returned when in the interaction object
     communication_disabled_until: Optional[:class:`~melisa.utils.timestamp.Timestamp`]
-        When the user's timeout will expire and the user will be able to communicate in the guild again,
+        When the user's timeout will expire and the
+        user will be able to communicate in the guild again,
         null or a time in the past if the user is not timed out
     guild_id: List[:class:`~melisa.utils.snowflake.Snowflake`]
         The id of the guild this member belongs to.
@@ -75,7 +77,8 @@ class GuildMember(APIModelBase):
         Parameters
         ----------
         size: int
-            The size to set for the URL, defaults to 1024. Can be any power of two between 16 and 4096.
+            The size to set for the URL, defaults to 1024.
+            Can be any power of two between 16 and 4096.
         """
         return "https://cdn.discordapp.com/guilds/{}/users/{}/avatars/{}.png?size={}".format(
             self.guild_id, self.user.id, self.guild_avatar, size
@@ -201,4 +204,41 @@ class GuildMember(APIModelBase):
 
         await self._client.rest.remove_guild_member(
             self.guild_id, self.user.id, reason=reason
+        )
+
+    async def ban(
+        self,
+        *,
+        delete_message_days: Optional[int] = 0,
+        reason: Optional[str] = None,
+    ):
+        """|coro|
+
+        Ban guild member, and optionally
+        delete previous messages sent by the banned user.
+
+        **Required permissions:** ``BAN_MEMBERS``
+
+        Parameters
+        ----------
+        delete_message_days: Optional[:class:`int`]
+            Number of days to delete messages for (0-7)
+        reason: Optional[:class:`str`]
+            The reason of the action.
+
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have proper permissions to do the actions required.
+        BadRequestError
+            You provided a wrong guild, user or something else
+        """
+
+        await self._client.rest.create_guild_ban(
+            self.guild_id,
+            self.user.id,
+            delete_message_days=delete_message_days,
+            reason=reason,
         )

@@ -492,3 +492,45 @@ class RESTApp:
             f"guilds/{guild_id}/members/{user_id}",
             headers={"X-Audit-Log-Reason": reason},
         )
+
+    async def create_guild_ban(
+        self,
+        guild_id: Union[Snowflake, str, int],
+        user_id: Union[Snowflake, str, int],
+        *,
+        delete_message_days: Optional[int] = 0,
+        reason: Optional[str] = None,
+    ):
+        """|coro|
+
+        [**REST API**] Create a guild ban, and optionally
+        delete previous messages sent by the banned user.
+
+        **Required permissions:** ``BAN_MEMBERS``
+
+        Parameters
+        ----------
+        guild_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
+            Id of guild where we will ban member
+        user_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
+            Id of user to operate with.
+        delete_message_days: Optional[:class:`int`]
+            Number of days to delete messages for (0-7)
+        reason: Optional[:class:`str`]
+            The reason of the action.
+
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have proper permissions to do the actions required.
+        BadRequestError
+            You provided a wrong guild, user or something else
+        """
+
+        await self._http.put(
+            f"guilds/{guild_id}/bans/{user_id}",
+            data={"delete_message_days": delete_message_days},
+            headers={"X-Audit-Log-Reason": reason},
+        )
