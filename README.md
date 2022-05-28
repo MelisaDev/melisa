@@ -42,15 +42,11 @@ We are going to create really cool Cache configuration, so don't worry about the
 ---
 ## Install MelisaPy
 
-At this moment, you can install melisa only from Github repository.
-
-For install Melisa enter to command line this command:
+NOTE: Currently, installation is only possible through GitHub
 
 ```commandline
 pip install git+https://github.com/MelisaDev/melisa
 ```
-
-And you can use Melisa in your projects!
 
 ---
 
