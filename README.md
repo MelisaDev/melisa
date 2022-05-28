@@ -42,7 +42,7 @@ We are going to create really cool Cache configuration, so don't worry about the
 ---
 ## Install MelisaPy
 
-NOTE: Currently, installation is only possible through GitHub
+NOTE: Currently, installation is only possible using GitHub
 
 ```commandline
 pip install git+https://github.com/MelisaDev/melisa
