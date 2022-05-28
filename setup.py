@@ -46,7 +46,6 @@ setup(
         "speedup": parse_requirements_file("packages/speed.txt")
     },
     classifiers=[
-        "Development Status :: 1 - Development",
         "License :: OSI Approved :: MIT License",
         "Intended Audience :: Developers",
         "Natural Language :: English",
