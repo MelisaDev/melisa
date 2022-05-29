@@ -12,18 +12,12 @@ from .models.guild.channel import ChannelType, Channel
 from .utils.snowflake import Snowflake
 
 
-class AutoCacheModels(Enum):
-    # ToDo: Add FULL_GUILD auto cache model
-
-    """ """
-
-    FULL_GUILDS = "FULL_GUILDS"
-    GUILD_ROLES = "GUILD_ROLES"
-    GUILD_THREADS = "GUILD_THREADS"
-    GUILD_EMOJIS = "GUILD_EMOJIS"
-    GUILD_WEBHOOKS = "GUILD_WEBHOOKS"
-    GUILD_MEMBERS = "GUILD_MEMBERS"
-    TEXT_CHANNELS = "TEXT_CHANNELS"
+class ChannelsCachingPolicy(Enum):
+    """"Channels caching policy"""
+    ALL = "all"
+    NONE = "none"
+    GUILD_TEXT = 0
+    GUILD_VOICE = 2
 
 
 class CacheManager:
@@ -33,12 +27,9 @@ class CacheManager:
         self,
         *,
         disabled: bool = False,
-        disabled_auto_models: Optional[List[AutoCacheModels]] = None,
+        policies: Dict[str, List[ChannelsCachingPolicy]] = None,
         auto_unused_attributes: Optional[Dict[Any, List[str]]] = None,
     ):
-        self._disabled_auto_models: List[AutoCacheModels] = (
-            [] if disabled_auto_models is None else disabled_auto_models
-        )
         self.auto_unused_attributes: Dict[Any, List[str]] = (
             {} if auto_unused_attributes is not None else auto_unused_attributes
         )
@@ -48,6 +39,16 @@ class CacheManager:
         self._raw_dm_channels: Dict[Snowflake, Any] = {}
 
         self._disabled = disabled
+
+        # Some default values
+        if policies is None:
+            policies = {
+                "channels": [
+                    ChannelsCachingPolicy.GUILD_TEXT
+                ]
+            }
+
+        self._policies = policies
 
         # We use symlinks to cache guild channels
         # like we save channel in Guild and save it here
@@ -103,12 +104,16 @@ class CacheManager:
 
         guild = self.__remove_unused_attributes(guild, Guild)
 
-        if hasattr(guild, "channels"):
+        policy = self._policies["channels"]
+
+        if hasattr(guild, "channels") and ChannelsCachingPolicy.NONE not in policy:
             channels = guild.channels.values()
 
-            if AutoCacheModels.TEXT_CHANNELS not in self._disabled_auto_models:
+            if ChannelsCachingPolicy.ALL not in policy:
+                policy = [int(x.value) for x in policy]
+
                 channels = filter(
-                    lambda channel: channel.type == ChannelType.GUILD_TEXT, channels
+                    lambda channel: channel.type is not None and int(channel.type) in policy, channels
                 )
 
             for sym in channels:
@@ -117,6 +122,9 @@ class CacheManager:
                     self._channel_symlinks.pop(sym_id)
 
                 self._channel_symlinks[sym_id] = guild.id
+        else:
+            if hasattr(guild, "channels"):
+                guild.channels = {}
 
         self._raw_guilds.update({guild.id: guild})
 

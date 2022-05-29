@@ -538,7 +538,7 @@ class MessageableChannel(Channel):
             Some of specified parameters is invalid.
         """
 
-        return self._client.rest.create_message(
+        return await self._client.rest.create_message(
             self.id,
             content,
             tts=tts,

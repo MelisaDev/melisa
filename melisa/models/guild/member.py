@@ -101,7 +101,7 @@ class GuildMember(APIModelBase):
         )
         self.nick = data.get("nick")
         self.guild_avatar = data.get("avatar")
-        self.role_ids = [Snowflake(x) for x in data["roles"]]
+        self.role_ids = [Snowflake(x) for x in data.get("roles", [])]
         self.joined_at = (
             Timestamp.parse(data["joined_at"])
             if data.get("joined_at") is not None

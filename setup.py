@@ -1,49 +1,40 @@
+import pathlib
 import re
+import setuptools
 
-from setuptools import setup
+HERE = pathlib.Path(__file__).parent
 
+README = (HERE / "README.md").read_text(encoding="utf8")
 
-def long_description():
-    with open("README.md") as fp:
-        return fp.read()
-
-
-def parse_requirements_file(path):
-    with open(path, encoding='utf-8') as file:
-        return file.read().splitlines()
-
-
-with open('melisa/__init__.py', encoding='utf-8') as file:
+with open(HERE / "melisa/__init__.py") as file:
     version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', file.read(), re.MULTILINE).group(1)
 
-
-packages = [
-    'melisa',
-    'melisa.listeners',
-    'melisa.models',
-    'melisa.models.app',
-    'melisa.models.guild',
-    'melisa.models.message',
-    'melisa.models.user',
-    'melisa.utils',
-    'melisa.core'
-]
-
-setup(
+setuptools.setup(
     name='melisa',
     author='MelisaDev',
     url='https://github.com/MelisaDev/melisa',
     version=version,
-    packages=packages,
+    packages=setuptools.find_packages(),
     license='MIT',
     description='Cache-optimized Discord microframework for Python 3',
-    long_description=long_description(),
+    long_description=README,
     long_description_content_type="text/markdown",
     include_package_data=True,
     python_requires='>=3.8,<3.11',
-    install_requires=parse_requirements_file("requirements.txt"),
+    zip_safe=False,
+    install_requires=[
+        "aiohttp", "typing_extensions"
+    ],
     extras_require={
-        "speedup": parse_requirements_file("packages/speed.txt")
+        "speedup": [
+            "orjson==3.6.8"
+        ]
+    },
+    test_suite="tests",
+    project_urls={
+        "Documentation": "https://docs.melisapy.site/",
+        "Source (GitHub)": "https://github.com/MelisaDev/melisa",
+        "Discord": "https://discord.gg/QX4EG8f7aD",
     },
     classifiers=[
         "License :: OSI Approved :: MIT License",
