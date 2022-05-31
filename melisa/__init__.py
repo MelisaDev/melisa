@@ -4,7 +4,7 @@
 from .client import Client, Bot
 from .models import *
 from .exceptions import *
-from .rest import RESTApp
+from .rest import RESTApp, CDNBuilder
 from .cache import CacheManager, ChannelsCachingPolicy
 
 __package__ = "melisa"

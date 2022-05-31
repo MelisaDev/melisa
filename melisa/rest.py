@@ -681,7 +681,7 @@ class CDNBuilder:
     def avatar_url(
         self, user_id: str, _hash: str, *, size: int = 1024, image_format: str = None
     ):
-        return "/{}/avatars/{}/{}.{}?size={}".format(
+        return "{}/avatars/{}/{}.{}?size={}".format(
             self.BASE_URL,
             user_id,
             _hash,
@@ -692,7 +692,7 @@ class CDNBuilder:
     def guild_icon_url(
         self, guild_id: str, _hash: str, *, size: int = 1024, image_format: str = None
     ):
-        return "/icons/{}/{}.{}?size={}".format(
+        return "{}/icons/{}/{}.{}?size={}".format(
             self.BASE_URL,
             guild_id,
             _hash,
@@ -703,7 +703,7 @@ class CDNBuilder:
     def default_avatar_url(
         self, discriminator: str
     ):
-        return "/embed/avatars/{}.png".format(
+        return "{}/embed/avatars/{}.png".format(
             self.BASE_URL,
-            discriminator
+            int(discriminator) % 5
         )
