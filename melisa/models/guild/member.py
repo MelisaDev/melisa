@@ -308,3 +308,13 @@ class GuildMember(APIModelBase):
         await self._client.rest.remove_guild_member_role(
             self.guild_id, self.user.id, role_id, reason=reason
         )
+
+    def avatar_url(self, *, size: int = 1024, image_format: str = None) -> str | None:
+        # ToDo: Add Docstrings
+        """Avatar url (from the Discord CDN server)"""
+        if self.guild_avatar is None:
+            return self.user.avatar_url()
+
+        return self._client.rest.cdn.guild_member_avatar_url(
+            self.guild_id, self.user.id, self.guild_avatar, size=size, image_format=image_format
+        )
