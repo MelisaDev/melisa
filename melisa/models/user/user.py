@@ -216,7 +216,9 @@ class User(APIModelBase):
         if self.avatar is None:
             return self.default_avatar_url()
 
-        return self._client.rest.cdn.avatar_url(self.id, self.avatar, size=size, image_format=image_format)
+        return self._client.rest.cdn.avatar_url(
+            self.id, self.avatar, size=size, image_format=image_format
+        )
 
     def default_avatar_url(self):
         """Default avatar url (from the Discord CDN server)"""

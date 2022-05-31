@@ -700,10 +700,23 @@ class CDNBuilder:
             size,
         )
 
-    def default_avatar_url(
-        self, discriminator: str
+    def default_avatar_url(self, discriminator: str):
+        return "{}/embed/avatars/{}.png".format(self.BASE_URL, int(discriminator) % 5)
+
+    def guild_member_avatar_url(
+        self,
+        guild_id: str,
+        user_id: str,
+        _hash: str,
+        *,
+        size: int = 1024,
+        image_format: str = None,
     ):
-        return "{}/embed/avatars/{}.png".format(
+        return "{}/guilds/{}/users/{}/avatars/{}.{}?size={}".format(
             self.BASE_URL,
-            int(discriminator) % 5
+            guild_id,
+            user_id,
+            _hash,
+            image_format if image_format is not None else self.dif,
+            size,
         )

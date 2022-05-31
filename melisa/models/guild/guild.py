@@ -491,7 +491,9 @@ class Guild(APIModelBase):
         if self.icon is None:
             return None
         else:
-            return self._client.rest.cdn.avatar_url(self.id, self.icon, size=size, image_format=image_format)
+            return self._client.rest.cdn.avatar_url(
+                self.id, self.icon, size=size, image_format=image_format
+            )
 
     @overload
     async def create_channel(
