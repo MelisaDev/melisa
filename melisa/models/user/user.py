@@ -210,11 +210,10 @@ class User(APIModelBase):
         """:class:`str`: The user's mention string. (<@id>)"""
         return "<@{}>".format(self.id)
 
-    def avatar_url(self) -> str:
+    def avatar_url(self, *, size: int = 1024, image_format: str = None) -> str:
+        # ToDo: Add Docstrings
         """Avatar url (from the Discord CDN server)"""
-        return "https://cdn.discordapp.com/avatars/{}/{}.png?size=1024".format(
-            self.id, self.avatar
-        )
+        return self._client.rest.cdn.avatar_url(self.id, self.avatar, size=size, image_format=image_format)
 
     async def create_dm_channel(self):
         # ToDo: Add docstrings

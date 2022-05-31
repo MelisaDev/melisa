@@ -13,7 +13,8 @@ from .utils.snowflake import Snowflake
 
 
 class ChannelsCachingPolicy(Enum):
-    """"Channels caching policy"""
+    """ "Channels caching policy"""
+
     ALL = "all"
     NONE = "none"
     GUILD_TEXT = 0
@@ -42,11 +43,7 @@ class CacheManager:
 
         # Some default values
         if policies is None:
-            policies = {
-                "channels": [
-                    ChannelsCachingPolicy.GUILD_TEXT
-                ]
-            }
+            policies = {"channels": [ChannelsCachingPolicy.GUILD_TEXT]}
 
         self._policies = policies
 
@@ -113,7 +110,9 @@ class CacheManager:
                 policy = [int(x.value) for x in policy]
 
                 channels = filter(
-                    lambda channel: channel.type is not None and int(channel.type) in policy, channels
+                    lambda channel: channel.type is not None
+                    and int(channel.type) in policy,
+                    channels,
                 )
 
             for sym in channels:

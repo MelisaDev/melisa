@@ -45,10 +45,18 @@ class RESTApp:
     ----------
     token: :class:`str`
         The token to authorize (you can found it in the developer portal)
+    default_image_format: :class:`str`
+        Default image format
+
+    Attributes
+    -----------
+    cdn: :class:`~melisa.rest.CDNBuilder`
+        CDN Builder to build images
     """
 
-    def __init__(self, token: str):
+    def __init__(self, token: str, default_image_format: str = None):
         self._http: HTTPClient = HTTPClient(token)
+        self.cdn = CDNBuilder(default_image_format)
 
     async def fetch_user(self, user_id: Union[Snowflake, int, str]) -> User:
         """|coro|
@@ -651,4 +659,32 @@ class RESTApp:
         await self._http.delete(
             f"guilds/{guild_id}/members/{user_id}/roles/{role_id}",
             headers={"X-Audit-Log-Reason": reason},
+        )
+
+
+class CDNBuilder:
+    """Can be used to build images
+
+    Parameters
+    ----------
+    default_image_format: :class:`str`
+        Default image format
+    """
+
+    # ToDo: Add docstrings
+
+    BASE_URL = "https://cdn.discordapp.com"
+
+    def __init__(self, default_image_format: str = None):
+        self.dif = default_image_format if default_image_format is not None else "png"
+
+    def avatar_url(
+        self, user_id: str, _hash: str, *, size: int = 1024, image_format: str = None
+    ):
+        return "{}/avatars/{}/{}.{}?size={}".format(
+            self.BASE_URL,
+            user_id,
+            _hash,
+            image_format if image_format is not None else self.dif,
+            size,
         )

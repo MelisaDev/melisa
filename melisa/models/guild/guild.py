@@ -15,7 +15,7 @@ from .channel import (
 
 
 from .member import GuildMember
-from ... import Role
+from .role import Role
 from ...utils import Snowflake, Timestamp
 from ...utils.api_model import APIModelBase
 from ...utils.conversion import try_enum
@@ -466,6 +466,7 @@ class Guild(APIModelBase):
         self.threads = {}
         self.channels = {}
         self.members = {}
+        self.roles = {}
 
         for member in data.get("members", []):
             member = GuildMember.from_dict(member)
@@ -480,7 +481,7 @@ class Guild(APIModelBase):
 
         for role in data.get("roles", []):
             role["guild_id"] = self.id
-            self.roles[Snowflake(int(role.id))] = Role.from_dict(role)
+            self.roles[Snowflake(int(role["id"]))] = Role.from_dict(role)
 
         return self
 
