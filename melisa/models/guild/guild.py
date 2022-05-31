@@ -15,6 +15,7 @@ from .channel import (
 
 
 from .member import GuildMember
+from ... import Role
 from ...utils import Snowflake, Timestamp
 from ...utils.api_model import APIModelBase
 from ...utils.conversion import try_enum
@@ -390,7 +391,6 @@ class Guild(APIModelBase):
         self.icon_hash = data.get("icon_hash")
         self.banner = data.get("banner")
         self.unavailable = data.get("unavailable", False)
-        self.roles = data.get("roles", {})
         self.permissions = data.get("permissions")
         self.welcome_screen = data.get("welcome_screen")
         self.guild_scheduled_events = data.get("guild_scheduled_events")
@@ -477,6 +477,10 @@ class Guild(APIModelBase):
         for channel in data.get("channels", []):
             channel = _choose_channel_type(channel)
             self.channels[Snowflake(int(channel.id))] = channel
+
+        for role in data.get("roles", []):
+            role["guild_id"] = self.id
+            self.roles[Snowflake(int(role.id))] = Role.from_dict(role)
 
         return self
 

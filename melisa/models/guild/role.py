@@ -4,11 +4,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Dict
+from typing import Dict
 
 from ...utils import Snowflake
 from ...utils.api_model import APIModelBase
 from ...utils.types import APINullable, UNDEFINED
+from ..message.colors import Color
 
 
 @dataclass(repr=False)
@@ -25,7 +26,7 @@ class Role(APIModelBase):
         Integer representation of hexadecimal color code
     hoist: :class:`bool`
         If this role is pinned in the user listing
-    icon: :class:`str`
+    icon: Optional[:class:`str`]
         Role icon hash
     unicode_emoji: :class:`str`
         Role unicode emoji
@@ -37,11 +38,13 @@ class Role(APIModelBase):
         Whether this role is managed by an integration
     mentionable: :class:`bool`
         Whether this role is mentionable
+    guild_id: Optional[:class:`Snowflake`]
+        Id of guild where role is
     """
 
     id: APINullable[Snowflake] = UNDEFINED
     name: APINullable[str] = UNDEFINED
-    color: APINullable[int] = UNDEFINED
+    color: APINullable[Color] = UNDEFINED
     hoist: APINullable[bool] = UNDEFINED
     icon: APINullable[str] = UNDEFINED
     unicode_emoji: APINullable[str] = UNDEFINED
@@ -49,6 +52,7 @@ class Role(APIModelBase):
     permission: APINullable[str] = UNDEFINED
     managed: APINullable[bool] = UNDEFINED
     mentionable: APINullable[bool] = UNDEFINED
+    guild_id: APINullable[Snowflake] = UNDEFINED
 
     @classmethod
     def from_dict(cls, data: Dict[str, any]) -> Role:
@@ -62,9 +66,9 @@ class Role(APIModelBase):
 
         self: Role = super().__new__(cls)
 
-        self.id = int(data["id"])
+        self.id = Snowflake(data["id"])
         self.name = data.get("name")
-        self.color = data.get("color")
+        self.color = Color(data.get("color", 0))
         self.hoist = data.get("hoist", False)
         self.icon = data.get("icon")
         self.unicode_emoji = data.get("unicode_emoji")
@@ -72,5 +76,13 @@ class Role(APIModelBase):
         self.permission = data.get("permission")
         self.managed = data.get("managed", False)
         self.mentionable = data.get("mentionable", False)
+        self.guild_id = data.get("guild_id")
 
         return self
+
+    @property
+    def guild(self):
+        if self.guild_id is None:
+            return None
+        else:
+            return self._client.cache.get_guild(self.guild_id)
