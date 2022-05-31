@@ -485,6 +485,14 @@ class Guild(APIModelBase):
 
         return self
 
+    def icon_url(self, *, size: int = 1024, image_format: str = None) -> str | None:
+        # ToDo: Add Docstrings
+        """Icon Url (from the Discord CDN server)"""
+        if self.icon is None:
+            return None
+        else:
+            return self._client.rest.cdn.avatar_url(self.id, self.icon, size=size, image_format=image_format)
+
     @overload
     async def create_channel(
         self,
