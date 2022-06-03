@@ -621,37 +621,6 @@ class Guild(APIModelBase):
         """
 
         await self._client.rest.remove_guild_ban(self.id, user_id, reason=reason)
-    
-    async def add_role(
-        self,
-        *,
-        user_id: Union[Snowflake, str, int],
-        role_id: Union[Snowflake, str, int],
-        reason: Optional[str] = None
-    ):
-        #TODO: Add description 
-
-       await self._http.put(
-            f"/guilds/{self.id}/members/{user_id}/roles/{role_id}",
-            headers = {
-                "X-Audit-Log-Reason": reason
-                }) 
-    
-    async def delete_role(
-        self,
-        *,
-        user_id: Union[Snowflake, str, int],
-        role_id: Union[Snowflake, str, int],
-        reason: Optional[str] = None
-    ):
-        #TODO: add description :D
-
-        await self._http.delete(
-            f"/guilds/{self.id}/members/{user_id}/roles/{role_id}",
-            headers = {
-                "X-Audit-Log-Reason": reason
-                })
-
 
 @dataclass(repr=False)
 class UnavailableGuild(APIModelBase):

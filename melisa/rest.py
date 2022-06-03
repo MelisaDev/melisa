@@ -720,3 +720,19 @@ class CDNBuilder:
             image_format if image_format is not None else self.dif,
             size,
         )
+
+    def role_icon_url(
+        self,
+        role_id: str,
+        _hash: str,
+        *,
+        size: int = 1024,
+        image_format: str = None,
+    ):
+        return "{}/role-icons/{}/{}.{}?size={}".format(
+            self.BASE_URL,
+            role_id,
+            _hash,
+            image_format if image_format is not None else self.dif,
+            size,
+        )
