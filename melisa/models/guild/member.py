@@ -316,5 +316,9 @@ class GuildMember(APIModelBase):
             return self.user.avatar_url()
 
         return self._client.rest.cdn.guild_member_avatar_url(
-            self.guild_id, self.user.id, self.guild_avatar, size=size, image_format=image_format
+            self.guild_id,
+            self.user.id,
+            self.guild_avatar,
+            size=size,
+            image_format=image_format,
         )

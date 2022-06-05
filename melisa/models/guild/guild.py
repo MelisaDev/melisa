@@ -622,6 +622,7 @@ class Guild(APIModelBase):
 
         await self._client.rest.remove_guild_ban(self.id, user_id, reason=reason)
 
+
 @dataclass(repr=False)
 class UnavailableGuild(APIModelBase):
     """A partial guild object.
