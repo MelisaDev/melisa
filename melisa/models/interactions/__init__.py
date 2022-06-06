@@ -4,6 +4,4 @@
 from .commands import ApplicationCommandTypes
 
 
-__all__ = (
-    "ApplicationCommandTypes"
-)
+__all__ = "ApplicationCommandTypes"

@@ -4,8 +4,9 @@
 from __future__ import annotations
 
 from enum import IntEnum
-from typing import Optional, Dict, Union, Any
+from typing import Optional, Dict, Union, Any, List
 
+from ...utils.conversion import try_enum
 from ...utils.api_model import APIModelBase
 
 
@@ -54,7 +55,7 @@ class ApplicationCommandOptionTypes(IntEnum):
     MENTIONABLE:
         Includes users and roles
     NUMBER:
-    	Any :class:`float` between -2^53 and 2^53
+        Any :class:`float` between -2^53 and 2^53
     ATTACHMENT:
         Attachment object
     """
@@ -87,7 +88,7 @@ class ApplicationCommandOptionChoice(APIModelBase):
         1-100 character choice name
     name_localizations: Optional[Dict[:class:`str`, :class:`str`]]
         Dictionary with keys in
-        `avaliable locales <https://discord.com/developers/docs/reference#locales>`_
+        `available locales <https://discord.com/developers/docs/reference#locales>`_
 
         Localization dictionary for the name field.
         Values follow the same restrictions as name
@@ -96,11 +97,11 @@ class ApplicationCommandOptionChoice(APIModelBase):
         Value for the choice, up to 100 characters if string
     """
 
-    name: str
-    name_localizations: Optional[Dict[str, str]]
-    value: Union[str, int, float]
+    name: str = None
+    name_localizations: Optional[Dict[str, str]] = None
+    value: Union[str, int, float] = None
 
-    @staticmethod
+    @classmethod
     def from_dict(cls, data: Dict[str, Any]):
         """Generate a ApplicationCommandOptionChoice from the given data.
 
@@ -118,5 +119,54 @@ class ApplicationCommandOptionChoice(APIModelBase):
         return self
 
 
+class ApplicationCommandInteractionDataOption(APIModelBase):
+    """Application Command Interaction Data Option
 
+    All options have names, and an option can either be a parameter
+    and input value--in which case ``value`` will be set--or it
+    can denote a subcommand or group--in which case it will contain
+    a top-level key and another array of ``options``.
 
+    ``value`` and ``options`` are mutually exclusive.
+
+    Attributes
+    ----------
+    name: :class:`str`
+        Name of the parameter
+    type: :class:`~melisa.models.interactions.commands.ApplicationCommandOptionTypes`
+        Value of :class:`~melisa.models.interactions.commands.ApplicationCommandOptionTypes`
+    value: Optional[Union[str, int, float]]
+        Value of the option resulting from user input
+    options: Optional[List[ApplicationCommandInteractionDataOption]]
+        Present if this option is a group or subcommand
+    focused: Optional[bool]
+        ``true`` if this option is the currently focused option for autocomplete
+    """
+
+    name: str = None
+    type: ApplicationCommandOptionTypes = None
+    value: Optional[Union[str, int, float]] = None
+    options: Optional[List[ApplicationCommandInteractionDataOption]] = None
+    focused: Optional[bool] = None
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]):
+        """Generate a ApplicationCommandInteractionDataOption from the given data.
+
+        Parameters
+        ----------
+        data: :class:`dict`
+            The dictionary to convert into a ApplicationCommandInteractionDataOption.
+        """
+        self: ApplicationCommandInteractionDataOption = super().__new__(cls)
+
+        self.name = data.get("name")
+        self.type = try_enum(ApplicationCommandOptionTypes, data.get("type", 0))
+        self.value = data.get("value")
+        self.options = [
+            ApplicationCommandInteractionDataOption.from_dict(x)
+            for x in data.get("options", [])
+        ]
+        self.focused = data.get("focused")
+
+        return self
