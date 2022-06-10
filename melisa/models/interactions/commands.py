@@ -79,11 +79,7 @@ class ApplicationCommandOptionTypes(IntEnum):
 
 
 class ApplicationCommand(APIModelBase):
-    """Application Command Option
-
-    .. warning::
-
-        Required ``options`` must be listed before optional options.
+    """Application Command
 
     Attributes
     ----------
