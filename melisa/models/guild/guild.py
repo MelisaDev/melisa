@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from enum import IntEnum
 from typing import List, Any, Optional, overload, Dict, TYPE_CHECKING, Union
 
@@ -239,8 +240,6 @@ class Guild(APIModelBase):
         System channel flags
     rules_channel_id: APINullable[:class:`~melisa.utils.types.Snowflake`]
         The id of the channel where Community guilds can display rules and/or guidelines
-    joined_at: APINullable[:class:`~melisa.utils.Timestamp`]
-        When this guild was joined at
     large: APINullable[:class:`bool`]
         True if this is considered a large guild
     unavailable: :class:`bool`
@@ -335,7 +334,6 @@ class Guild(APIModelBase):
     system_channel_id: APINullable[Snowflake] = None
     system_channel_flags: APINullable[SystemChannelFlags] = None
     rules_channel_id: APINullable[Snowflake] = None
-    joined_at: APINullable[Timestamp] = None
 
     large: APINullable[bool] = None
     unavailable: APINullable[bool] = None
@@ -376,7 +374,7 @@ class Guild(APIModelBase):
         """
         self: Guild = super().__new__(cls)
 
-        self.id = int(data["id"])
+        self.id = Snowflake(int(data.get("id", 0)))
         self.member_count = data.get("member_count", 0)
         self.name = data.get("name", "")
         self.region = data.get("region")
@@ -451,11 +449,6 @@ class Guild(APIModelBase):
         else:
             self.afk_channel_id = None
 
-        if data.get("joined_at") is not None:
-            self.joined_at = Timestamp.parse(data["joined_at"])
-        else:
-            self.joined_at = None
-
         self.stage_instances = data.get("stage_instances")
         self.scheduled_events = data.get("guild_scheduled_events")
         self.owner = None if data.get("owner") is None else data["owner"]
@@ -484,6 +477,11 @@ class Guild(APIModelBase):
             self.roles[Snowflake(int(role["id"]))] = Role.from_dict(role)
 
         return self
+
+    @property
+    def created_at(self):
+        """:class:`datetime.datetime`: Returns the guild's creation time in UTC."""
+        return datetime.fromtimestamp(self.id.timestamp, tz=timezone.utc)
 
     def icon_url(self, *, size: int = 1024, image_format: str = None) -> str | None:
         # ToDo: Add Docstrings

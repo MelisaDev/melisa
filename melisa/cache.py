@@ -35,9 +35,9 @@ class CacheManager:
             {} if auto_unused_attributes is not None else auto_unused_attributes
         )
 
-        self._raw_guilds: Dict[Snowflake, Any] = {}
-        self._raw_users: Dict[Snowflake, Any] = {}
-        self._raw_dm_channels: Dict[Snowflake, Any] = {}
+        self._raw_guilds: Dict[str, Any] = {}
+        self._raw_users: Dict[str, Any] = {}
+        self._raw_dm_channels: Dict[str, Any] = {}
 
         self._disabled = disabled
 
@@ -51,7 +51,7 @@ class CacheManager:
         # like we save channel in Guild and save it here
         # and if you need channel, and you don't know its guild
         # you can use special method, and it will find it in guild
-        self._channel_symlinks: Dict[Snowflake, Snowflake] = {}
+        self._channel_symlinks: Dict[str, str] = {}
 
     def guilds_count(self) -> int:
         """Cached Guilds Count"""
@@ -116,16 +116,16 @@ class CacheManager:
                 )
 
             for sym in channels:
-                sym_id = Snowflake(int(sym.id))
+                sym_id = str(sym.id)
                 if self._channel_symlinks.get(sym_id, UNDEFINED) is not UNDEFINED:
                     self._channel_symlinks.pop(sym_id)
 
-                self._channel_symlinks[sym_id] = guild.id
+                self._channel_symlinks[sym_id] = str(guild.id)
         else:
             if hasattr(guild, "channels"):
                 guild.channels = {}
 
-        self._raw_guilds.update({guild.id: guild})
+        self._raw_guilds.update({str(guild.id): guild})
 
         return guild
 
@@ -149,15 +149,15 @@ class CacheManager:
             channel, Channel
         )  # ToDo: add channel type
 
-        guild = self._raw_guilds.get(channel.guild_id, UNDEFINED)
+        guild = self._raw_guilds.get(str(channel.guild_id), UNDEFINED)
 
-        channel_id = Snowflake(int(channel.id))
+        channel_id = str(channel.id)
 
         if guild != UNDEFINED:
             if hasattr(guild, "channels"):
-                self._raw_guilds[guild.id].channels.update({channel_id: channel})
+                self._raw_guilds[str(guild.id)].channels.update({channel_id: channel})
 
-        self._channel_symlinks.update({channel_id: channel.guild_id})
+        self._channel_symlinks.update({channel_id: str(channel.guild_id)})
 
         return channel
 
@@ -174,7 +174,7 @@ class CacheManager:
         if self._disabled:
             return None
 
-        channel_id = Snowflake(int(channel_id))
+        channel_id = str(channel_id)
         guild_id = self._channel_symlinks.get(channel_id, UNDEFINED)
 
         if guild_id == UNDEFINED:
@@ -203,8 +203,8 @@ class CacheManager:
         if self._disabled:
             return None
 
-        if not isinstance(guild_id, Snowflake):
-            guild_id = Snowflake(int(guild_id))
+        if not isinstance(guild_id, str):
+            guild_id = str(guild_id)
         return self._raw_guilds.get(guild_id, None)
 
     def _set_none_guilds(self, guilds: List[Dict[str, Any]]) -> None:
@@ -222,7 +222,7 @@ class CacheManager:
 
         guilds_dict = dict(
             map(
-                lambda i: (Snowflake(int(i["id"])), UnavailableGuild.from_dict(i)),
+                lambda i: (str(i["id"]), UnavailableGuild.from_dict(i)),
                 guilds,
             )
         )
@@ -243,8 +243,8 @@ class CacheManager:
         if self._disabled:
             return
 
-        if not isinstance(guild_id, Snowflake):
-            guild_id = Snowflake(int(guild_id))
+        if not isinstance(guild_id, str):
+            guild_id = str(guild_id)
 
         return self._raw_guilds.pop(guild_id, None)
 
@@ -261,10 +261,10 @@ class CacheManager:
         if self._disabled:
             return
 
-        if not isinstance(channel_id, Snowflake):
-            channel_id = Snowflake(int(channel_id))
+        if not isinstance(channel_id, str):
+            channel_id = str(channel_id)
 
-        guild_id = self._channel_symlinks.pop(channel_id, None)
+        guild_id = str(self._channel_symlinks.pop(channel_id, None))
 
         if guild_id is None:
             return None
@@ -297,11 +297,11 @@ class CacheManager:
         message_id: Optional[:class:`~melisa.utils.snowflake.Snowflake`, `str`, `int`]
             ID of message to set.
         """
-        if not isinstance(channel_id, Snowflake):
-            channel_id = Snowflake(int(channel_id))
+        if not isinstance(channel_id, str):
+            channel_id = str(channel_id)
 
-        if not isinstance(guild_id, Snowflake):
-            guild_id = Snowflake(int(guild_id))
+        if not isinstance(guild_id, str):
+            guild_id = str(guild_id)
 
         if not isinstance(message_id, Snowflake):
             message_id = Snowflake(int(message_id))

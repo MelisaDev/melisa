@@ -19,6 +19,7 @@ class Snowflake(int):
 
     _MAX_VALUE: int = 9223372036854775807
     _MIN_VALUE: int = 0
+    _DISCORD_EPOCH = 1420070400
 
     def __init__(self, _):
         super().__init__()
@@ -46,11 +47,11 @@ class Snowflake(int):
         return Snowflake(int(string))
 
     @property
-    def timestamp(self) -> int:
+    def timestamp(self) -> float:
         """
         Milliseconds since Discord Epoch, the first second of 2015 or 1420070400000.
         """
-        return self >> 22
+        return (self >> 22) / 1000 + self._DISCORD_EPOCH
 
     @property
     def worker_id(self) -> int:

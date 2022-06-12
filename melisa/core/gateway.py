@@ -86,9 +86,9 @@ class Gateway:
             "properties": {
                 "$os": sys.platform,
                 "$browser": "Discord iOS"
-                if kwargs.get("mobile") is not None
-                else "MelisaPy",
-                "$device": "Melisa Python Library",
+                if kwargs.get("mobile") is True
+                else "melisa",
+                "$device": "melisa",
             },
             "compress": True,
             "shard": [shard_id, num_shards],
