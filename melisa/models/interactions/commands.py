@@ -88,7 +88,7 @@ class ApplicationCommand(APIModelBase):
     type: Optional[:class:`~melisa.interactions.commands.ApplicationCommandTypes`]
         Type of command, defaults to ``1``
     application_id: :class:`~melisa.utils.snowflake.Snowflake`
-    	ID of the parent application
+        ID of the parent application
     guild_id: Optional[:class:`~melisa.utils.snowflake.Snowflake`]
         guild id of the command, if not global
     name: str
@@ -97,14 +97,14 @@ class ApplicationCommand(APIModelBase):
         Localization dictionary for ``name`` field.
         Values follow the same restrictions as ``name``
     description: str
-    	Description for ``CHAT_INPUT`` commands, 1-100 characters.
-    	Empty string for ``USER`` and ``MESSAGE`` commands
+        Description for ``CHAT_INPUT`` commands, 1-100 characters.
+        Empty string for ``USER`` and ``MESSAGE`` commands
     description_localizations: Optional[Dict[str, str]]
         Localization dictionary for ``description`` field.
         Values follow the same restrictions as ``description``
     options: Optional[List[:class:`~melisa.models.interactions.commands.ApplicationCommandOption`]]
-    	Parameters for the command, max of 25.
-    	Only available for ``CHAT_INPUT`` command type.
+        Parameters for the command, max of 25.
+        Only available for ``CHAT_INPUT`` command type.
     default_member_permissions: Optional[str]
         Set of permissions represented as a bit set
     dm_permission: Optional[bool]
@@ -112,12 +112,13 @@ class ApplicationCommand(APIModelBase):
         in DMs with the app, only for globally-scoped commands.
         By default, commands are visible.
     default_permission: Optional[bool]
-    	Not recommended for use as field will soon be deprecated.
-    	Indicates whether the command is enabled by default
-    	 when the app is added to a guild, defaults to true
+        Not recommended for use as field will soon be deprecated.
+        Indicates whether the command is enabled by default
+         when the app is added to a guild, defaults to true
     version: :class:`~melisa.utils.snowflake.Snowflake`
         Autoincrementing version identifier updated during substantial record changes
     """
+
     # ToDo: Better Permissions
 
     id: Snowflake = None
@@ -145,19 +146,23 @@ class ApplicationCommand(APIModelBase):
         """
         self: ApplicationCommand = super().__new__(cls)
 
-        self.id = Snowflake(data.get('id', 0))
-        self.type = data.get('type', 1)
-        self.application_id = Snowflake(data.get('application_id'))
-        self.guild_id = Snowflake(data['guild_id']) if data.get('guild_id') is not None else None
-        self.name = data.get('name')
-        self.name_localizations = data.get('name_localizations')
-        self.description = data.get('description')
-        self.description_localizations = data.get('description_localizations')
-        self.options = [ApplicationCommandOption.from_dict(x) for x in data.get('options')]
-        self.default_member_permissions = data.get('default_member_permissions')
-        self.dm_permission = data.get('dm_permission', True)
-        self.default_permission = data.get('default_permission', True)
-        self.version = Snowflake(data.get('version', 0))
+        self.id = Snowflake(data.get("id", 0))
+        self.type = data.get("type", 1)
+        self.application_id = Snowflake(data.get("application_id"))
+        self.guild_id = (
+            Snowflake(data["guild_id"]) if data.get("guild_id") is not None else None
+        )
+        self.name = data.get("name")
+        self.name_localizations = data.get("name_localizations")
+        self.description = data.get("description")
+        self.description_localizations = data.get("description_localizations")
+        self.options = [
+            ApplicationCommandOption.from_dict(x) for x in data.get("options", [])
+        ]
+        self.default_member_permissions = data.get("default_member_permissions")
+        self.dm_permission = data.get("dm_permission", True)
+        self.default_permission = data.get("default_permission", True)
+        self.version = Snowflake(data.get("version", 0))
 
         return self
 
@@ -244,9 +249,9 @@ class ApplicationCommandOption(APIModelBase):
         self.channel_types = [
             try_enum(ChannelType, x) for x in data.get("channel_types", [])
         ]
-        self.min_value = data.get('min_value')
-        self.max_value = data.get('max_value')
-        self.autocomplete = data.get('autocomplete')
+        self.min_value = data.get("min_value")
+        self.max_value = data.get("max_value")
+        self.autocomplete = data.get("autocomplete")
 
         return self
 

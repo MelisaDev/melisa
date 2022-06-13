@@ -6,6 +6,8 @@ from typing import Union, Optional, List, Dict, Any, AsyncIterator
 
 from aiohttp import FormData
 
+from .models.interactions import ApplicationCommandTypes
+from .models.interactions.commands import ApplicationCommandOption, ApplicationCommand
 from .models.message import Embed, File, AllowedMentions, Message
 from .exceptions import EmbedFieldError
 from .core.http import HTTPClient
@@ -659,6 +661,93 @@ class RESTApp:
         await self._http.delete(
             f"guilds/{guild_id}/members/{user_id}/roles/{role_id}",
             headers={"X-Audit-Log-Reason": reason},
+        )
+
+    async def create_global_application_command(
+        self,
+        application_id: Union[int, str, Snowflake],
+        command_type: ApplicationCommandTypes,
+        name: str,
+        description: str = None,
+        *,
+        name_localizations: Optional[Dict[str, str]] = None,
+        description_localizations: Optional[Dict[str, str]] = None,
+        options: Optional[List[ApplicationCommandOption]] = None,
+        default_member_permissions: Optional[str] = None,
+        dm_permission: Optional[bool] = None,
+        default_permission: Optional[bool] = None,
+    ):
+        """|coro|
+
+        [**REST API**] Create a new global command.
+
+        Parameters
+        ----------
+        application_id: :class:`~melisa.utils.snowflake.Snowflake`
+            ID of the parent application
+        command_type: Optional[:class:`~melisa.interactions.commands.ApplicationCommandTypes`]
+            Type of command, defaults to ``1``
+        name: str
+            Name of command, 1-32 characters
+        description: str
+            Description for ``CHAT_INPUT`` commands, 1-100 characters.
+            Empty string for ``USER`` and ``MESSAGE`` commands
+        name_localizations: Optional[Dict[str, str]]
+            Localization dictionary for ``name`` field.
+            Values follow the same restrictions as ``name``
+        description_localizations: Optional[Dict[str, str]]
+            Localization dictionary for ``description`` field.
+            Values follow the same restrictions as ``description``
+        options: Optional[List[:class:`~melisa.models.interactions.commands.ApplicationCommandOption`]]
+            Parameters for the command, max of 25.
+            Only available for ``CHAT_INPUT`` command type.
+        default_member_permissions: Optional[str]
+            Set of permissions represented as a bit set
+        dm_permission: Optional[bool]
+            Indicates whether the command is available
+            in DMs with the app, only for globally-scoped commands.
+            By default, commands are visible.
+        default_permission: Optional[bool]
+            Not recommended for use as field will soon be deprecated.
+            Indicates whether the command is enabled by default
+             when the app is added to a guild, defaults to true
+
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have proper permissions to do the actions required.
+        BadRequestError
+            You provided a wrong arguments
+        """
+
+        data = {
+            "name": name,
+            "description": description,
+            "type": int(command_type),
+        }
+
+        if name_localizations is not None:
+            data["name_localizations"] = name_localizations
+
+        if description_localizations is not None:
+            data["description_localizations"] = description_localizations
+
+        if default_member_permissions is not None:
+            data["default_member_permissions"] = default_member_permissions
+
+        if options is not None:
+            data["options"] = [x.to_dict() for x in options]
+
+        if dm_permission is not None:
+            data["dm_permission"] = dm_permission
+
+        if default_permission is not None:
+            data["default_permission"] = default_permission
+
+        return ApplicationCommand.from_dict(
+            await self._http.post(f"/applications/{application_id}/commands", data=data)
         )
 
 

@@ -203,7 +203,7 @@ class HTTPClient:
         Optional[:class:`Dict`]
             JSON response from the Discord API.
         """
-        return await self.__send("POST", route, data=data, headers=headers)
+        return await self.__send("POST", route, json=data, headers=headers)
 
     async def delete(self, route: str, *, headers: dict = None) -> Optional[Dict]:
         """|coro|

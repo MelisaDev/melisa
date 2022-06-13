@@ -85,9 +85,7 @@ class Gateway:
             "intents": self.intents,
             "properties": {
                 "$os": sys.platform,
-                "$browser": "Discord iOS"
-                if kwargs.get("mobile") is True
-                else "melisa",
+                "$browser": "Discord iOS" if kwargs.get("mobile") is True else "melisa",
                 "$device": "melisa",
             },
             "compress": True,
