@@ -822,6 +822,98 @@ class RESTApp:
             )
         )
 
+    async def edit_global_application_command(
+        self,
+        application_id: Union[int, str, Snowflake],
+        command_id: Union[int, str, Snowflake],
+        *,
+        name: Optional[str] = None,
+        description: Optional[str] = None,
+        name_localizations: Optional[Dict[str, str]] = None,
+        description_localizations: Optional[Dict[str, str]] = None,
+        options: Optional[List[ApplicationCommandOption]] = None,
+        default_member_permissions: Optional[str] = None,
+        dm_permission: Optional[bool] = None,
+        default_permission: Optional[bool] = None,
+    ):
+        """|coro|
+
+        All parameters are optional, but any parameters
+        provided will entirely overwrite the existing values of those parameters.
+
+        [**REST API**] Edit a global command.
+
+        Parameters
+        ----------
+        application_id: :class:`~melisa.utils.snowflake.Snowflake`
+            ID of the parent application
+        command_id: Optional[bool]
+            ID of command to edit.
+        name: Optional[str]
+            Name of command, 1-32 characters
+        description: Optional[str]
+            Description for ``CHAT_INPUT`` commands, 1-100 characters.
+            Empty string for ``USER`` and ``MESSAGE`` commands
+        name_localizations: Optional[Dict[str, str]]
+            Localization dictionary for ``name`` field.
+            Values follow the same restrictions as ``name``
+        description_localizations: Optional[Dict[str, str]]
+            Localization dictionary for ``description`` field.
+            Values follow the same restrictions as ``description``
+        options: Optional[List[:class:`~melisa.models.interactions.commands.ApplicationCommandOption`]]
+            Parameters for the command, max of 25.
+            Only available for ``CHAT_INPUT`` command type.
+        default_member_permissions: Optional[str]
+            Set of permissions represented as a bit set
+        dm_permission: Optional[bool]
+            Indicates whether the command is available
+            in DMs with the app, only for globally-scoped commands.
+            By default, commands are visible.
+        default_permission: Optional[bool]
+            Not recommended for use as field will soon be deprecated.
+            Indicates whether the command is enabled by default
+             when the app is added to a guild, defaults to true
+
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have proper permissions to do the actions required.
+        BadRequestError
+            You provided a wrong arguments
+        """
+
+        data = {}
+
+        if name is not None:
+            data["name"] = name
+
+        if description is not None:
+            data["description"] = description
+
+        if name_localizations is not None:
+            data["name_localizations"] = name_localizations
+
+        if description_localizations is not None:
+            data["description_localizations"] = description_localizations
+
+        if default_member_permissions is not None:
+            data["default_member_permissions"] = default_member_permissions
+
+        if options is not None:
+            data["options"] = [x.to_dict() for x in options]
+
+        if dm_permission is not None:
+            data["dm_permission"] = dm_permission
+
+        if default_permission is not None:
+            data["default_permission"] = default_permission
+
+        return ApplicationCommand.from_dict(
+            await self._http.patch(f"/applications/{application_id}/commands/{command_id}", json=data)
+        )
+
 
 class CDNBuilder:
     """Can be used to build images

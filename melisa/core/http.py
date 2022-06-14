@@ -231,7 +231,7 @@ class HTTPClient:
         return await self.__send("DELETE", route, headers=headers)
 
     async def patch(
-        self, route: str, *, headers: dict = None, data: Optional[Dict] = None
+        self, route: str, *, headers: dict = None, json: Optional[Dict] = None, data=None
     ) -> Optional[Dict]:
         """|coro|
         Sends a PATCH request to a Discord REST API endpoint.
@@ -240,8 +240,10 @@ class HTTPClient:
         ----------
         route : :class:`str`
             The endpoint to send the request to.
-        data : Dict
+        data : Any
             Data to post
+        json: Dict
+            Json data to post
         headers : :class:`dict`
             Custom request headers
 
@@ -250,7 +252,7 @@ class HTTPClient:
         Optional[:class:`Dict`]
             JSON response from the Discord API.
         """
-        return await self.__send("PATCH", route, json=data, headers=headers)
+        return await self.__send("PATCH", route, json=json, data=data, headers=headers)
 
     async def put(
         self, route: str, *, headers: dict = None, data: Optional[Dict] = None
