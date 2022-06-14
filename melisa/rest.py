@@ -671,7 +671,7 @@ class RESTApp:
         application_id: Union[int, str, Snowflake],
         *,
         with_localizations: Optional[bool] = False,
-    ):
+    ) -> List[ApplicationCommand]:
         """|coro|
 
         [**REST API**] Fetch all of the global commands for your application.
@@ -716,7 +716,7 @@ class RESTApp:
         default_member_permissions: Optional[str] = None,
         dm_permission: Optional[bool] = None,
         default_permission: Optional[bool] = None,
-    ):
+    ) -> ApplicationCommand:
         """|coro|
 
         [**REST API**] Create a new global command.
@@ -794,7 +794,7 @@ class RESTApp:
         self,
         application_id: Union[int, str, Snowflake],
         command_id: Union[int, str, Snowflake],
-    ):
+    ) -> ApplicationCommand:
         """|coro|
 
         [**REST API**] Fetch a global command for your application.
@@ -835,7 +835,7 @@ class RESTApp:
         default_member_permissions: Optional[str] = None,
         dm_permission: Optional[bool] = None,
         default_permission: Optional[bool] = None,
-    ):
+    ) -> ApplicationCommand:
         """|coro|
 
         All parameters are optional, but any parameters
@@ -913,6 +913,38 @@ class RESTApp:
         return ApplicationCommand.from_dict(
             await self._http.patch(f"/applications/{application_id}/commands/{command_id}", json=data)
         )
+
+    async def delete_global_application_command(
+        self,
+        application_id: Union[int, str, Snowflake],
+        command_id: Union[int, str, Snowflake],
+    ) -> None:
+        """|coro|
+
+        [**REST API**] Delete a global command.
+
+        Parameters
+        ----------
+        application_id: :class:`~melisa.utils.snowflake.Snowflake`
+            ID of the parent application
+        command_id: Optional[bool]
+            ID of command to delete.
+
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have proper permissions to do the actions required.
+        BadRequestError
+            You provided a wrong arguments
+        """
+
+        await self._http.delete(
+            f"/applications/{application_id}/commands/{command_id}"
+        )
+
+        return None
 
 
 class CDNBuilder:
