@@ -184,7 +184,12 @@ class HTTPClient:
         return await self.__send("GET", route, params=params)
 
     async def post(
-        self, route: str, *, headers: dict = None, data: Optional[Dict] = None
+        self,
+        route: str,
+        *,
+        headers: dict = None,
+        json: Optional[Dict] = None,
+        data=None,
     ) -> Optional[Dict]:
         """|coro|
         Sends a POST request to a Discord REST API endpoint.
@@ -193,7 +198,9 @@ class HTTPClient:
         ----------
         route : :class:`str`
             The endpoint to send the request to.
-        data : Dict
+        json : Dict
+            Json data to post
+        data : Any
             Data to post
         headers : :class:`dict`
             Custom request headers
@@ -203,7 +210,7 @@ class HTTPClient:
         Optional[:class:`Dict`]
             JSON response from the Discord API.
         """
-        return await self.__send("POST", route, json=data, headers=headers)
+        return await self.__send("POST", route, json=json, data=data, headers=headers)
 
     async def delete(self, route: str, *, headers: dict = None) -> Optional[Dict]:
         """|coro|

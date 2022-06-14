@@ -137,20 +137,3 @@ class Color:
     def default(cls: typing.Type[CT]) -> CT:
         """A factory method that returns a :class:`Colour` with a value of ``0``."""
         return cls(0)
-
-    @classmethod
-    def random(
-        cls: typing.Type[CT],
-        *,
-        seed: typing.Optional[typing.Union[int, str, float, bytes, bytearray]] = None,
-    ) -> CT:
-        """A factory method that returns a :class:`Colour` with a random hue.
-
-        Parameters
-        ----------
-        seed: Optional[Union[:class:`int`, :class:`str`,
-                :class:`float`, :class:`bytes`, :class:`bytearray`]]
-            The seed to initialize the RNG with. If ``None`` is passed the default RNG is used.
-        """
-        rand = random if seed is None else random.Random(seed)
-        return cls.from_hsv(rand.random(), 1, 1)

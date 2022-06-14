@@ -470,7 +470,7 @@ class Guild(APIModelBase):
 
         for channel in data.get("channels", []):
             channel = _choose_channel_type(channel)
-            self.channels[Snowflake(int(channel.id))] = channel
+            self.channels[str(channel.id)] = channel
 
         for role in data.get("roles", []):
             role["guild_id"] = self.id

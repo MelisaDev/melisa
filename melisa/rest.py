@@ -197,19 +197,22 @@ class RESTApp:
         # ToDo: add file checks
 
         if embeds is None:
-            embeds = [embed.to_dict()] if embed is not None else []
+            embeds = [embed] if embed is not None else []
         if files is None:
             files = [file] if file is not None else []
 
-        payload = {"content": str(content) if content is not None else None}
+        payload = {
+            "content": str(content) if content is not None else None,
+            "embeds": [],
+        }
 
         for _embed in embeds:
-            if embed.total_length() > 6000:
+            if _embed.total_length() > 6000:
                 raise EmbedFieldError.characters_from_desc(
                     "Embed", embed.total_length(), 6000
                 )
+            payload["embeds"].append(_embed.to_dict())
 
-        payload["embeds"] = embeds
         payload["tts"] = tts
 
         # ToDo: add auto allowed_mentions from client
@@ -663,6 +666,43 @@ class RESTApp:
             headers={"X-Audit-Log-Reason": reason},
         )
 
+    async def get_global_application_commands(
+        self,
+        application_id: Union[int, str, Snowflake],
+        *,
+        with_localizations: Optional[bool] = False,
+    ):
+        """|coro|
+
+        [**REST API**] Fetch all of the global commands for your application.
+
+        Parameters
+        ----------
+        application_id: :class:`~melisa.utils.snowflake.Snowflake`
+            ID of the parent application
+        with_localizations: Optional[bool]
+            Whether to include full localization dictionaries
+            (``name_localizations`` and ``description_localizations``) in
+            the returned objects, instead of the ``name_localized`
+            and ``description_localized fields``. Default ``False``.
+
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have proper permissions to do the actions required.
+        BadRequestError
+            You provided a wrong arguments
+        """
+
+        return [
+            ApplicationCommand.from_dict(x)
+            for x in await self._http.get(
+                f"/applications/{application_id}/commands?with_localizations={with_localizations}"
+            )
+        ]
+
     async def create_global_application_command(
         self,
         application_id: Union[int, str, Snowflake],
@@ -747,7 +787,7 @@ class RESTApp:
             data["default_permission"] = default_permission
 
         return ApplicationCommand.from_dict(
-            await self._http.post(f"/applications/{application_id}/commands", data=data)
+            await self._http.post(f"/applications/{application_id}/commands", json=data)
         )
 
 
