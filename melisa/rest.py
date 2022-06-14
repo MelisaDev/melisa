@@ -750,7 +750,7 @@ class RESTApp:
         default_permission: Optional[bool]
             Not recommended for use as field will soon be deprecated.
             Indicates whether the command is enabled by default
-             when the app is added to a guild, defaults to true
+            when the app is added to a guild, defaults to ``True``
 
         Raises
         -------
@@ -872,7 +872,7 @@ class RESTApp:
         default_permission: Optional[bool]
             Not recommended for use as field will soon be deprecated.
             Indicates whether the command is enabled by default
-             when the app is added to a guild, defaults to true
+            when the app is added to a guild, defaults to true
 
         Raises
         -------
