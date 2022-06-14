@@ -790,6 +790,38 @@ class RESTApp:
             await self._http.post(f"/applications/{application_id}/commands", json=data)
         )
 
+    async def get_global_application_command(
+        self,
+        application_id: Union[int, str, Snowflake],
+        command_id: Union[int, str, Snowflake],
+    ):
+        """|coro|
+
+        [**REST API**] Fetch a global command for your application.
+
+        Parameters
+        ----------
+        application_id: :class:`~melisa.utils.snowflake.Snowflake`
+            ID of the parent application
+        command_id: Optional[bool]
+            ID of command to fetch.
+
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have proper permissions to do the actions required.
+        BadRequestError
+            You provided a wrong arguments
+        """
+
+        return ApplicationCommand.from_dict(
+            await self._http.get(
+                f"/applications/{application_id}/commands/{command_id}"
+            )
+        )
+
 
 class CDNBuilder:
     """Can be used to build images
