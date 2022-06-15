@@ -42,11 +42,11 @@ We are going to create really cool cache configuration, so don't worry about the
 ---
 ## Install MelisaPy
 
-Installing from PyPi:
+### Installing from PyPi:
 ```commandline
 pip install melisa
 ```
-Installing from Git:
+### Installing from Git:
 ```commandline
 pip install git+https://github.com/MelisaDev/melisa
 ```
