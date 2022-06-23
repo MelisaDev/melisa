@@ -28,7 +28,7 @@ setuptools.setup(
     ],
     extras_require={
         "speedup": [
-            "orjson==3.7.2"
+            "orjson==3.7.3"
         ]
     },
     test_suite="tests",
