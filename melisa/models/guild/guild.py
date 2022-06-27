@@ -621,7 +621,7 @@ class Guild(APIModelBase):
 
         await self._client.rest.remove_guild_ban(self.id, user_id, reason=reason)
     
-    async def emojis(
+    async def fetch_emojis(
         self
     ):
         """|coro|
@@ -640,7 +640,7 @@ class Guild(APIModelBase):
 
         await self._client.rest.list_guild_emojis(self.id)
 
-    async def emoji(
+    async def fetch_emoji(
         self,
         emoji_id: Union[Snowflake, str, int]
     ):
