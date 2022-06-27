@@ -666,6 +666,65 @@ class RESTApp:
             headers={"X-Audit-Log-Reason": reason},
         )
 
+    async def list_guild_emojis(
+        self,
+        guild_id: Union[Snowflake, str, int],
+    ):
+        """|coro|
+        
+        [**REST API**] Getting all emojis from guild
+
+        Parameters
+        ----------
+        guild_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
+            ID of the guild in which we will get the list emojis
+        
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have proper permissions to do the actions required.
+        BadRequestError
+            You provided a wrong guild
+        """
+
+        await self._http.get(
+            f"/guilds/{guild_id}/emojis"
+        )
+    
+    async def get_guild_emoji(
+        self,
+        guild_id: Union[Snowflake, str, int],
+        emoji_id: Union[Snowflake, str, int]
+    ):
+        """|coro|
+        
+        [**REST API**] Getting all emojis from guild
+
+        Parameters
+        ----------
+        guild_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
+           The ID of the guild in which we will receive emojis
+        emoji_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
+            The ID of the emoji that we will get
+        
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have proper permissions to do the actions required.
+        BadRequestError
+            You provided a wrong guild and emoji
+        """
+
+        await self._http.get(
+            f"/guilds/{guild_id}/emojis/{emoji_id}"
+        )
+
+    #TODO: add create and delete emoji
+
     async def get_global_application_commands(
         self,
         application_id: Union[int, str, Snowflake],

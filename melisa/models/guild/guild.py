@@ -24,6 +24,7 @@ from ...utils.types import APINullable
 
 if TYPE_CHECKING:
     from .channel import ChannelType, Channel
+    from .emoji import Emoji
 
 
 class DefaultMessageNotificationLevel(IntEnum):
@@ -619,6 +620,50 @@ class Guild(APIModelBase):
         """
 
         await self._client.rest.remove_guild_ban(self.id, user_id, reason=reason)
+    
+    async def emojis(
+        self
+    ):
+        """|coro|
+        
+        Getting all emojis from guild
+
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have proper permissions to do the actions required.
+        BadRequestError
+            You provided a wrong guild
+        """
+
+        await self._client.rest.list_guild_emojis(self.id)
+
+    async def emoji(
+        self,
+        emoji_id: Union[Snowflake, str, int]
+    ):
+        """|coro|
+        
+        Getting all emojis from guild
+
+        Parameters
+        ----------
+        emoji_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
+            The ID of the emoji that we will get
+        
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have proper permissions to do the actions required.
+        BadRequestError
+            You provided a wrong guild and emoji
+        """
+
+        await self._client.rest.get_guild_emoji(self.id, emoji_id)
 
 
 @dataclass(repr=False)
