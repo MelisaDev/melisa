@@ -306,7 +306,6 @@ class Guild(APIModelBase):
 
     id: Snowflake
     roles: APINullable[Dict]
-    emojis: APINullable[Dict]
     members: APINullable[Dict]
     threads: APINullable[Dict]
     presences: APINullable[Dict]
@@ -328,6 +327,7 @@ class Guild(APIModelBase):
     default_message_notifications: APINullable[int] = None
     explicit_content_filter: APINullable[int] = None
     features: APINullable[List[str]] = None
+    emojis: APINullable[Emoji] = None
     # TODO: Make a structures of emoji and role
 
     mfa_level: APINullable[MFALevel] = None
@@ -646,7 +646,7 @@ class Guild(APIModelBase):
     ):
         """|coro|
         
-        Getting all emojis from guild
+        Get emoji from guild
 
         Parameters
         ----------
@@ -664,6 +664,115 @@ class Guild(APIModelBase):
         """
 
         await self._client.rest.get_guild_emoji(self.id, emoji_id)
+    
+    async def create_emoji(
+        self,
+        emoji_name: Optional[str],
+        emoji_image: Optional[str],
+        *,
+        reason: Optional[str] = None,
+        role_id: Union[Snowflake, str, int] = None
+    ):
+        """|coro|
+        
+        Create a new emoji for the guild. 
+        Requires the `MANAGE_EMOJIS_AND_STICKERS` permission. 
+        Returns the new emoji object on success. Fires a Guild Emojis Update Gateway event.
+
+        Parameters
+        ----------
+        emoji_name: Optional[:class:`str`]
+            Name of the emoji
+        emoji_image: Optional[:class:`str`]
+            The 128x128 emoji image
+        reason: Optional[:class:`str`]
+            The reason of the action
+        role_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
+            Roles allowed to use this emoji
+        
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have proper permissions to do the actions required.
+        BadRequestError
+            You provided a wrong guild
+        """
+
+        await self._client.rest.create_guild_emoji(self.id, emoji_name, emoji_image, reason=reason, role_id=role_id)
+    
+    async def edit_emoji(
+        self,
+        emoji_id: Union[Snowflake, str, int],
+        emoji_name: Optional[str],
+        *,
+        reason: Optional[str] = None,
+        role_id: Union[Snowflake, str, int] = None
+    ):
+        """|coro|
+        
+        Modify the given emoji. 
+        Requires the `MANAGE_EMOJIS_AND_STICKERS` permission. 
+        Returns the updated emoji object on success. Fires a Guild Emojis Update Gateway event. 
+
+        Parameters
+        ----------
+        guild_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
+           ID of the guild in which we will modify emoji
+        emoji_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
+            The ID of the emoji that we will modify
+        emoji_name: Optional[:class:`str`]
+            Name of the emoji
+        reason: Optional[:class:`str`]
+            The reason of the action
+        role_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
+            Roles allowed to use this emoji
+        
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have proper permissions to do the actions required.
+        BadRequestError
+            You provided a wrong guild and emoji
+        """
+
+        await self._client.rest.modify_guild_emoji(self.id, emoji_id, emoji_name, reason=reason, role_id=role_id)
+    
+    async def delete_emoji(
+        self,
+        emoji_id: Union[Snowflake, str, int],
+        *,
+        reason: Optional[str] = None
+    ):
+        """|coro|
+        
+        Delete the given emoji. 
+        Requires the `MANAGE_EMOJIS_AND_STICKERS` permission. 
+        Returns `204 No Content` on success. Fires a Guild Emojis Update Gateway event.
+
+        Parameters
+        ----------
+        guild_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
+           ID of the guild in which we will delete emoji
+        emoji_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
+            The ID of the emoji that we will delete
+        reason: Optional[:class:`str`]
+            The reason of the action
+        
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have proper permissions to do the actions required.
+        BadRequestError
+            You provided a wrong guild and emoji
+        """
+
+        await self._client.rest.delete_guild_emoji(self.id, emoji_id, reason=reason)
 
 
 @dataclass(repr=False)

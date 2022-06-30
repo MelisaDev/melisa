@@ -700,12 +700,12 @@ class RESTApp:
     ):
         """|coro|
         
-        [**REST API**] Getting all emojis from guild
+        [**REST API**] Get emoji from guild
 
         Parameters
         ----------
         guild_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
-           The ID of the guild in which we will receive emojis
+           The ID of the guild in which we will receive emoji
         emoji_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
             The ID of the emoji that we will get
         
@@ -723,7 +723,138 @@ class RESTApp:
             f"/guilds/{guild_id}/emojis/{emoji_id}"
         )
 
-    #TODO: add create and delete emoji
+    async def create_guild_emoji(
+        self,
+        guild_id: Union[int, str, Snowflake],
+        emoji_name: Optional[str],
+        emoji_image: Optional[str],
+        *,
+        reason: Optional[str] = None,
+        role_id: Union[int, str, Snowflake] = None
+    ):
+        """|coro|
+        
+        [**REST API**] Create a new emoji for the guild. 
+        **Required permissions:** ``MANAGE_EMOJIS_AND_STICKERS``. 
+
+        Parameters
+        ----------
+        guild_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
+           ID of the guild in which we will create emoji
+        emoji_name: Optional[:class:`str`]
+            Name of the emoji
+        emoji_image: Optional[:class:`str`]
+            The 128x128 emoji image
+        reason: Optional[:class:`str`]
+            The reason of the action
+        role_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
+            Roles allowed to use this emoji
+        
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have proper permissions to do the actions required.
+        BadRequestError
+            You provided a wrong guild
+        """
+
+        data = {
+            "name": emoji_name,
+            "image": emoji_image,
+            "roles": role_id
+        }
+
+        await self._http.post(
+            f"/guilds/{guild_id}/emojis",
+            json = data,
+            headers={"X-Audit-Log-Reason": reason}
+        )  
+    
+    async def modify_guild_emoji(
+        self,
+        guild_id: Union[int, str, Snowflake],
+        emoji_id: Union[int, str, Snowflake],
+        emoji_name: Optional[str],
+        *,
+        reason: Optional[str] = None,
+        role_id: Union[int, str, Snowflake] = None
+    ):
+        """|coro|
+        
+        [**REST API**] Modify the given emoji.
+        **Required permissions:** ``MANAGE_EMOJIS_AND_STICKERS``. 
+
+        Parameters
+        ----------
+        guild_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
+           ID of the guild in which we will modify emoji
+        emoji_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
+            The ID of the emoji that we will modify
+        emoji_name: Optional[:class:`str`]
+            Name of the emoji
+        reason: Optional[:class:`str`]
+            The reason of the action
+        role_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
+            Roles allowed to use this emoji
+        
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have proper permissions to do the actions required.
+        BadRequestError
+            You provided a wrong guild and emoji
+        """
+
+        data = {
+            "name": emoji_name,
+            "roles": role_id
+        }
+
+        await self._http.patch(
+            f"/guilds/{guild_id}/emojis/{emoji_id}",
+            json = data,
+            headers={"X-Audit-Log-Reason": reason}
+        )
+
+    async def delete_guild_emoji(
+        self,
+        guild_id: Union[int, str, Snowflake],
+        emoji_id: Union[int, str, Snowflake],
+        *,
+        reason: Optional[str] = None
+    ):
+        """|coro|
+        
+        [**REST API**] Delete the given emoji
+        **Required permissions:** ``MANAGE_EMOJIS_AND_STICKERS``. 
+
+        Parameters
+        ----------
+        guild_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
+           ID of the guild in which we will delete emoji
+        emoji_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
+            The ID of the emoji that we will delete
+        reason: Optional[:class:`str`]
+            The reason of the action
+        
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have proper permissions to do the actions required.
+        BadRequestError
+            You provided a wrong guild and emoji
+        """
+
+        await self._http.delete(
+            f"/guilds/{guild_id}/emojis/{emoji_id}",
+            headers={"X-Audit-Log-Reason": reason}
+        )
 
     async def get_global_application_commands(
         self,
