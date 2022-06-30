@@ -15,6 +15,7 @@ from .utils import json, UNDEFINED
 from .utils.snowflake import Snowflake
 from .models.guild.guild import Guild
 from .models.user.user import User
+from .models.guild.emoji import Emoji
 from .models.guild.channel import _choose_channel_type, Channel
 
 
@@ -671,14 +672,14 @@ class RESTApp:
         guild_id: Union[Snowflake, str, int],
     ):
         """|coro|
-        
+
         [**REST API**] Getting all emojis from guild
 
         Parameters
         ----------
         guild_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
-            ID of the guild in which we will get the list emojis
-        
+            ID of the guild in which we will get the list of emojis
+
         Raises
         -------
         HTTPException
@@ -688,18 +689,16 @@ class RESTApp:
         BadRequestError
             You provided a wrong guild
         """
+        return [
+            Emoji.from_dict(emoji)
+            for emoji in await self._http.get(f"/guilds/{guild_id}/emojis")
+        ]
 
-        await self._http.get(
-            f"/guilds/{guild_id}/emojis"
-        )
-    
     async def get_guild_emoji(
-        self,
-        guild_id: Union[Snowflake, str, int],
-        emoji_id: Union[Snowflake, str, int]
+        self, guild_id: Union[Snowflake, str, int], emoji_id: Union[Snowflake, str, int]
     ):
         """|coro|
-        
+
         [**REST API**] Get emoji from guild
 
         Parameters
@@ -708,7 +707,7 @@ class RESTApp:
            The ID of the guild in which we will receive emoji
         emoji_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
             The ID of the emoji that we will get
-        
+
         Raises
         -------
         HTTPException
@@ -719,23 +718,22 @@ class RESTApp:
             You provided a wrong guild and emoji
         """
 
-        await self._http.get(
-            f"/guilds/{guild_id}/emojis/{emoji_id}"
-        )
+        await self._http.get(f"/guilds/{guild_id}/emojis/{emoji_id}")
 
     async def create_guild_emoji(
         self,
         guild_id: Union[int, str, Snowflake],
-        emoji_name: Optional[str],
-        emoji_image: Optional[str],
+        emoji_name: str,
+        emoji_image: Any,
         *,
         reason: Optional[str] = None,
-        role_id: Union[int, str, Snowflake] = None
+        role_id: Union[int, str, Snowflake] = None,
     ):
+        # FIXME: emoji_image != str, it works another way
         """|coro|
-        
-        [**REST API**] Create a new emoji for the guild. 
-        **Required permissions:** ``MANAGE_EMOJIS_AND_STICKERS``. 
+
+        [**REST API**] Create a new emoji for the guild.
+        **Required permissions:** ``MANAGE_EMOJIS_AND_STICKERS``.
 
         Parameters
         ----------
@@ -749,7 +747,7 @@ class RESTApp:
             The reason of the action
         role_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
             Roles allowed to use this emoji
-        
+
         Raises
         -------
         HTTPException
@@ -760,18 +758,16 @@ class RESTApp:
             You provided a wrong guild
         """
 
-        data = {
-            "name": emoji_name,
-            "image": emoji_image,
-            "roles": role_id
-        }
+        data = {"name": emoji_name, "image": emoji_image, "roles": role_id}
 
-        await self._http.post(
-            f"/guilds/{guild_id}/emojis",
-            json = data,
-            headers={"X-Audit-Log-Reason": reason}
-        )  
-    
+        return Emoji.from_dict(
+            await self._http.post(
+                f"/guilds/{guild_id}/emojis",
+                json=data,
+                headers={"X-Audit-Log-Reason": reason},
+            )
+        )
+
     async def modify_guild_emoji(
         self,
         guild_id: Union[int, str, Snowflake],
@@ -779,12 +775,12 @@ class RESTApp:
         emoji_name: Optional[str],
         *,
         reason: Optional[str] = None,
-        role_id: Union[int, str, Snowflake] = None
+        role_id: Union[int, str, Snowflake] = None,
     ):
         """|coro|
-        
+
         [**REST API**] Modify the given emoji.
-        **Required permissions:** ``MANAGE_EMOJIS_AND_STICKERS``. 
+        **Required permissions:** ``MANAGE_EMOJIS_AND_STICKERS``.
 
         Parameters
         ----------
@@ -798,7 +794,7 @@ class RESTApp:
             The reason of the action
         role_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
             Roles allowed to use this emoji
-        
+
         Raises
         -------
         HTTPException
@@ -809,15 +805,14 @@ class RESTApp:
             You provided a wrong guild and emoji
         """
 
-        data = {
-            "name": emoji_name,
-            "roles": role_id
-        }
+        data = {"name": emoji_name, "roles": role_id}
 
-        await self._http.patch(
-            f"/guilds/{guild_id}/emojis/{emoji_id}",
-            json = data,
-            headers={"X-Audit-Log-Reason": reason}
+        return Emoji.from_dict(
+            await self._http.patch(
+                f"/guilds/{guild_id}/emojis/{emoji_id}",
+                json=data,
+                headers={"X-Audit-Log-Reason": reason},
+            )
         )
 
     async def delete_guild_emoji(
@@ -825,12 +820,12 @@ class RESTApp:
         guild_id: Union[int, str, Snowflake],
         emoji_id: Union[int, str, Snowflake],
         *,
-        reason: Optional[str] = None
+        reason: Optional[str] = None,
     ):
         """|coro|
-        
+
         [**REST API**] Delete the given emoji
-        **Required permissions:** ``MANAGE_EMOJIS_AND_STICKERS``. 
+        **Required permissions:** ``MANAGE_EMOJIS_AND_STICKERS``.
 
         Parameters
         ----------
@@ -840,7 +835,7 @@ class RESTApp:
             The ID of the emoji that we will delete
         reason: Optional[:class:`str`]
             The reason of the action
-        
+
         Raises
         -------
         HTTPException
@@ -853,7 +848,7 @@ class RESTApp:
 
         await self._http.delete(
             f"/guilds/{guild_id}/emojis/{emoji_id}",
-            headers={"X-Audit-Log-Reason": reason}
+            headers={"X-Audit-Log-Reason": reason},
         )
 
     async def get_global_application_commands(
@@ -1101,7 +1096,9 @@ class RESTApp:
             data["default_permission"] = default_permission
 
         return ApplicationCommand.from_dict(
-            await self._http.patch(f"/applications/{application_id}/commands/{command_id}", json=data)
+            await self._http.patch(
+                f"/applications/{application_id}/commands/{command_id}", json=data
+            )
         )
 
     async def delete_global_application_command(
@@ -1130,9 +1127,7 @@ class RESTApp:
             You provided a wrong arguments
         """
 
-        await self._http.delete(
-            f"/applications/{application_id}/commands/{command_id}"
-        )
+        await self._http.delete(f"/applications/{application_id}/commands/{command_id}")
 
         return None
 

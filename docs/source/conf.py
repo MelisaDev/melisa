@@ -21,39 +21,36 @@ import sys
 import os
 
 sys.path.append(os.path.abspath("../.."))
-sys.path.append(os.path.abspath('extensions'))
+sys.path.append(os.path.abspath("extensions"))
 
 
-project = 'Melisa'
-copyright = '2022, MelisaDev'
-author = 'MelisaDev'
+project = "Melisa"
+copyright = "2022, MelisaDev"
+author = "MelisaDev"
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.1a'
+release = "0.0.1a"
 
 
 # -- General configuration ---------------------------------------------------
 
 extensions = [
-    'sphinx_design',
+    "sphinx_design",
     "sphinx.ext.napoleon",
     "sphinx.ext.autodoc",
     "sphinx.ext.viewcode",
     "sphinx.ext.autosectionlabel",
     "sphinx.ext.extlinks",
     "sphinxcontrib_trio",
-    "attributable"
+    "attributable",
 ]
 
-autodoc_default_options = {
-    'members': True,
-    'show-inheritance': True
-}
+autodoc_default_options = {"members": True, "show-inheritance": True}
 
-autodoc_typehints = 'none'
+autodoc_typehints = "none"
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 add_module_names = False
 
@@ -67,13 +64,13 @@ intersphinx_mapping = {
 
 # -- Options for HTML output -------------------------------------------------
 
-html_theme = 'furo'
+html_theme = "furo"
 html_theme_options = {
     "sidebar_hide_name": True,
 }
-pygments_style = 'monokai'
+pygments_style = "monokai"
 default_dark_mode = True
-html_static_path = ['_static']
+html_static_path = ["_static"]
 html_css_files = ["custom.css"]
 
 rst_prolog = """

@@ -231,7 +231,12 @@ class HTTPClient:
         return await self.__send("DELETE", route, headers=headers)
 
     async def patch(
-        self, route: str, *, headers: dict = None, json: Optional[Dict] = None, data=None
+        self,
+        route: str,
+        *,
+        headers: dict = None,
+        json: Optional[Dict] = None,
+        data=None,
     ) -> Optional[Dict]:
         """|coro|
         Sends a PATCH request to a Discord REST API endpoint.

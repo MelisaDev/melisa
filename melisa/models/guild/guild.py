@@ -13,8 +13,7 @@ from .channel import (
     Thread,
     _choose_channel_type,
 )
-
-
+from .emoji import Emoji
 from .member import GuildMember
 from .role import Role
 from ...utils import Snowflake, Timestamp
@@ -24,7 +23,6 @@ from ...utils.types import APINullable
 
 if TYPE_CHECKING:
     from .channel import ChannelType, Channel
-    from .emoji import Emoji
 
 
 class DefaultMessageNotificationLevel(IntEnum):
@@ -226,9 +224,9 @@ class Guild(APIModelBase):
         Explicit content filter level
     features: APINullable[List[:class:`str`]]
         Enabled guild features
-    roles: APINullable[:class:`typing.Any`]
+    roles: Dict[:class:`~melisa.utils.snowflake.Snowflake`, :class:`~melisa.models.guild.role.Role`]
         Roles in the guild
-    emojis: APINullable[:class:`typing.Any`]
+    emojis: Dict[:class:`~melisa.utils.snowflake.Snowflake`, :class:`~melisa.models.guild.emoji.Emoji`]
         Custom guild emojis
     mfa_level: :class:`int`
         Required MFA level for the guild
@@ -327,8 +325,7 @@ class Guild(APIModelBase):
     default_message_notifications: APINullable[int] = None
     explicit_content_filter: APINullable[int] = None
     features: APINullable[List[str]] = None
-    emojis: APINullable[Emoji] = None
-    # TODO: Make a structures of emoji and role
+    emojis: APINullable[Dict[str, Emoji]] = None
 
     mfa_level: APINullable[MFALevel] = None
     application_id: APINullable[Snowflake] = None
@@ -461,6 +458,7 @@ class Guild(APIModelBase):
         self.channels = {}
         self.members = {}
         self.roles = {}
+        self.emojis = {}
 
         for member in data.get("members", []):
             member = GuildMember.from_dict(member)
@@ -476,6 +474,10 @@ class Guild(APIModelBase):
         for role in data.get("roles", []):
             role["guild_id"] = self.id
             self.roles[Snowflake(int(role["id"]))] = Role.from_dict(role)
+
+        for emoji in data.get("emojis", []):
+            emoji["guild_id"] = self.id
+            self.emojis[Snowflake(emoji["id"])] = Emoji.from_dict(emoji)
 
         return self
 
@@ -620,12 +622,10 @@ class Guild(APIModelBase):
         """
 
         await self._client.rest.remove_guild_ban(self.id, user_id, reason=reason)
-    
-    async def fetch_emojis(
-        self
-    ):
+
+    async def fetch_emojis(self) -> List[Emoji]:
         """|coro|
-        
+
         Getting all emojis from guild
 
         Raises
@@ -638,21 +638,18 @@ class Guild(APIModelBase):
             You provided a wrong guild
         """
 
-        await self._client.rest.list_guild_emojis(self.id)
+        return await self._client.rest.list_guild_emojis(self.id)
 
-    async def fetch_emoji(
-        self,
-        emoji_id: Union[Snowflake, str, int]
-    ):
+    async def fetch_emoji(self, emoji_id: Union[Snowflake, str, int]) -> Emoji:
         """|coro|
-        
+
         Get emoji from guild
 
         Parameters
         ----------
         emoji_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
             The ID of the emoji that we will get
-        
+
         Raises
         -------
         HTTPException
@@ -663,20 +660,21 @@ class Guild(APIModelBase):
             You provided a wrong guild and emoji
         """
 
-        await self._client.rest.get_guild_emoji(self.id, emoji_id)
-    
+        return await self._client.rest.get_guild_emoji(self.id, emoji_id)
+
     async def create_emoji(
         self,
-        emoji_name: Optional[str],
-        emoji_image: Optional[str],
+        emoji_name: str,
+        emoji_image: Any,
         *,
         reason: Optional[str] = None,
-        role_id: Union[Snowflake, str, int] = None
-    ):
+        role_id: List[Union[Snowflake, str, int]] = None,
+    ) -> Emoji:
+        # FIXME: emoji_image != str, it works another way
         """|coro|
-        
-        Create a new emoji for the guild. 
-        Requires the `MANAGE_EMOJIS_AND_STICKERS` permission. 
+
+        Create a new emoji for the guild.
+        Requires the `MANAGE_EMOJIS_AND_STICKERS` permission.
         Returns the new emoji object on success. Fires a Guild Emojis Update Gateway event.
 
         Parameters
@@ -687,9 +685,9 @@ class Guild(APIModelBase):
             The 128x128 emoji image
         reason: Optional[:class:`str`]
             The reason of the action
-        role_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
+        role_id: List[Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]]
             Roles allowed to use this emoji
-        
+
         Raises
         -------
         HTTPException
@@ -700,26 +698,26 @@ class Guild(APIModelBase):
             You provided a wrong guild
         """
 
-        await self._client.rest.create_guild_emoji(self.id, emoji_name, emoji_image, reason=reason, role_id=role_id)
-    
+        return await self._client.rest.create_guild_emoji(
+            self.id, emoji_name, emoji_image, reason=reason, role_id=role_id
+        )
+
     async def edit_emoji(
         self,
         emoji_id: Union[Snowflake, str, int],
         emoji_name: Optional[str],
         *,
         reason: Optional[str] = None,
-        role_id: Union[Snowflake, str, int] = None
+        role_id: List[Union[Snowflake, str, int]] = None,
     ):
         """|coro|
-        
-        Modify the given emoji. 
-        Requires the `MANAGE_EMOJIS_AND_STICKERS` permission. 
-        Returns the updated emoji object on success. Fires a Guild Emojis Update Gateway event. 
+
+        Modify the given emoji.
+        Requires the `MANAGE_EMOJIS_AND_STICKERS` permission.
+        Returns the updated emoji object on success.
 
         Parameters
         ----------
-        guild_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
-           ID of the guild in which we will modify emoji
         emoji_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
             The ID of the emoji that we will modify
         emoji_name: Optional[:class:`str`]
@@ -728,7 +726,7 @@ class Guild(APIModelBase):
             The reason of the action
         role_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
             Roles allowed to use this emoji
-        
+
         Raises
         -------
         HTTPException
@@ -739,29 +737,26 @@ class Guild(APIModelBase):
             You provided a wrong guild and emoji
         """
 
-        await self._client.rest.modify_guild_emoji(self.id, emoji_id, emoji_name, reason=reason, role_id=role_id)
-    
+        return await self._client.rest.modify_guild_emoji(
+            self.id, emoji_id, emoji_name, reason=reason, role_id=role_id
+        )
+
     async def delete_emoji(
-        self,
-        emoji_id: Union[Snowflake, str, int],
-        *,
-        reason: Optional[str] = None
-    ):
+        self, emoji_id: Union[Snowflake, str, int], *, reason: Optional[str] = None
+    ) -> None:
         """|coro|
-        
-        Delete the given emoji. 
-        Requires the `MANAGE_EMOJIS_AND_STICKERS` permission. 
+
+        Delete the given emoji.
+        Requires the `MANAGE_EMOJIS_AND_STICKERS` permission.
         Returns `204 No Content` on success. Fires a Guild Emojis Update Gateway event.
 
         Parameters
         ----------
-        guild_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
-           ID of the guild in which we will delete emoji
         emoji_id: Union[:class:`int`, :class:`str`, :class:`~.melisa.utils.snowflake.Snowflake`]
             The ID of the emoji that we will delete
         reason: Optional[:class:`str`]
             The reason of the action
-        
+
         Raises
         -------
         HTTPException
