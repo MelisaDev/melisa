@@ -173,8 +173,11 @@ class SlashCommand(PartialApplicationCommand):
         self.guild_id = (
             Snowflake(data["guild_id"]) if data.get("guild_id") is not None else None
         )
-        self.name = data.get("name")
-        self.name_localizations = data.get("name_localizations")
+
+        name = data.get("name")
+        name_localizations = data.get("name_localizations")
+
+        self.name = LocalizedField(name, name_localizations)
 
         description = data.get("description")
         description_localizations = data.get("description_localizations")
@@ -202,16 +205,10 @@ class SlashCommandOption(APIModelBase):
     ----------
     type: :class:`~melisa.models.interactions.commands.SlashCommandOptionType`
         Type of option
-    name: str
-        1-32 character name
-    name_localizations: Dict[str, str]
-        Localization dictionary for the ``name`` field.
-        Values follow the same restrictions as ``name``
-    description: str
-        1-100 character description
-    description_localizations: Dict[str, str]
-        Localization dictionary for the ``description`` field.
-        Values follow the same restrictions as ``description``
+    name: :class:`~melisa.models.interactions.i18n.LocalizedField`
+        Name of option
+    description: :class:`~melisa.models.interactions.i18n.LocalizedField`
+        Description of option
     required: Optional[bool]
         If the parameter is required or optional--default false
     choices: Optional[List[:class:`~melisa.models.interactions.commands.SlashCommandOptionChoice`]]
@@ -235,10 +232,8 @@ class SlashCommandOption(APIModelBase):
     """
 
     type: SlashCommandOptionType = None
-    name: str = None
-    name_localizations: Dict[str, str] = None
-    description: str
-    description_localizations: Dict[str, str] = None
+    name: LocalizedField = None
+    description: LocalizedField = None
     required: Optional[bool] = False
     choices: Optional[List[SlashCommandOptionChoice]] = None
     options: Optional[List[SlashCommandOption]] = None
@@ -259,10 +254,17 @@ class SlashCommandOption(APIModelBase):
         self: SlashCommandOption = super().__new__(cls)
 
         self.type = try_enum(SlashCommandOptionType, data.get("type", 0))
-        self.name = data.get("name")
-        self.name_localizations = data.get("name_localizations")
-        self.description = data.get("description")
-        self.description_localizations = data.get("description_localizations")
+
+        name = data.get("name")
+        name_localizations = data.get("name_localizations")
+
+        self.name = LocalizedField(name, name_localizations)
+
+        description = data.get("description")
+        description_localizations = data.get("description_localizations")
+
+        self.description = LocalizedField(description, description_localizations)
+
         self.required = data.get("required", False)
         self.choices = [
             try_enum(SlashCommandOptionChoice, x) for x in data.get("choices", [])
@@ -288,21 +290,13 @@ class SlashCommandOptionChoice(APIModelBase):
 
     Attributes
     ----------
-    name: :class:`str`
-        1-100 character choice name
-    name_localizations: Optional[Dict[:class:`str`, :class:`str`]]
-        Dictionary with keys in
-        `available locales <https://discord.com/developers/docs/reference#locales>`_
-
-        Localization dictionary for the name field.
-        Values follow the same restrictions as name
-
+    name: :class:`~melisa.models.interactions.i18n.LocalizedField`
+        Name of option choice
     value: Union[:class:`str`, :class:`int`, :class:`float`]
         Value for the choice, up to 100 characters if string
     """
 
-    name: str = None
-    name_localizations: Optional[Dict[str, str]] = None
+    name: LocalizedField = None
     value: Union[str, int, float] = None
 
     @classmethod
@@ -316,8 +310,11 @@ class SlashCommandOptionChoice(APIModelBase):
         """
         self: SlashCommandOptionChoice = super().__new__(cls)
 
-        self.name = data.get("name")
-        self.name_localizations = data.get("name_localizations")
+        name = data.get("name")
+        name_localizations = data.get("name_localizations")
+
+        self.name = LocalizedField(name, name_localizations)
+        
         self.value = data.get("value")
 
         return self

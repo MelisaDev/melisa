@@ -957,7 +957,16 @@ class RESTApp:
             data["default_member_permissions"] = default_member_permissions
 
         if options is not None:
-            data["options"] = [x.to_dict() for x in options]
+            for option in options:
+                option_data = option.to_dict()
+
+                option_data["name"] = option.name.original
+                option_data["description"] = option.description.original
+
+                if option.name.localizations is not None:
+                    option_data["name_localizations"] = option.name.localizations
+                if option.description.localizations is not None:
+                    option_data["description_localizations"] = option.description.localizations
 
         if dm_permission is not None:
             data["dm_permission"] = dm_permission

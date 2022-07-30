@@ -7,8 +7,22 @@ from typing import Dict
 
 
 class LocalizedField:
+    """
+    Represents a field, that could be localized
+
     original: str
-    localizations: str
+        Value of non-localized field
+    localizations: Optional[Dict[str, str]]
+        Dictionary with keys in
+        `available locales <https://discord.com/developers/docs/reference#locales>`_
+
+        Localization dictionary for the name field.
+        Values follow the same restrictions as name
+
+    """
+
+    original: str
+    localizations: Optional[Dict[str, str]]
 
     def __init__(
         self,
