@@ -6,7 +6,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from urllib.parse import quote
-from typing import Dict, Optional, Any
+from typing import Dict, Optional, Any, Union, List
 
 from aiohttp import ClientSession, ClientResponse
 
@@ -165,7 +165,9 @@ class HTTPClient:
 
         return await self.__send(method, endpoint, _ttl=_ttl - 1, **kwargs)
 
-    async def get(self, route: str, *, params: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]:
+    async def get(
+        self, route: str, *, params: Optional[Dict[str, Any]] = None
+    ) -> Optional[Dict[str, Any]]:
         """|coro|
         Sends a GET request to a Discord REST API endpoint.
 
@@ -212,7 +214,9 @@ class HTTPClient:
         """
         return await self.__send("POST", route, json=json, data=data, headers=headers)
 
-    async def delete(self, route: str, *, headers: Dict[str, Any] = None) -> Optional[Dict[str, Any]]:
+    async def delete(
+        self, route: str, *, headers: Dict[str, Any] = None
+    ) -> Optional[Dict[str, Any]]:
         """|coro|
         Sends a DELETE request to a Discord REST API endpoint.
 
@@ -260,7 +264,12 @@ class HTTPClient:
         return await self.__send("PATCH", route, json=json, data=data, headers=headers)
 
     async def put(
-        self, route: str, *, headers: Dict[str, Any] = None, data: Optional[Dict[str, Any]] = None
+        self,
+        route: str,
+        *,
+        headers: Dict[str, Any] = None,
+        json: Optional[Union[List[Any], Dict[str, Any]]] = None,
+        data: Optional[Dict[str, Any]] = None,
     ) -> Optional[Dict[str, Any]]:
         """|coro|
         Sends a PUT request to a Discord REST API endpoint.
@@ -271,6 +280,8 @@ class HTTPClient:
             The endpoint to send the request to.
         data : Dict
             Data to post
+        json: Dict
+            Json data to post
         headers : :class:`dict`
             Custom request headers
 
@@ -279,4 +290,4 @@ class HTTPClient:
         Optional[:class:`Dict`]
             JSON response from the Discord API.
         """
-        return await self.__send("PUT", route, json=data, headers=headers)
+        return await self.__send("PUT", route, json=json, data=data, headers=headers)

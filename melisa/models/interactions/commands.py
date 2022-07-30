@@ -155,6 +155,7 @@ class SlashCommand(PartialApplicationCommand):
     """
 
     description: LocalizedField = None
+    options: List[SlashCommandOption] = None
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]):
@@ -314,7 +315,7 @@ class SlashCommandOptionChoice(APIModelBase):
         name_localizations = data.get("name_localizations")
 
         self.name = LocalizedField(name, name_localizations)
-        
+
         self.value = data.get("value")
 
         return self
@@ -374,13 +375,15 @@ class SlashCommandInteractionDataOption(APIModelBase):
 
 
 # noinspection PyTypeChecker
-command_types_for_converting: Dict[ApplicationCommandType, PartialApplicationCommand] = {
-    ApplicationCommandType.CHAT_INPUT: SlashCommand
-}
+command_types_for_converting: Dict[
+    ApplicationCommandType, PartialApplicationCommand
+] = {ApplicationCommandType.CHAT_INPUT: SlashCommand}
 
 
 def _choose_command_type(data):
     data.update({"type": ApplicationCommandType(data.pop("type"))})
 
-    command_cls = command_types_for_converting.get(data["type"], PartialApplicationCommand)
+    command_cls = command_types_for_converting.get(
+        data["type"], PartialApplicationCommand
+    )
     return command_cls.from_dict(data)

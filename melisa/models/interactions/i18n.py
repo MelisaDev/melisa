@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from typing import Dict
+from typing import Dict, Optional
 
 
 class LocalizedField:
@@ -18,7 +18,6 @@ class LocalizedField:
 
         Localization dictionary for the name field.
         Values follow the same restrictions as name
-
     """
 
     original: str
@@ -44,7 +43,10 @@ class LocalizedField:
         return f"<LocalizedField original={self.original} localizations={self.localizations}>"
 
     def __eq__(self, other):
-        return self.original == other.original and self.localizations == other.localizations
+        return (
+            self.original == other.original
+            and self.localizations == other.localizations
+        )
 
     def __hash__(self):
         return hash((self.original, self.localizations))

@@ -7,8 +7,12 @@ from typing import Union, Optional, List, Dict, Any, AsyncIterator
 from aiohttp import FormData
 
 from .models.interactions import ApplicationCommandType
-from .models.interactions.commands import SlashCommandOption, SlashCommand, PartialApplicationCommand, \
-    _choose_command_type
+from .models.interactions.commands import (
+    SlashCommandOption,
+    SlashCommand,
+    PartialApplicationCommand,
+    _choose_command_type,
+)
 from .models.interactions.i18n import LocalizedField
 from .models.message import Embed, File, AllowedMentions, Message
 from .exceptions import EmbedFieldError
@@ -943,12 +947,14 @@ class RESTApp:
 
         data = {
             "name": name.original,
-            "description": description.original,
             "type": int(command_type),
         }
 
         if name.localizations is not None:
             data["name_localizations"] = name.localizations
+
+        if description.original is not None:
+            data["description"] = description.original
 
         if description.localizations is not None:
             data["description_localizations"] = description.localizations
@@ -966,7 +972,9 @@ class RESTApp:
                 if option.name.localizations is not None:
                     option_data["name_localizations"] = option.name.localizations
                 if option.description.localizations is not None:
-                    option_data["description_localizations"] = option.description.localizations
+                    option_data[
+                        "description_localizations"
+                    ] = option.description.localizations
 
         if dm_permission is not None:
             data["dm_permission"] = dm_permission
@@ -1081,8 +1089,23 @@ class RESTApp:
         if default_member_permissions is not None:
             data["default_member_permissions"] = default_member_permissions
 
+        data["options"] = []
+
         if options is not None:
-            data["options"] = [x.to_dict() for x in options]
+            for option in options:
+                option_data = option.to_dict()
+
+                option_data["name"] = option.name.original
+                option_data["description"] = option.description.original
+
+                if option.name.localizations is not None:
+                    option_data["name_localizations"] = option.name.localizations
+                if option.description.localizations is not None:
+                    option_data[
+                        "description_localizations"
+                    ] = option.description.localizations
+
+                data["options"].append(option_data)
 
         if dm_permission is not None:
             data["dm_permission"] = dm_permission
@@ -1125,6 +1148,89 @@ class RESTApp:
         await self._http.delete(f"/applications/{application_id}/commands/{command_id}")
 
         return None
+
+    async def bulk_overwrite_global_application_commands(
+        self,
+        application_id: Union[int, str, Snowflake],
+        commands: List[Union[SlashCommand, PartialApplicationCommand]],
+    ) -> List[Union[SlashCommand, PartialApplicationCommand]]:
+        """|coro|
+
+        [**REST API**] Overwrites all existing global commands.
+
+        Parameters
+        ----------
+        application_id: :class:`~melisa.utils.snowflake.Snowflake`
+            ID of the parent application
+        commands: List[Union[:class:`~melisa.models.interactions.commands.SlashCommand`,
+        :class:`~melisa.models.interactions.commands.PartialApplicationCommand`]]
+
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have proper permissions to do the actions required.
+        BadRequestError
+            You provided a wrong arguments
+        """
+
+        better_commands = []
+
+        for command in commands:
+            command_data = {
+                "name": command.name.original,
+                "type": int(command.type),
+            }
+
+            if command.name.localizations is not None:
+                command_data["name_localizations"] = command.name.localizations
+
+            if command.default_member_permissions is not None:
+                command_data[
+                    "default_member_permissions"
+                ] = command.default_member_permissions
+
+            if command.dm_permission is not None:
+                command_data["dm_permission"] = command.dm_permission
+
+            if isinstance(command, SlashCommand):
+                if command.description is not None:
+                    command_data["description"] = command.description.original
+
+                if command.description.localizations is not None:
+                    command_data[
+                        "description_localizations"
+                    ] = command.description.localizations
+
+                command_data["options"] = []
+
+                if command.options is not None:
+                    for option in command.options:
+                        option_data = option.to_dict()
+
+                        option_data["name"] = option.name.original
+                        option_data["description"] = option.description.original
+
+                        if option.name.localizations is not None:
+                            option_data[
+                                "name_localizations"
+                            ] = option.name.localizations
+                        if option.description.localizations is not None:
+                            option_data[
+                                "description_localizations"
+                            ] = option.description.localizations
+
+                        command_data["options"].append(option_data)
+
+                better_commands.append(command_data)
+
+        return [
+            _choose_command_type(x)
+            for x in await self._http.put(
+                f"/applications/{application_id}/commands", json=better_commands
+            )
+        ]
 
 
 class CDNBuilder:
