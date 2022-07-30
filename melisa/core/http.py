@@ -70,9 +70,9 @@ class HTTPClient:
         *,
         _ttl: int = None,
         headers: Optional[Dict[str, Any]] = None,
-        params: Optional[Dict] = None,
+        params: Optional[Dict[str, Any]] = None,
         **kwargs,
-    ) -> Optional[Dict]:
+    ) -> Optional[Dict[str, Any]]:
         """Send an API request to the Discord API."""
 
         ttl = _ttl or self.max_ttl
@@ -113,7 +113,7 @@ class HTTPClient:
         *,
         _ttl: int = None,
         **kwargs,
-    ) -> Optional[Dict]:
+    ) -> Optional[Dict[str, Any]]:
         """Handle responses from the Discord API."""
 
         _logger.debug(f"Received response for the {endpoint} ({await res.text()})")
@@ -165,7 +165,7 @@ class HTTPClient:
 
         return await self.__send(method, endpoint, _ttl=_ttl - 1, **kwargs)
 
-    async def get(self, route: str, *, params: Optional[Dict] = None) -> Optional[Dict]:
+    async def get(self, route: str, *, params: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]:
         """|coro|
         Sends a GET request to a Discord REST API endpoint.
 
@@ -187,22 +187,22 @@ class HTTPClient:
         self,
         route: str,
         *,
-        headers: dict = None,
-        json: Optional[Dict] = None,
-        data=None,
-    ) -> Optional[Dict]:
+        headers: Dict[str, Any] = None,
+        json: Optional[Dict[str, Any]] = None,
+        data: Optional[Dict[str, Any]] = None,
+    ) -> Optional[Dict[str, Any]]:
         """|coro|
         Sends a POST request to a Discord REST API endpoint.
 
         Parameters
         ----------
-        route : :class:`str`
+        route: :class:`str`
             The endpoint to send the request to.
-        json : Dict
+        json: Dict[str, Any]
             Json data to post
-        data : Any
+        data: Any
             Data to post
-        headers : :class:`dict`
+        headers: Dict[str, Any]
             Custom request headers
 
         Returns
@@ -212,7 +212,7 @@ class HTTPClient:
         """
         return await self.__send("POST", route, json=json, data=data, headers=headers)
 
-    async def delete(self, route: str, *, headers: dict = None) -> Optional[Dict]:
+    async def delete(self, route: str, *, headers: Dict[str, Any] = None) -> Optional[Dict[str, Any]]:
         """|coro|
         Sends a DELETE request to a Discord REST API endpoint.
 
@@ -234,10 +234,10 @@ class HTTPClient:
         self,
         route: str,
         *,
-        headers: dict = None,
-        json: Optional[Dict] = None,
-        data=None,
-    ) -> Optional[Dict]:
+        headers: Dict[str, Any] = None,
+        json: Optional[Dict[str, Any]] = None,
+        data: Optional[Dict[str, Any]] = None,
+    ) -> Optional[Dict[str, Any]]:
         """|coro|
         Sends a PATCH request to a Discord REST API endpoint.
 
@@ -260,8 +260,8 @@ class HTTPClient:
         return await self.__send("PATCH", route, json=json, data=data, headers=headers)
 
     async def put(
-        self, route: str, *, headers: dict = None, data: Optional[Dict] = None
-    ) -> Optional[Dict]:
+        self, route: str, *, headers: Dict[str, Any] = None, data: Optional[Dict[str, Any]] = None
+    ) -> Optional[Dict[str, Any]]:
         """|coro|
         Sends a PUT request to a Discord REST API endpoint.
 

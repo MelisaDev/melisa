@@ -6,8 +6,10 @@ from typing import Union, Optional, List, Dict, Any, AsyncIterator
 
 from aiohttp import FormData
 
-from .models.interactions import ApplicationCommandTypes
-from .models.interactions.commands import ApplicationCommandOption, ApplicationCommand
+from .models.interactions import ApplicationCommandType
+from .models.interactions.commands import SlashCommandOption, SlashCommand, PartialApplicationCommand, \
+    _choose_command_type
+from .models.interactions.i18n import LocalizedField
 from .models.message import Embed, File, AllowedMentions, Message
 from .exceptions import EmbedFieldError
 from .core.http import HTTPClient
@@ -856,7 +858,7 @@ class RESTApp:
         application_id: Union[int, str, Snowflake],
         *,
         with_localizations: Optional[bool] = False,
-    ) -> List[ApplicationCommand]:
+    ) -> List[PartialApplicationCommand]:
         """|coro|
 
         [**REST API**] Fetch all of the global commands for your application.
@@ -882,7 +884,7 @@ class RESTApp:
         """
 
         return [
-            ApplicationCommand.from_dict(x)
+            _choose_command_type(x)
             for x in await self._http.get(
                 f"/applications/{application_id}/commands?with_localizations={with_localizations}"
             )
@@ -891,17 +893,15 @@ class RESTApp:
     async def create_global_application_command(
         self,
         application_id: Union[int, str, Snowflake],
-        command_type: ApplicationCommandTypes,
-        name: str,
-        description: str = None,
+        command_type: ApplicationCommandType,
+        name: LocalizedField,
+        description: LocalizedField = None,
         *,
-        name_localizations: Optional[Dict[str, str]] = None,
-        description_localizations: Optional[Dict[str, str]] = None,
-        options: Optional[List[ApplicationCommandOption]] = None,
+        options: Optional[List[SlashCommandOption]] = None,
         default_member_permissions: Optional[str] = None,
         dm_permission: Optional[bool] = None,
         default_permission: Optional[bool] = None,
-    ) -> ApplicationCommand:
+    ) -> PartialApplicationCommand:
         """|coro|
 
         [**REST API**] Create a new global command.
@@ -910,20 +910,14 @@ class RESTApp:
         ----------
         application_id: :class:`~melisa.utils.snowflake.Snowflake`
             ID of the parent application
-        command_type: Optional[:class:`~melisa.interactions.commands.ApplicationCommandTypes`]
+        command_type: Optional[:class:`~melisa.interactions.commands.ApplicationCommandType`]
             Type of command, defaults to ``1``
-        name: str
+        name: :class:`~melisa.models.interactions.i18n.LocalizedField`
             Name of command, 1-32 characters
-        description: str
+        description: Optional[:class:`~melisa.models.interactions.i18n.LocalizedField`]
             Description for ``CHAT_INPUT`` commands, 1-100 characters.
             Empty string for ``USER`` and ``MESSAGE`` commands
-        name_localizations: Optional[Dict[str, str]]
-            Localization dictionary for ``name`` field.
-            Values follow the same restrictions as ``name``
-        description_localizations: Optional[Dict[str, str]]
-            Localization dictionary for ``description`` field.
-            Values follow the same restrictions as ``description``
-        options: Optional[List[:class:`~melisa.models.interactions.commands.ApplicationCommandOption`]]
+        options: Optional[List[:class:`~melisa.models.interactions.commands.SlashCommandOption`]]
             Parameters for the command, max of 25.
             Only available for ``CHAT_INPUT`` command type.
         default_member_permissions: Optional[str]
@@ -948,16 +942,16 @@ class RESTApp:
         """
 
         data = {
-            "name": name,
-            "description": description,
+            "name": name.original,
+            "description": description.original,
             "type": int(command_type),
         }
 
-        if name_localizations is not None:
-            data["name_localizations"] = name_localizations
+        if name.localizations is not None:
+            data["name_localizations"] = name.localizations
 
-        if description_localizations is not None:
-            data["description_localizations"] = description_localizations
+        if description.localizations is not None:
+            data["description_localizations"] = description.localizations
 
         if default_member_permissions is not None:
             data["default_member_permissions"] = default_member_permissions
@@ -971,7 +965,7 @@ class RESTApp:
         if default_permission is not None:
             data["default_permission"] = default_permission
 
-        return ApplicationCommand.from_dict(
+        return _choose_command_type(
             await self._http.post(f"/applications/{application_id}/commands", json=data)
         )
 
@@ -979,7 +973,7 @@ class RESTApp:
         self,
         application_id: Union[int, str, Snowflake],
         command_id: Union[int, str, Snowflake],
-    ) -> ApplicationCommand:
+    ) -> PartialApplicationCommand:
         """|coro|
 
         [**REST API**] Fetch a global command for your application.
@@ -1001,7 +995,7 @@ class RESTApp:
             You provided a wrong arguments
         """
 
-        return ApplicationCommand.from_dict(
+        return _choose_command_type(
             await self._http.get(
                 f"/applications/{application_id}/commands/{command_id}"
             )
@@ -1012,15 +1006,13 @@ class RESTApp:
         application_id: Union[int, str, Snowflake],
         command_id: Union[int, str, Snowflake],
         *,
-        name: Optional[str] = None,
-        description: Optional[str] = None,
-        name_localizations: Optional[Dict[str, str]] = None,
-        description_localizations: Optional[Dict[str, str]] = None,
-        options: Optional[List[ApplicationCommandOption]] = None,
+        name: Optional[LocalizedField] = None,
+        description: Optional[LocalizedField] = None,
+        options: Optional[List[SlashCommandOption]] = None,
         default_member_permissions: Optional[str] = None,
         dm_permission: Optional[bool] = None,
         default_permission: Optional[bool] = None,
-    ) -> ApplicationCommand:
+    ) -> PartialApplicationCommand:
         """|coro|
 
         All parameters are optional, but any parameters
@@ -1034,17 +1026,11 @@ class RESTApp:
             ID of the parent application
         command_id: Optional[bool]
             ID of command to edit.
-        name: Optional[str]
+        name: Optional[:class:`~melisa.models.interactions.i18n.LocalizedField`]
             Name of command, 1-32 characters
-        description: Optional[str]
+        description: Optional[:class:`~melisa.models.interactions.i18n.LocalizedField`]
             Description for ``CHAT_INPUT`` commands, 1-100 characters.
             Empty string for ``USER`` and ``MESSAGE`` commands
-        name_localizations: Optional[Dict[str, str]]
-            Localization dictionary for ``name`` field.
-            Values follow the same restrictions as ``name``
-        description_localizations: Optional[Dict[str, str]]
-            Localization dictionary for ``description`` field.
-            Values follow the same restrictions as ``description``
         options: Optional[List[:class:`~melisa.models.interactions.commands.ApplicationCommandOption`]]
             Parameters for the command, max of 25.
             Only available for ``CHAT_INPUT`` command type.
@@ -1071,17 +1057,17 @@ class RESTApp:
 
         data = {}
 
-        if name is not None:
-            data["name"] = name
+        if name.original is not None:
+            data["name"] = name.original
 
-        if description is not None:
-            data["description"] = description
+        if description.original is not None:
+            data["description"] = description.original
 
-        if name_localizations is not None:
-            data["name_localizations"] = name_localizations
+        if name.localizations is not None:
+            data["name_localizations"] = name.localizations
 
-        if description_localizations is not None:
-            data["description_localizations"] = description_localizations
+        if description.localizations is not None:
+            data["description_localizations"] = description.localizations
 
         if default_member_permissions is not None:
             data["default_member_permissions"] = default_member_permissions
@@ -1095,7 +1081,7 @@ class RESTApp:
         if default_permission is not None:
             data["default_permission"] = default_permission
 
-        return ApplicationCommand.from_dict(
+        return _choose_command_type(
             await self._http.patch(
                 f"/applications/{application_id}/commands/{command_id}", json=data
             )
