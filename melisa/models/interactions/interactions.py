@@ -3,11 +3,14 @@
 
 from __future__ import annotations
 
-from typing import Dict, Any
+from typing import Dict, Any, Optional, List
 from enum import IntEnum
 
 from dataclasses import dataclass
 
+from .commands import ApplicationCommandType
+from .commands import SlashCommandInteractionDataOption
+from ...utils.conversion import try_enum
 from ...models.guild import Channel, Role, _choose_channel_type, GuildMember
 from ...utils.api_model import APIModelBase
 from ...models.message.message import Message
@@ -105,5 +108,60 @@ class ResolvedData(APIModelBase):
 
         for _id, value in data.get("users", {}).items():
             self.users[Snowflake(_id)] = User.from_dict(value)
+
+        return self
+
+
+@dataclass(repr=False)
+class ApplicationCommandData(APIModelBase):
+    """Application Command Data
+
+    Attributes
+    ----------
+    id:	:class:`~melisa.utils.types.snowflake.Snowflake`
+        The ID of the invoked command
+    name: str
+        The name of the invoked command
+    type: :class:`~melisa.models.interactions.commands.ApplicationCommandType`
+        Type of the application command
+    resolved: Optional[:class:`~melisa.models.interactions.interactions.ResolvedData`]
+        Data resolved from the interaction
+    options: Optional[List[:class:`~melisa.models.interactions.commands.SlashCommandInteractionDataOption`]]
+        List of application command interaction data option	the params + values from the user
+    guild_id: Optional[:class:`~melisa.utils.types.snowflake.Snowflake`]
+        The id of the guild the command is registered to
+    target_id: Optional[:class:`~melisa.utils.types.snowflake.Snowflake`]
+        Id of the user or message targeted by a user or message command
+    """
+
+    id: Snowflake = None
+    name: str = None
+    type: ApplicationCommandType = None
+    resolved: Optional[ResolvedData] = None
+    options: Optional[List[SlashCommandInteractionDataOption]] = None
+    guild_id: Optional[Snowflake] = None
+    target_id: Optional[Snowflake] = None
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]):
+        """Generate a ApplicationCommandData from the given data.
+
+        Parameters
+        ----------
+        data: :class:`dict`
+            The dictionary to convert into a ApplicationCommandData.
+        """
+        self: ApplicationCommandData = super().__new__(cls)
+
+        self.id = Snowflake(data.get("id", 0))
+        self.name = data.get("name")
+        self.type = try_enum(ApplicationCommandType, data.get("type"))
+        self.resolved = ResolvedData.from_dict(data.get("resolved", {}))
+        self.options = [
+            SlashCommandInteractionDataOption.from_dict(option)
+            for option in data.get("options", [])
+        ]
+        self.guild_id = Snowflake(data.get("guild_id", 0))
+        self.target_id = Snowflake(data.get("target_id", 0))
 
         return self
