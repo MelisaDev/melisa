@@ -46,6 +46,112 @@ class InteractionType(IntEnum):
 
 
 @dataclass(repr=False)
+class Interaction(APIModelBase):
+    """Interaction
+
+    Attributes
+    ----------
+    id: :class:`~melisa.utils.types.snowflake.Snowflake`
+        ID of the interaction
+    application_id:	:class:`~melisa.utils.types.snowflake.Snowflake`
+        ID of the application this interaction is for
+    type: :class:`~melisa.models.interactions.interactions.InteractionType`
+        Type of interaction
+    data: Optional[:class:`~melisa.models.interactions.interactions.ApplicationCommandData`]
+        Interaction data payload
+    guild_id: Optional[:class:`~melisa.utils.types.snowflake.Snowflake`]
+        Guild that the interaction was sent from
+    channel_id: Optional[:class:`~melisa.utils.types.snowflake.Snowflake`]
+        Channel that the interaction was sent from
+    member: Optional[:class:`~melisa.models.guild.member.GuildMember`]
+        Guild member data for the invoking user, including permissions
+    user: Optional[:class:`~melisa.models.user.user.User`]
+        User object for the invoking user, if invoked in a DM
+    token: str
+        Continuation token for responding to the interaction
+    version: int
+        Read-only property, always 1
+    message: Optional[:class:`~melisa.models.message.message.Message`]
+        For components, the message they were attached to
+    app_permissions: str
+        Bitwise set of permissions the app or bot has within the channel the interaction was sent from
+    locale: Optional[str]
+        Selected language of the invoking user
+    guild_locale: Optional[str]
+        Guild's preferred locale, if invoked in a guild
+    """
+
+    id: Snowflake = None
+    application_id: Snowflake = None
+    type: InteractionType = None
+    data: Optional[ApplicationCommandData] = None
+    guild_id: Optional[Snowflake] = None
+    channel_id: Optional[Snowflake] = None
+    member: Optional[GuildMember] = None
+    user: Optional[User] = None
+    token: str = None
+    version: int = None
+    message: Optional[Message] = None
+    app_permissions: str = None
+    locale: Optional[str] = None
+    guild_locale: Optional[str] = None
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]):
+        """Generate a Interaction from the given data.
+
+        Parameters
+        ----------
+        data: :class:`dict`
+            The dictionary to convert into a Interaction.
+        """
+        self: Interaction = super().__new__(cls)
+
+        self.id = Snowflake(data.get("id", 0))
+        self.application_id = Snowflake(data.get("application_id", 0))
+        self.type = (
+            try_enum(ApplicationCommandType, data["type"])
+            if data.get("type", None) is not None
+            else None
+        )
+        self.data = (
+            ApplicationCommandData.from_dict(data["data"])
+            if data.get("data", None) is not None
+            else None
+        )
+        self.guild_id = (
+            Snowflake(data["guild_id"])
+            if data.get("guild_id", None) is not None
+            else None
+        )
+        self.channel_id = (
+            Snowflake(data["channel_id"])
+            if data.get("channel_id", None) is not None
+            else None
+        )
+        self.member = (
+            GuildMember.from_dict(data["member"])
+            if data.get("member", None) is not None
+            else None
+        )
+        self.user = (
+            User.from_dict(data["user"]) if data.get("user", None) is not None else None
+        )
+        self.token = data.get("token")
+        self.version = data.get("version")
+        self.message = (
+            Message.from_dict(data["message"])
+            if data.get("message", None) is not None
+            else None
+        )
+        self.app_permissions = data.get("app_permissions")
+        self.locale = data.get("locale", None)
+        self.guild_locale = data.get("guild_locale", None)
+
+        return self
+
+
+@dataclass(repr=False)
 class ResolvedData(APIModelBase):
     """Resolved Data
 
