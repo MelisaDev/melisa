@@ -45,6 +45,39 @@ class InteractionType(IntEnum):
         return self.value
 
 
+class InteractionCallbackType(IntEnum):
+    """Interaction Callback Type
+
+    Attributes
+    ----------
+    PONG:
+        ACK a Ping
+    CHANNEL_MESSAGE_WITH_SOURCE:
+        Respond to an interaction with a message
+    DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE:
+        ACK an interaction and edit a response later, the user sees a loading state
+    DEFERRED_UPDATE_MESSAGE:
+        For components, ACK an interaction and edit the original message later; the user does not see a loading state
+    UPDATE_MESSAGE:
+        For components, edit the message the component was attached to
+    APPLICATION_COMMAND_AUTOCOMPLETE_RESULT:
+        Respond to an autocomplete interaction with suggested choices
+    MODAL:
+        Respond to an interaction with a popup modal
+    """
+
+    PONG = 1
+    CHANNEL_MESSAGE_WITH_SOURCE = 4
+    DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE = 5
+    DEFERRED_UPDATE_MESSAGE = 6
+    UPDATE_MESSAGE = 7
+    APPLICATION_COMMAND_AUTOCOMPLETE_RESULT = 8
+    MODAL = 9
+
+    def __int__(self):
+        return self.value
+
+
 @dataclass(repr=False)
 class Interaction(APIModelBase):
     """Interaction
