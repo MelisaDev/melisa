@@ -10,10 +10,12 @@ from dataclasses import dataclass
 
 from .commands import ApplicationCommandType
 from .commands import SlashCommandInteractionDataOption
+from ...models.message import Embed
+from ...exceptions import EmbedFieldError
 from ...utils.conversion import try_enum
 from ...models.guild import Channel, Role, _choose_channel_type, GuildMember
 from ...utils.api_model import APIModelBase
-from ...models.message.message import Message
+from ...models.message.message import Message, AllowedMentions, MessageFlags
 from ...models.user.user import User
 from ...utils.snowflake import Snowflake
 
@@ -86,12 +88,12 @@ class InteractionResponse(APIModelBase):
     ----------
     type: InteractionType
         The type of response
-    data: Optional[Any]
+    data: Optional[Dict[str, Any]]
         An optional response message
     """
 
-    type: InteractionCallbackType
-    data: Optional[Any]
+    type: InteractionCallbackType = None
+    data: Optional[Dict[str, Any]] = None
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> InteractionResponse:
@@ -215,7 +217,7 @@ class Interaction(APIModelBase):
 
         return self
 
-    async def respond(self, response: InteractionResponse):
+    async def respond(self, response: InteractionResponse, *, content_type: str = None):
         """
         Respond to an interaction.
 
@@ -226,6 +228,86 @@ class Interaction(APIModelBase):
         """
 
         await self._client.rest.interaction_respond(self, response)
+
+    async def send_message(
+        self,
+        content: Optional[str] = None,
+        *,
+        tts: Optional[bool] = False,
+        embed: Optional[Embed] = None,
+        embeds: Optional[List[Embed]] = None,
+        allowed_mentions: Optional[AllowedMentions] = None,
+        ephemeral: Optional[bool] = False,
+    ) -> None:
+        """|coro|
+
+        Respond to an interaction with a message.
+
+        The content must be a type that can convert to a string through str(content).
+
+        Parameters
+        ----------
+        content: Optional[:class:`str`]
+            The content of the message to send.
+        tts: Optional[:class:`bool`]
+            Whether the message should be sent using text-to-speech.
+        embed: Optional[:class:`~melisa.models.message.embed.Embed`]
+            Embed
+        embeds: Optional[List[:class:`~melisa.models.message.embed.Embed`]]
+            List of embeds
+        allowed_mentions: Optional[:class:`~melisa.models.message.message.AllowedMentions`]
+            Controls the mentions being processed in this message.
+        ephemeral: Optional[:class:`bool`]
+            Whether the message should be sent as an ephemeral message. Defaults to False.
+
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have the proper permissions to send the message.
+        BadRequestError
+            Some of specified parameters is invalid.
+        """
+
+        # ToDo: Add delete_after parameter
+        # ToDo: Add components parameter
+        # ToDo: Add files parameter
+
+        if embeds is None:
+            embeds = [embed] if embed is not None else []
+
+        payload = {
+            "content": str(content) if content is not None else None,
+            "embeds": [],
+        }
+
+        for _embed in embeds:
+            if _embed.total_length() > 6000:
+                raise EmbedFieldError.characters_from_desc(
+                    "Embed", embed.total_length(), 6000
+                )
+            payload["embeds"].append(_embed.to_dict())
+
+        payload["tts"] = tts
+        if allowed_mentions is not None:
+            payload["allowed_mentions"] = allowed_mentions.to_dict()
+        elif self._client.allowed_mentions is not None:
+            payload[
+                "allowed_mentions"
+            ] = self._client.allowed_mentions.to_dict()
+
+        if ephemeral:
+            payload["flags"] = MessageFlags.EPHEMERAL.value
+
+        return await self.respond(
+            InteractionResponse.from_dict(
+                {
+                    "type": InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE,
+                    "data": payload,
+                }
+            )
+        )
 
 
 @dataclass(repr=False)

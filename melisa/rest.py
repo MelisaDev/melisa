@@ -1234,7 +1234,9 @@ class RESTApp:
         ]
 
     async def interaction_respond(
-        self, interaction: Interaction, interaction_response: InteractionResponse
+        self,
+        interaction: Interaction,
+        interaction_response: InteractionResponse,
     ):
         """|coro|
 
