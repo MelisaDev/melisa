@@ -78,6 +78,7 @@ class InteractionCallbackType(IntEnum):
         return self.value
 
 
+@dataclass(repr=False)
 class InteractionResponse(APIModelBase):
     """Interaction Response
 
@@ -88,6 +89,7 @@ class InteractionResponse(APIModelBase):
     data: Optional[Any]
         An optional response message
     """
+
     type: InteractionCallbackType
     data: Optional[Any]
 
@@ -212,6 +214,18 @@ class Interaction(APIModelBase):
         self.guild_locale = data.get("guild_locale", None)
 
         return self
+
+    async def respond(self, response: InteractionResponse):
+        """
+        Respond to an interaction.
+
+        Parameters
+        ----------
+        response: :class:`~melisa.models.interactions.interactions.InteractionResponse`
+            The response to send.
+        """
+
+        await self._client.rest.interaction_respond(self, response)
 
 
 @dataclass(repr=False)

@@ -14,6 +14,7 @@ from .models.interactions.commands import (
     _choose_command_type,
 )
 from .models.interactions.i18n import LocalizedField
+from .models.interactions.interactions import Interaction, InteractionResponse
 from .models.message import Embed, File, AllowedMentions, Message
 from .exceptions import EmbedFieldError
 from .core.http import HTTPClient
@@ -1231,6 +1232,35 @@ class RESTApp:
                 f"/applications/{application_id}/commands", json=better_commands
             )
         ]
+
+    async def interaction_respond(
+        self, interaction: Interaction, interaction_response: InteractionResponse
+    ):
+        """|coro|
+
+        [**REST API**] Respond to an interaciton
+
+        Parameters
+        ----------
+        interaction: :class:`~melisa.models.interactions.interactions.Interaction`
+            Interaction to respond to
+        interaction_response: :class:`~melisa.models.interactions.interactions.InteractionResponse`
+            InteractionResponse`e``
+
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have proper permissions to do the actions required.
+        BadRequestError
+            You provided a wrong arguments
+        """
+
+        return await self._http.post(
+            f"/interactions/{interaction.id}/{interaction.token}/callback",
+            json=interaction_response.to_dict(),
+        )
 
 
 class CDNBuilder:
