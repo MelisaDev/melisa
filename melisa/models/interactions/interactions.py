@@ -78,6 +78,36 @@ class InteractionCallbackType(IntEnum):
         return self.value
 
 
+class InteractionResponse(APIModelBase):
+    """Interaction Response
+
+    Attributes
+    ----------
+    type: InteractionType
+        The type of response
+    data: Optional[Any]
+        An optional response message
+    """
+    type: InteractionCallbackType
+    data: Optional[Any]
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> InteractionResponse:
+        """Generate a InteractionResponse from the given data.
+
+        Parameters
+        ----------
+        data: :class:`dict`
+            The dictionary to convert into a InteractionResponse.
+        """
+        self: InteractionResponse = super().__new__(cls)
+
+        self.type = try_enum(InteractionCallbackType, data["type"])
+        self.data = data.get("data", None)
+
+        return self
+
+
 @dataclass(repr=False)
 class Interaction(APIModelBase):
     """Interaction
