@@ -26,12 +26,11 @@ from .models.guild.emoji import Emoji
 from .models.guild.channel import _choose_channel_type, Channel
 
 
-def create_form(payload: Dict[str, Any], files: List[File]):
+def create_form(files: List[File]):
     """
     Creates an aiohttp payload from an array of File objects.
     """
     form = FormData()
-    form.add_field("payload_json", json.dumps(payload))
 
     for index, file in enumerate(files):
         form.add_field(
@@ -41,8 +40,49 @@ def create_form(payload: Dict[str, Any], files: List[File]):
             content_type="application/octet-stream",
         )
 
-    payload = form()
-    return payload.headers["Content-Type"], payload
+    return form
+
+
+def _build_message_data(
+    *,
+    content: str = None,
+    tts: bool = False,
+    embed: Embed = None,
+    embeds: List[Embed] = None,
+    file: File = None,
+    files: List[File] = None,
+    allowed_mentions: AllowedMentions = None,
+    _client_allowed_mentions: AllowedMentions = None,
+):
+    if embeds is None:
+        embeds = [embed] if embed is not None else []
+    if files is None:
+        files = [file] if file is not None else []
+
+    payload = {
+        "content": str(content) if content is not None else None,
+        "embeds": [],
+    }
+
+    for _embed in embeds:
+        if _embed.total_length() > 6000:
+            raise EmbedFieldError.characters_from_desc(
+                "Embed", embed.total_length(), 6000
+            )
+        payload["embeds"].append(_embed.to_dict())
+
+    payload["tts"] = tts
+
+    if allowed_mentions is not None:
+        payload["allowed_mentions"] = allowed_mentions.to_dict()
+    elif _client_allowed_mentions is not None:
+        payload["allowed_mentions"] = _client_allowed_mentions.to_dict()
+
+    if len(files) > 0:
+        form_builder = create_form(files)
+        return payload, form_builder
+
+    return payload, None
 
 
 class RESTApp:
@@ -244,40 +284,37 @@ class RESTApp:
         # ToDo: Add other parameters
         # ToDo: add file checks
 
-        if embeds is None:
-            embeds = [embed] if embed is not None else []
-        if files is None:
-            files = [file] if file is not None else []
-
-        payload = {
-            "content": str(content) if content is not None else None,
-            "embeds": [],
-        }
-
-        for _embed in embeds:
-            if _embed.total_length() > 6000:
-                raise EmbedFieldError.characters_from_desc(
-                    "Embed", embed.total_length(), 6000
-                )
-            payload["embeds"].append(_embed.to_dict())
-
-        payload["tts"] = tts
-
-        # ToDo: add auto allowed_mentions from client
-        if allowed_mentions is not None:
-            payload["allowed_mentions"] = allowed_mentions.to_dict()
-        elif _client_allowed_mentions is not None:
-            payload["allowed_mentions"] = _client_allowed_mentions.to_dict()
-
-        content_type, data = create_form(payload, files)
-
-        message_data = Message.from_dict(
-            await self._http.post(
-                f"/channels/{channel_id}/messages",
-                data=data,
-                headers={"Content-Type": content_type},
-            )
+        body, form_builder = _build_message_data(
+            content=content,
+            file=file,
+            files=files,
+            embed=embed,
+            embeds=embeds,
+            tts=tts,
+            allowed_mentions=allowed_mentions,
+            _client_allowed_mentions=_client_allowed_mentions,
         )
+
+        if form_builder is not None:
+            form_builder.add_field("payload_json", json.dumps(body))
+
+            form = form_builder()
+
+            message_data = Message.from_dict(
+                await self._http.post(
+                    f"/channels/{channel_id}/messages",
+                    data=form,
+                    headers={"Content-Type": form.headers["Content-Type"]},
+                )
+            )
+        else:
+            message_data = Message.from_dict(
+                await self._http.post(
+                    f"/channels/{channel_id}/messages",
+                    json=body,
+                    headers={"Content-Type": "application/json"},
+                )
+            )
 
         if delete_after:
             await message_data.delete(delay=delete_after)
