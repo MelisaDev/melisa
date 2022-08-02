@@ -113,6 +113,27 @@ class RESTApp:
 
         return _choose_channel_type(data)
 
+    async def get_original_interaction_response(
+        self, application_id: Union[Snowflake, str, int], interaction_token: str
+    ) -> Message:
+        """|coro|
+
+        [**REST API**] Fetch Original Interaction Response from the Discord API.
+
+        Parameters
+        ----------
+        application_id : Union[:class:`~melisa.utils.snowflake.Snowflake`, str, int]
+            Id of interaction to fetch
+        interaction_token: str
+            Interaction token
+        """
+
+        data = await self._http.get(
+            f"/webhooks/{application_id}/{interaction_token}/messages/@original"
+        )
+
+        return Message.from_dict(data)
+
     async def delete_message(
         self,
         channel_id: Union[Snowflake, str, int],

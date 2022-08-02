@@ -373,6 +373,12 @@ class Interaction(APIModelBase):
             )
         )
 
+    async def fetch_original_message(self) -> Message:
+        """Fetch Original Interaction Response from the Discord API."""
+        return await self._client.rest.get_original_interaction_response(
+            self.application_id, self.token
+        )
+
 
 @dataclass(repr=False)
 class ResolvedData(APIModelBase):
