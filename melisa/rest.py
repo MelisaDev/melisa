@@ -134,6 +134,25 @@ class RESTApp:
 
         return Message.from_dict(data)
 
+    async def delete_original_interaction_response(
+        self, application_id: Union[Snowflake, str, int], interaction_token: str
+    ) -> Message:
+        """|coro|
+
+        [**REST API**] Delete Original Interaction Response.
+
+        Parameters
+        ----------
+        application_id : Union[:class:`~melisa.utils.snowflake.Snowflake`, str, int]
+            Id of interaction to fetch
+        interaction_token: str
+            Interaction token
+        """
+
+        await self._http.delete(
+            f"/webhooks/{application_id}/{interaction_token}/messages/@original"
+        )
+
     async def delete_message(
         self,
         channel_id: Union[Snowflake, str, int],
