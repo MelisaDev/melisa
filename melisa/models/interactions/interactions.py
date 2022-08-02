@@ -162,6 +162,7 @@ class Interaction(APIModelBase):
     app_permissions: str = None
     locale: Optional[str] = None
     guild_locale: Optional[str] = None
+    _is_responded: bool = False
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]):
@@ -217,7 +218,12 @@ class Interaction(APIModelBase):
 
         return self
 
-    async def respond(self, response: InteractionResponse, *, content_type: str = None):
+    @property
+    def is_responded(self) -> bool:
+        """Whether an interaction has been responded before."""
+        return self._is_responded
+
+    async def respond(self, response: InteractionResponse):
         """
         Respond to an interaction.
 
@@ -228,6 +234,66 @@ class Interaction(APIModelBase):
         """
 
         await self._client.rest.interaction_respond(self, response)
+
+    async def defer(
+        self,
+        *,
+        with_message: Optional[bool] = False,
+        ephemeral: Optional[bool] = False,
+    ) -> None:
+        """|coro|
+
+        Respond to an interaction with a message.
+
+        The content must be a type that can convert to a string through str(content).
+
+        Parameters
+        ----------
+        with_message: Optional[:class:`bool`]
+            Whether the response will be a message with thinking state (bot is thinking…)
+        ephemeral: Optional[:class:`bool`]
+            Whether the message should be an ephemeral message. Defaults to False.
+
+        Raises
+        -------
+        HTTPException
+            The request to perform the action failed with other http exception.
+        ForbiddenError
+            You do not have the proper permissions to send the message.
+        BadRequestError
+            Some of specified parameters is invalid.
+        """
+
+        defer_callback_type = None
+        data = {}
+
+        if self.type not in (
+            InteractionType.APPLICATION_COMMAND,
+            InteractionType.MODAL_SUBMIT,
+            InteractionType.MESSAGE_COMPONENT,
+        ):
+            raise TypeError(
+                "This interaction must be of type 'APPLICATION_COMMAND', 'MESSAGE_COMPONENT' or 'MODAL_SUBMIT' to defer."
+            )
+
+        if with_message:
+            defer_callback_type = (
+                InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
+            )
+
+            if ephemeral:
+                data["flags"] = MessageFlags.EPHEMERAL.value
+        else:
+            defer_callback_type = InteractionCallbackType.DEFERRED_UPDATE_MESSAGE
+
+        return await self.respond(
+            InteractionResponse.from_dict(
+                {
+                    "type": defer_callback_type,
+                    "data": data,
+                }
+            )
+        )
 
     async def send_message(
         self,
@@ -293,9 +359,7 @@ class Interaction(APIModelBase):
         if allowed_mentions is not None:
             payload["allowed_mentions"] = allowed_mentions.to_dict()
         elif self._client.allowed_mentions is not None:
-            payload[
-                "allowed_mentions"
-            ] = self._client.allowed_mentions.to_dict()
+            payload["allowed_mentions"] = self._client.allowed_mentions.to_dict()
 
         if ephemeral:
             payload["flags"] = MessageFlags.EPHEMERAL.value
