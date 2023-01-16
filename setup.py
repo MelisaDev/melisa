@@ -25,7 +25,7 @@ setuptools.setup(
     python_requires=">=3.8,<3.11",
     zip_safe=False,
     install_requires=["aiohttp", "typing_extensions"],
-    extras_require={"speedup": ["orjson==3.8.3"]},
+    extras_require={"speedup": ["orjson==3.8.5"]},
     test_suite="tests",
     project_urls={
         "Documentation": "https://docs.melisapy.site/",
