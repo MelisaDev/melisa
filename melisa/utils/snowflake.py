@@ -19,7 +19,7 @@ class Snowflake(int):
 
     _MAX_VALUE: int = 9223372036854775807
     _MIN_VALUE: int = 0
-    _DISCORD_EPOCH = 1420070400
+    _DISCORD_EPOCH = 1420070400000
 
     def __init__(self, _):
         super().__init__()
@@ -48,10 +48,7 @@ class Snowflake(int):
 
     @property
     def timestamp(self) -> float:
-        """
-        Milliseconds since Discord Epoch, the first second of 2015 or 1420070400000.
-        """
-        return (self >> 22) / 1000 + self._DISCORD_EPOCH
+        return self >> 22
 
     @property
     def worker_id(self) -> int:
@@ -69,5 +66,5 @@ class Snowflake(int):
         return self % 2048
 
     @property
-    def unix(self) -> int:
-        return self.timestamp + 1420070400000
+    def unix(self) -> float:
+        return self.timestamp + self._DISCORD_EPOCH
