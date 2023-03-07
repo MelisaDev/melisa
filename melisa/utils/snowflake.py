@@ -48,7 +48,10 @@ class Snowflake(int):
 
     @property
     def timestamp(self) -> float:
-        return self >> 22
+        """
+        Timestamp of moment when snowflake was created
+        """
+        return (self >> 22) + self._DISCORD_EPOCH
 
     @property
     def worker_id(self) -> int:
@@ -64,7 +67,3 @@ class Snowflake(int):
     def increment(self) -> int:
         """For every ID that is generated on that process, this number is incremented"""
         return self % 2048
-
-    @property
-    def unix(self) -> float:
-        return self.timestamp + self._DISCORD_EPOCH
